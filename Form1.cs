@@ -8,26 +8,26 @@ namespace DocMgr
     {
         readonly int BUTTON_SPACING = 40;
         readonly Font font = new Font("Calibri", 14, FontStyle.Bold);
-        string? currentFilePath;
+        string? CurrentFilePath;
+        string? ProjectPath;
         bool loadingDoc = false;
 
-        private Doc Root = new Doc("Root");
+        private Doc? Root = new Doc("Root");
         private static Point ButtonListStart { get; } = new Point(10, 80);
         public DocMgr()
         {
             InitializeComponent();
         }
 
-        //string fileName = "DocMgr.json";
         private void DocMgr_Load(object sender, EventArgs e)
         {
-            string? lastProjectPath = GetLastProjectPath();
+            ProjectPath = GetLastProjectPath();
 
             CenterToScreen();
 
-            if (lastProjectPath != null)
+            if (ProjectPath != null)
             {
-                LoadProject(lastProjectPath, out Root);
+                LoadProject(ProjectPath, out Root);
                 MakeButtons(Root.SubDocs);
                 richTextBox.Clear();
 
@@ -103,6 +103,9 @@ namespace DocMgr
 
             RemoveOldButtons();
 
+            if (subDocs == null)
+                return;
+
             foreach(Doc doc in subDocs)
             {
                 // Make configurable button:
@@ -138,22 +141,23 @@ namespace DocMgr
             while (changed);
        }
 
-        private void SelectDocClick(object sender, EventArgs e)
+        private void SelectDocClick(object? sender, EventArgs e)
         {
             loadingDoc = true;
 
             richTextBox.Clear();
             Button but = sender as Button;
             DocName.Text = but.Name + ':';
-            currentFilePath = but.Tag.ToString();
+            CurrentFilePath = but.Tag.ToString();
 
-            if (File.Exists(currentFilePath))
+            if (File.Exists(CurrentFilePath))
             {
-                richTextBox.LoadFile(currentFilePath);
+                richTextBox.LoadFile(CurrentFilePath);
                 buttonSaveDoc.Enabled = false;
+                buttonRemoveDoc.Enabled = ProjectPath != null;
             }
             else
-                MessageBox.Show("File '" + currentFilePath + "' was not found.");
+                MessageBox.Show("File '" + CurrentFilePath + "' was not found.");
 
             richTextBox.Focus();
             loadingDoc = false;
@@ -170,23 +174,25 @@ namespace DocMgr
                 }
 
         }
-        private void LoadProject(string projectPath, out Doc Root)
+        private void LoadProject(string projectPath, out Doc? Root)
         {
             if (File.Exists(projectPath))
             {                               // Load project file:
-                string docList;
-                docList = File.ReadAllText(projectPath);
-
-                try
-                {
-                    Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
-                }
-                catch(Exception ex)
-                {
-                    MessageBox.Show("Problem loading project: " + ex.Message);
+                string? docList = File.ReadAllText(projectPath);
+                if (docList != null)
+                    try
+                    {
+                        Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
+                    }
+                    catch(Exception ex)
+                    {
+                        MessageBox.Show("Problem loading project: " + ex.Message);
+                        Root = new Doc("Root");
+                        return;
+                    }
+                else
                     Root = new Doc("Root");
-                    return;
-                }
+
                 ProjectName.Text = Path.GetFileNameWithoutExtension(projectPath);
             }
             else
@@ -194,7 +200,11 @@ namespace DocMgr
                 MessageBox.Show("Project file '" + projectPath + "' not found.");
                 Root = new Doc("Root");
                 DocName.Text = "";
+                buttonRemoveDoc.Enabled = false;
             }
+
+            buttonRemoveDoc.Enabled = false;
+            CurrentFilePath = null;
         }
 
         private string? GetLastProjectPath()
@@ -212,13 +222,17 @@ namespace DocMgr
 
         private void DocMgr_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (int) Keys.Escape)
+            if (e.KeyChar == (int)Keys.Escape)
                 buttonClose_Click(sender, e);           // User wants to exit.
 
             //richTextBox.Modified = true;
 
             if (DocName.Text.Length == 0)
+            {
                 DocName.Text = "Document";              // Default name for new document.
+                buttonRemoveDoc.Enabled = false;
+            }
+
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -228,13 +242,13 @@ namespace DocMgr
 
         private void buttonLoadProj_Click(object sender, EventArgs e)
         {
-            string? projectPath = SelectProjectFile();
+            ProjectPath = SelectProjectFile();
             buttonSaveDoc.Enabled = false;
             loadingDoc = true;
 
-            if (projectPath != null)
+            if (ProjectPath != null)
             {
-                LoadProject(projectPath, out Root);
+                LoadProject(ProjectPath, out Root);
                 MakeButtons(Root.SubDocs);
                 richTextBox.Clear();
                 DocName.Text = "";
@@ -314,7 +328,10 @@ namespace DocMgr
         {
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = System.Text.Json.JsonSerializer.Serialize(Root, options);
-            File.WriteAllText(GetLastProjectPath(), jsonString);
+            string? path = GetLastProjectPath();
+
+            if (path != null)
+                File.WriteAllText(path, jsonString);
         }
 
         private void AddPathToRoot(string docPath)
@@ -325,9 +342,9 @@ namespace DocMgr
 
         private void buttonSaveDoc_Click(object sender, EventArgs e)
         {
-            if (currentFilePath != null)
+            if (CurrentFilePath != null  &&  DocName.Text.Length > 0)
             {
-                richTextBox.SaveFile(currentFilePath);
+                richTextBox.SaveFile(CurrentFilePath);
 
                 if (DocName.Text[0] == '*')
                     DocName.Text = DocName.Text.Remove(0, 1);
@@ -338,7 +355,24 @@ namespace DocMgr
 
         private void buttonRemoveDoc_Click(object sender, EventArgs e)
         {
+            if (CurrentFilePath == null  ||  ProjectPath == null)
+                return;
 
+            foreach(Doc doc in Root.SubDocs)
+                if (doc.Path == CurrentFilePath)
+                {
+                    richTextBox.Clear();
+                    DocName.Text = "";
+                    buttonRemoveDoc.Enabled = false;
+                    Root.SubDocs.Remove(doc);
+                    MakeButtons(Root.SubDocs);
+                    string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+                    File.WriteAllText(ProjectPath, text);
+                    buttonSaveDoc.Enabled = false;
+                    return;
+                }
+
+            MessageBox.Show("Path " + CurrentFilePath + " not found in documents.");
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)

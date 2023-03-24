@@ -115,6 +115,7 @@
             // 
             // buttonRemoveDoc
             // 
+            this.buttonRemoveDoc.Enabled = false;
             this.buttonRemoveDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonRemoveDoc.Location = new System.Drawing.Point(796, 16);
             this.buttonRemoveDoc.Name = "buttonRemoveDoc";
