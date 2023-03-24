@@ -32,13 +32,12 @@ namespace DocMgr
                 richTextBox.Clear();
 
                 if (Root.SubDocs.Count == 1)
-                    ClickSingleButton();
+                    ClickSingleButton();            // Auto-load the single document.
 
 
             // NEXT STEPS: Need to serialize default font.  Then add button to use font dlg to set default font.
             // (LATER) When new doc created, set font from default font.
             // Get code project font mgr running.
-            // Read/save rtf from control to/from .rtf file.
 
                 // Sets font selected for rich text box:
                 //var fontDlg = new FontDialog();
@@ -62,32 +61,10 @@ namespace DocMgr
                 //doc.SubDocs = new List<Doc>();
                 //doc.SubDocs.Add(doc2);
                 //doc.SubDocs.Add(doc3);
-
-                //var options = new JsonSerializerOptions { WriteIndented = true };
-                //string jsonString = System.Text.Json.JsonSerializer.Serialize(doc, options);
-                //File.WriteAllText(fileName, jsonString);
-
-
-                // Deserializes doc:
-                //string docs;
-                //docs = File.ReadAllText(fileName);
-                //MessageBox.Show(docs);
-                //var docOut = JsonConvert.DeserializeObject(docs);
-
-                // Make configurable button:
-                //Button b = new Button();
-                //b.Text = "&New";
-                //b.Font = new Font("Calibri", 14, FontStyle.Bold);
-                //b.Name = "FirstDoc";
-                //b.Tag = @"C:\Users\alank\Documents\DocMgr\temp large.rtf";
-                //b.Click += SelectDocClick;
-                //b.Location = ButtonListStart;
-                //b.Size = new Size(120, 30);
-                //Controls.Add(b);
             }
         }
 
-        private void ClickSingleButton()
+        private void ClickSingleButton()    // Click the only button with path in Tag member.
         {
             foreach(Control cont in Controls)
                 if (cont is Button  &&  cont.Tag != null)
@@ -97,10 +74,9 @@ namespace DocMgr
                 }    
         }
 
-        private void MakeButtons(List<Doc>? subDocs)
-        {
+        private void MakeButtons(List<Doc>? subDocs)    // Make a button on the left side
+        {                                               // for each of project's documents.
             Point next = ButtonListStart;
-
             RemoveOldButtons();
 
             if (subDocs == null)
@@ -122,8 +98,8 @@ namespace DocMgr
             }
         }
 
-        private void RemoveOldButtons()
-        {
+        private void RemoveOldButtons()     // Remove every document button.
+        {                                   // These are the buttons with non-null Tag.
             bool changed;
 
             do
@@ -141,8 +117,8 @@ namespace DocMgr
             while (changed);
        }
 
-        private void SelectDocClick(object? sender, EventArgs e)
-        {
+        private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
+        {                                                           // clicked to load the document.
             loadingDoc = true;
 
             richTextBox.Clear();
@@ -163,7 +139,7 @@ namespace DocMgr
             loadingDoc = false;
         }
 
-        private void ClickButtonWithName(string buttonName)
+        private void ClickButtonWithName(string buttonName)     // Load the document with that name.
         {
             foreach (Control cont in Controls)
                 if (cont is Button && cont.Name == buttonName)
@@ -225,8 +201,6 @@ namespace DocMgr
             if (e.KeyChar == (int)Keys.Escape)
                 buttonClose_Click(sender, e);           // User wants to exit.
 
-            //richTextBox.Modified = true;
-
             if (DocName.Text.Length == 0)
             {
                 DocName.Text = "Document";              // Default name for new document.
@@ -274,7 +248,7 @@ namespace DocMgr
             return projectPath;
         }
 
-        private string? SelectFile(string filter)
+        private string? SelectFile(string filter)           // Used to select project & document files.
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -293,8 +267,8 @@ namespace DocMgr
             }
         }
 
-        private void buttonLoadDoc_Click(object sender, EventArgs e)
-        {
+        private void buttonLoadDoc_Click(object sender, EventArgs e)        // Add & load an existing .rtf
+        {                                                                   // file into the current project.
             string? docPath = SelectFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
             loadingDoc = true;
 
@@ -334,7 +308,7 @@ namespace DocMgr
                 File.WriteAllText(path, jsonString);
         }
 
-        private void AddPathToRoot(string docPath)
+        private void AddPathToRoot(string docPath)          // Add the given document to the current project.
         {
             string name = Path.GetFileNameWithoutExtension(docPath);
             Root.SubDocs.Add(new Doc(name, docPath));
@@ -353,8 +327,8 @@ namespace DocMgr
             buttonSaveDoc.Enabled = false;
         }
 
-        private void buttonRemoveDoc_Click(object sender, EventArgs e)
-        {
+        private void buttonRemoveDoc_Click(object sender, EventArgs e)      // Just removes from project.
+        {                                                                   // .rtf file is untouched.
             if (CurrentFilePath == null  ||  ProjectPath == null)
                 return;
 
