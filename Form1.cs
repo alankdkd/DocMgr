@@ -31,13 +31,16 @@ namespace DocMgr
                 MakeButtons(Root.SubDocs);
                 richTextBox.Clear();
 
+                if (Root.SubDocs == null)
+                    Root.SubDocs = new List<Doc>();
+
                 if (Root.SubDocs.Count == 1)
                     ClickSingleButton();            // Auto-load the single document.
 
 
-            // NEXT STEPS: Need to serialize default font.  Then add button to use font dlg to set default font.
-            // (LATER) When new doc created, set font from default font.
-            // Get code project font mgr running.
+                // NEXT STEPS: Need to serialize default font.  Then add button to use font dlg to set default font.
+                // (LATER) When new doc created, set font from default font.
+                // Get code project font mgr running.
 
                 // Sets font selected for rich text box:
                 //var fontDlg = new FontDialog();
@@ -66,12 +69,12 @@ namespace DocMgr
 
         private void ClickSingleButton()    // Click the only button with path in Tag member.
         {
-            foreach(Control cont in Controls)
-                if (cont is Button  &&  cont.Tag != null)
+            foreach (Control cont in Controls)
+                if (cont is Button && cont.Tag != null)
                 {
                     SelectDocClick(cont, new EventArgs());
                     return;
-                }    
+                }
         }
 
         private void MakeButtons(List<Doc>? subDocs)    // Make a button on the left side
@@ -82,14 +85,14 @@ namespace DocMgr
             if (subDocs == null)
                 return;
 
-            foreach(Doc doc in subDocs)
+            foreach (Doc doc in subDocs)
             {
                 // Make configurable button:
                 Button b = new Button();
                 b.Text = "&" + doc.DocName;
                 b.Font = font;
                 b.Name = doc.DocName;
-                b.Tag = doc.Path;
+                b.Tag = doc.DocPath;
                 b.Click += SelectDocClick;
                 b.Location = next;
                 next.Y += BUTTON_SPACING;
@@ -115,7 +118,7 @@ namespace DocMgr
                     }
             }
             while (changed);
-       }
+        }
 
         private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
         {                                                           // clicked to load the document.
@@ -133,7 +136,10 @@ namespace DocMgr
                 buttonRemoveDoc.Enabled = ProjectPath != null;
             }
             else
+            {
                 MessageBox.Show("File '" + CurrentFilePath + "' was not found.");
+                buttonRemoveDoc.Enabled = true;
+            }
 
             richTextBox.Focus();
             loadingDoc = false;
@@ -160,7 +166,7 @@ namespace DocMgr
                     {
                         Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         MessageBox.Show("Problem loading project: " + ex.Message);
                         Root = new Doc("Root");
@@ -183,12 +189,18 @@ namespace DocMgr
             CurrentFilePath = null;
         }
 
+        private void SaveProject(string projectPath, Doc? root)
+        {
+            string stringDoc = System.Text.Json.JsonSerializer.Serialize(root);
+            File.WriteAllText(projectPath, stringDoc);
+        }
+
         private string? GetLastProjectPath()
         {
             RegistryKey? key = Registry.CurrentUser.CreateSubKey(@"Software\PatternScope Systems\DocMgr");
             object? obj = key.GetValue("LastProjectPath");
 
-            return (obj == null)  ?  null  :  obj.ToString();
+            return (obj == null) ? null : obj.ToString();
         }
 
         private void buttonClose_Click(object sender, EventArgs e)
@@ -200,6 +212,9 @@ namespace DocMgr
         {
             if (e.KeyChar == (int)Keys.Escape)
                 buttonClose_Click(sender, e);           // User wants to exit.
+
+            if (e.KeyChar == 19)                        // Ctrl-S.  Civilized way to do this not apparent.
+                buttonSaveDoc_Click(sender, e);         // Save document.
 
             if (DocName.Text.Length == 0)
             {
@@ -278,7 +293,7 @@ namespace DocMgr
 
                 if (!DocAlreadyInProject(docName))
                 {
-                    AddPathToRoot(docPath);
+                    Root.AddDoc(docPath);
                     WriteUpdatedPath();
                     MakeButtons(Root.SubDocs);
                 }
@@ -308,32 +323,38 @@ namespace DocMgr
                 File.WriteAllText(path, jsonString);
         }
 
-        private void AddPathToRoot(string docPath)          // Add the given document to the current project.
-        {
-            string name = Path.GetFileNameWithoutExtension(docPath);
-            Root.SubDocs.Add(new Doc(name, docPath));
-        }
+        //private void AddPathToRoot(string docPath)          // Add the given document to the current project.
+        //{
+        //    string name = Path.GetFileNameWithoutExtension(docPath);
+        //    Root.SubDocs.Add(new Doc(name, docPath));
+        //}
 
         private void buttonSaveDoc_Click(object sender, EventArgs e)
         {
-            if (CurrentFilePath != null  &&  DocName.Text.Length > 0)
+            if (CurrentFilePath != null && DocName.Text.Length > 0)
             {
+                // DOESN'T WORK FOR EMPTY DOC:
                 richTextBox.SaveFile(CurrentFilePath);
+                // DFW: File.WriteAllText(CurrentFilePath, richTextBox.Rtf);
+                //Root = new Doc("Root");
+                //string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+                //File.WriteAllText(CurrentFilePath, text);
 
                 if (DocName.Text[0] == '*')
-                    DocName.Text = DocName.Text.Remove(0, 1);
+                    DocName.Text = DocName.Text.Remove(0, 2);
             }
 
             buttonSaveDoc.Enabled = false;
+            richTextBox.Focus();
         }
 
         private void buttonRemoveDoc_Click(object sender, EventArgs e)      // Just removes from project.
         {                                                                   // .rtf file is untouched.
-            if (CurrentFilePath == null  ||  ProjectPath == null)
+            if (CurrentFilePath == null || ProjectPath == null)
                 return;
 
-            foreach(Doc doc in Root.SubDocs)
-                if (doc.Path == CurrentFilePath)
+            foreach (Doc doc in Root.SubDocs)
+                if (doc.DocPath == CurrentFilePath)
                 {
                     richTextBox.Clear();
                     DocName.Text = "";
@@ -355,9 +376,33 @@ namespace DocMgr
             {
                 buttonSaveDoc.Enabled = true;
 
-                if (DocName.Text[0] != '*')         // Indicate docuement modified:
+                if (DocName.Text[0] != '*')         // Indicate document modified:
                     DocName.Text = DocName.Text.Insert(0, "* ");
             }
+        }
+
+        private void ButtonNewDoc_Click(object sender, EventArgs e)
+        {
+            FormCreateDoc fcd = new FormCreateDoc();
+
+            var tmp = fcd.ShowDialog();
+
+            bool success = fcd.labelPath.Text.Length > 0 && fcd.textBoxDocName.Text.Length > 0;
+
+            if (success == true  &&  Root != null)
+            {
+                CurrentFilePath = fcd.labelPath.Text;
+                Root.AddDoc(fcd.labelPath.Text, fcd.textBoxDocName.Text);
+                MakeButtons(Root.SubDocs);
+                buttonSaveDoc.Enabled = true;
+                SaveProject(ProjectPath, Root);
+                richTextBox.Focus();
+            }
+        }
+
+        private void ButtonNewProj_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
