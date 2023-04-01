@@ -9,7 +9,7 @@ namespace DocMgr
         readonly int BUTTON_SPACING = 40;
         readonly Font font = new Font("Calibri", 14, FontStyle.Bold);
         string? CurrentFilePath;
-        string? ProjectPath;
+        string? ProjectPath, lastDocName;
         bool loadingDoc = false;
 
         private Doc? Root = new Doc("Root");
@@ -110,7 +110,8 @@ namespace DocMgr
                 changed = false;
 
                 foreach (Control cont in Controls)
-                    if (cont is Button && (cont as Button).Tag != null)
+                    if (cont is Button && ((cont as Button).Tag != null  ||
+                        (lastDocName != null && (cont as Button).Name != null  && (cont as Button).Name == lastDocName)))
                     {
                         Controls.Remove(cont as Button);
                         changed = true;
@@ -127,20 +128,24 @@ namespace DocMgr
             richTextBox.Clear();
             Button but = sender as Button;
             DocName.Text = but.Name + ':';
-            CurrentFilePath = but.Tag.ToString();
 
-            if (File.Exists(CurrentFilePath))
+            if (but.Tag != null)
             {
-                richTextBox.LoadFile(CurrentFilePath);
-                buttonSaveDoc.Enabled = false;
-                buttonRemoveDoc.Enabled = ProjectPath != null;
+                CurrentFilePath = but.Tag.ToString();
+
+                if (File.Exists(CurrentFilePath))
+                {
+                    richTextBox.LoadFile(CurrentFilePath);
+                    buttonSaveDoc.Enabled = false;
+                    buttonRemoveDoc.Enabled = ProjectPath != null;
+                }
+                else
+                    MessageBox.Show("File '" + CurrentFilePath + "' was not found.");
             }
             else
-            {
-                MessageBox.Show("File '" + CurrentFilePath + "' was not found.");
-                buttonRemoveDoc.Enabled = true;
-            }
+                MessageBox.Show("Can't select document.");
 
+            buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
             loadingDoc = false;
         }
@@ -323,12 +328,6 @@ namespace DocMgr
                 File.WriteAllText(path, jsonString);
         }
 
-        //private void AddPathToRoot(string docPath)          // Add the given document to the current project.
-        //{
-        //    string name = Path.GetFileNameWithoutExtension(docPath);
-        //    Root.SubDocs.Add(new Doc(name, docPath));
-        //}
-
         private void buttonSaveDoc_Click(object sender, EventArgs e)
         {
             if (CurrentFilePath != null && DocName.Text.Length > 0)
@@ -350,23 +349,32 @@ namespace DocMgr
 
         private void buttonRemoveDoc_Click(object sender, EventArgs e)      // Just removes from project.
         {                                                                   // .rtf file is untouched.
-            if (CurrentFilePath == null || ProjectPath == null)
+            if (DocName.Text == null || DocName.Text.Length == 0 || ProjectPath == null  ||  Root == null)
                 return;
 
+            lastDocName = DocName.Text;
+
+            if (lastDocName[0] == '*')
+                lastDocName = lastDocName.Remove(0, 2);
+
+            if (lastDocName.EndsWith(':'))
+                lastDocName = lastDocName.Remove(lastDocName.Length - 1, 1);
+
             foreach (Doc doc in Root.SubDocs)
-                if (doc.DocPath == CurrentFilePath)
+                if (doc.DocName == lastDocName)
                 {
                     richTextBox.Clear();
-                    DocName.Text = "";
                     buttonRemoveDoc.Enabled = false;
                     Root.SubDocs.Remove(doc);
                     MakeButtons(Root.SubDocs);
                     string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
                     File.WriteAllText(ProjectPath, text);
+                    DocName.Text = "";
                     buttonSaveDoc.Enabled = false;
                     return;
                 }
 
+            lastDocName = null;
             MessageBox.Show("Path " + CurrentFilePath + " not found in documents.");
         }
 
@@ -402,7 +410,22 @@ namespace DocMgr
 
         private void ButtonNewProj_Click(object sender, EventArgs e)
         {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Filter = "rtf files (*.json)|*.json|All files (*.*)|*.*";
+                ofd.CheckFileExists = false;
+                ofd.CheckPathExists = false;
 
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    CurrentFilePath = ofd.FileName;
+                    Root = new Doc("Root");
+                    SaveProject(CurrentFilePath, Root);
+                    richTextBox.Clear();
+                    ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                    MakeButtons(Root.SubDocs);
+                }
+            }
         }
     }
 }
