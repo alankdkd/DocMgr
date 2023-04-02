@@ -404,6 +404,9 @@ namespace DocMgr
                 MakeButtons(Root.SubDocs);
                 buttonSaveDoc.Enabled = true;
                 SaveProject(ProjectPath, Root);
+                DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                richTextBox.Clear();
+                richTextBox.Font = font;
                 richTextBox.Focus();
             }
         }
@@ -412,7 +415,7 @@ namespace DocMgr
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Filter = "rtf files (*.json)|*.json|All files (*.*)|*.*";
+                ofd.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
                 ofd.CheckFileExists = false;
                 ofd.CheckPathExists = false;
 
