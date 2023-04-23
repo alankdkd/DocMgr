@@ -11,6 +11,10 @@ namespace DocMgr
 {
     public class Doc
     {
+        public string? DocName { get; set; }
+        public string? DocPath { get; set; }
+        public List<Doc> SubDocs { get; set; }
+
         public Doc(string? docName, string? path = null)
         {
             DocName = docName;
@@ -32,9 +36,5 @@ namespace DocMgr
 
             SubDocs.Add(new Doc(name, docPath));
         }
-           
-        public string? DocName { get; set; }
-        public string? DocPath { get; set; }
-        public List<Doc> SubDocs { get; set; }
     }
 }

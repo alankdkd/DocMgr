@@ -136,6 +136,8 @@ namespace DocMgr
                 if (File.Exists(CurrentFilePath))
                 {
                     richTextBox.LoadFile(CurrentFilePath);
+                    //richTextBox.ScrollToCaret();
+                    //richTextBox.AutoScrollOffset = new Point(300, 300);
                     buttonSaveDoc.Enabled = false;
                     buttonRemoveDoc.Enabled = ProjectPath != null;
                 }
@@ -144,6 +146,9 @@ namespace DocMgr
             }
             else
                 MessageBox.Show("Can't select document.");
+
+            if (richTextBox.Text.Length == 0)
+                richTextBox.Font = font;
 
             buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
@@ -166,10 +171,13 @@ namespace DocMgr
             if (File.Exists(projectPath))
             {                               // Load project file:
                 string? docList = File.ReadAllText(projectPath);
+                ProjectName.Text = Path.GetFileNameWithoutExtension(projectPath);
+
                 if (docList != null)
                     try
                     {
                         Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
+                        LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
                     }
                     catch (Exception ex)
                     {
@@ -179,8 +187,6 @@ namespace DocMgr
                     }
                 else
                     Root = new Doc("Root");
-
-                ProjectName.Text = Path.GetFileNameWithoutExtension(projectPath);
             }
             else
             {                               // File not found:
@@ -198,14 +204,6 @@ namespace DocMgr
         {
             string stringDoc = System.Text.Json.JsonSerializer.Serialize(root);
             File.WriteAllText(projectPath, stringDoc);
-        }
-
-        private string? GetLastProjectPath()
-        {
-            RegistryKey? key = Registry.CurrentUser.CreateSubKey(@"Software\PatternScope Systems\DocMgr");
-            object? obj = key.GetValue("LastProjectPath");
-
-            return (obj == null) ? null : obj.ToString();
         }
 
         private void buttonClose_Click(object sender, EventArgs e)
@@ -256,20 +254,28 @@ namespace DocMgr
 
         private string? SelectProjectFile()
         {
-            string? projectPath = SelectFile("json files (*.json)|*.json|All files (*.*)|*.*");
-            RegistryKey? key;
+            string? projectPath = null;
+            LoadProjectDlg dlg = new LoadProjectDlg();
+            DialogResult dr = dlg.ShowDialog();
 
-            if (projectPath != null)
-            {                                               // Project file selected:
-                key = Registry.CurrentUser.CreateSubKey(@"Software\PatternScope Systems\DocMgr");
-                key.SetValue("LastProjectPath", projectPath.ToString());
-            }
-
+            if (dr == DialogResult.OK)
+                projectPath = dlg.selectedPath;
+            
             return projectPath;
         }
 
-        private string? SelectFile(string filter)           // Used to select project & document files.
+        public static string? GetLastProjectPath()
         {
+            RegistryKey? key = Registry.CurrentUser.CreateSubKey(
+                @"Software\PatternScope Systems\DocMgr",
+                RegistryKeyPermissionCheck.ReadWriteSubTree);
+            object? obj = key.GetValue("LastProjectPath");
+
+            return (obj == null) ? null : obj.ToString();
+        }
+
+        public static string? SelectFile(string filter)           // General method to select a file.
+        {                                                   // Used to select project & document files.
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 string? path = GetLastProjectPath();        // From Registry.
@@ -426,9 +432,15 @@ namespace DocMgr
                     SaveProject(CurrentFilePath, Root);
                     richTextBox.Clear();
                     ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                    DocName.Text = "";
                     MakeButtons(Root.SubDocs);
                 }
             }
         }
+
+        //public static void CenterCursorInButton(this Button but)
+        //{
+        //    Cursor.Position = new Point(but.Left + but.Width / 2, but.Top + but.Height / 2);
+        //}
     }
 }

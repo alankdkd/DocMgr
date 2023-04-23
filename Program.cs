@@ -13,5 +13,12 @@ namespace DocMgr
             ApplicationConfiguration.Initialize();
             Application.Run(new DocMgr());
         }
+
+        public static void CenterCursorInButton(this Button but)
+        {
+            Point loc = but.PointToScreen(Point.Empty);
+            Cursor.Position = new Point(loc.X + but.Left + but.Width / 2, loc.Y + but.Top + but.Height / 2);
+
+        }
     }
 }
