@@ -294,7 +294,11 @@ namespace DocMgr
 
         private void buttonClose_Click(object sender, EventArgs e)
         {
-            buttonSaveDoc_Click(null, null);            // In case changes not saved.
+            if (DocName.Text.StartsWith('*'))
+                if (MessageBox.Show("Save changes before closing?", "Closing",
+                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    buttonSaveDoc_Click(null, null);    // Save changes.
+
             Close();
         }
 
