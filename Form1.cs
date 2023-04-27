@@ -61,16 +61,15 @@ namespace DocMgr
 
         private void HandleScroll()
         {
-            int nPos = GetScrollPosition();
+            Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
-            foreach (var doc in Root.SubDocs)
-                if (doc.DocName + ':' == DocName.Text)
-                {
-                    doc.ScrollPos = nPos;
-                    string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
-                    File.WriteAllText(ProjectPath, text);
-                    return;
-                }
+            if (doc != null)
+            {
+                doc.ScrollPos = GetScrollPosition();
+                string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+                File.WriteAllText(ProjectPath, text);
+                return;
+            }
         }
 
         private int GetScrollPosition()
@@ -192,6 +191,7 @@ namespace DocMgr
 
         private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
         {                                                           // clicked to load the document.
+            buttonSaveDoc_Click(null, null);                        // In case changes not saved.
             loadingDoc = true;
 
             richTextBox.Clear();
@@ -205,7 +205,6 @@ namespace DocMgr
                 if (File.Exists(CurrentFilePath))
                 {
                     richTextBox.LoadFile(CurrentFilePath);
-                    //richTextBox.AutoScrollOffset = new Point(100, 100);
                     ScrollToDocPosition(but.Name);
                     buttonSaveDoc.Enabled = false;
                     buttonRemoveDoc.Enabled = ProjectPath != null;
@@ -224,14 +223,21 @@ namespace DocMgr
             loadingDoc = false;
         }
 
-        private void ScrollToDocPosition(string name)
+        Doc? FindDocByName(string name)
         {
             foreach (var doc in Root.SubDocs)
                 if (doc.DocName == name)
-                {
-                    SetScrollPosition(doc.ScrollPos);
-                    return;
-                }
+                    return doc;
+
+            return null;
+        }
+
+        private void ScrollToDocPosition(string name)
+        {
+            Doc? doc = FindDocByName(name);
+
+            if (doc != null)
+                SetScrollPosition(doc.ScrollPos);
         }
 
         private void ClickButtonWithName(string buttonName)     // Load the document with that name.
@@ -245,6 +251,7 @@ namespace DocMgr
                 }
 
         }
+
         private void LoadProject(string projectPath, out Doc? Root)
         {
             if (File.Exists(projectPath))
@@ -287,6 +294,7 @@ namespace DocMgr
 
         private void buttonClose_Click(object sender, EventArgs e)
         {
+            buttonSaveDoc_Click(null, null);            // In case changes not saved.
             Close();
         }
 
@@ -303,7 +311,6 @@ namespace DocMgr
                 DocName.Text = "Document";              // Default name for new document.
                 buttonRemoveDoc.Enabled = false;
             }
-
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -313,6 +320,7 @@ namespace DocMgr
 
         private void buttonLoadProj_Click(object sender, EventArgs e)
         {
+            buttonSaveDoc_Click(null, null);            // In case changes not saved.
             ProjectPath = SelectProjectFile();
             buttonSaveDoc.Enabled = false;
             loadingDoc = true;
@@ -374,6 +382,7 @@ namespace DocMgr
 
         private void buttonLoadDoc_Click(object sender, EventArgs e)        // Add & load an existing .rtf
         {                                                                   // file into the current project.
+            buttonSaveDoc_Click(null, null);                                // In case changes not saved.
             string? docPath = SelectFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
             loadingDoc = true;
 
