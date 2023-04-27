@@ -13,12 +13,14 @@ namespace DocMgr
     {
         public string? DocName { get; set; }
         public string? DocPath { get; set; }
+        public int ScrollPos { get; set; }
         public List<Doc> SubDocs { get; set; }
 
         public Doc(string? docName, string? path = null)
         {
             DocName = docName;
             DocPath = path;
+            ScrollPos = 0;
             SubDocs = new List<Doc>();
         }
 
@@ -26,6 +28,7 @@ namespace DocMgr
         {
             DocName = null;
             DocPath = null;
+            ScrollPos = 0;
             SubDocs = new List<Doc>();
         }
 

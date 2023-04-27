@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Win32;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace DocMgr
 {
@@ -17,6 +19,73 @@ namespace DocMgr
         public DocMgr()
         {
             InitializeComponent();
+            richTextBox.VScroll += (s, e) => {
+                HandleScroll();
+            };
+            richTextBox.MouseWheel += (s, e) => {
+                HandleScroll();
+            };
+        }
+
+        public enum ScrollBarType : uint
+        {
+            SbHorz = 0,
+            SbVert = 1,
+            SbCtl = 2,
+            SbBoth = 3
+        }
+
+        public enum Message : uint
+        {
+            WM_VSCROLL = 0x0115
+        }
+
+        public enum ScrollBarCommands : uint
+        {
+            SB_THUMBPOSITION = 4
+        }// Scroll definitions.
+        [DllImport("User32.dll")]
+        public extern static int GetScrollPos(IntPtr hWnd, int nBar);
+
+        [DllImport("User32.dll")]
+        public extern static int SetScrollPos(IntPtr hWnd, int nBar, int nPos, Boolean bRedraw);
+
+        [DllImport("User32.dll")]
+        public extern static int SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll")]
+        public extern static int GetLastError();
+
+        [DllImport("user32.dll")]
+        static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);// DllImports.
+
+        private void HandleScroll()
+        {
+            int nPos = GetScrollPosition();
+
+            foreach (var doc in Root.SubDocs)
+                if (doc.DocName + ':' == DocName.Text)
+                {
+                    doc.ScrollPos = nPos;
+                    string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+                    File.WriteAllText(ProjectPath, text);
+                    return;
+                }
+        }
+
+        private int GetScrollPosition()
+        {
+            return GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
+        }
+
+        private bool SetScrollPosition(int nPos)
+        {
+            return PostMessage(richTextBox.Handle, (int)Message.WM_VSCROLL,
+                (IntPtr)((int)ScrollBarCommands.SB_THUMBPOSITION + 0x10000 * nPos), (IntPtr)0);
+        }
+
+        private void ButtonSaveAs_Click(object sender, EventArgs e)
+        {
         }
 
         private void DocMgr_Load(object sender, EventArgs e)
@@ -136,8 +205,8 @@ namespace DocMgr
                 if (File.Exists(CurrentFilePath))
                 {
                     richTextBox.LoadFile(CurrentFilePath);
-                    //richTextBox.ScrollToCaret();
-                    //richTextBox.AutoScrollOffset = new Point(300, 300);
+                    //richTextBox.AutoScrollOffset = new Point(100, 100);
+                    ScrollToDocPosition(but.Name);
                     buttonSaveDoc.Enabled = false;
                     buttonRemoveDoc.Enabled = ProjectPath != null;
                 }
@@ -153,6 +222,16 @@ namespace DocMgr
             buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
             loadingDoc = false;
+        }
+
+        private void ScrollToDocPosition(string name)
+        {
+            foreach (var doc in Root.SubDocs)
+                if (doc.DocName == name)
+                {
+                    SetScrollPosition(doc.ScrollPos);
+                    return;
+                }
         }
 
         private void ClickButtonWithName(string buttonName)     // Load the document with that name.

@@ -181,6 +181,7 @@
             this.ButtonSaveAs.TabIndex = 13;
             this.ButtonSaveAs.Text = "Save &As...";
             this.ButtonSaveAs.UseVisualStyleBackColor = true;
+            this.ButtonSaveAs.Click += new System.EventHandler(this.ButtonSaveAs_Click);
             // 
             // DocMgr
             // 
