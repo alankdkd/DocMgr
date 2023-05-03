@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Win32;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DocMgr
 {
@@ -64,7 +65,7 @@ namespace DocMgr
             Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
             if (doc != null)
-            {
+            {                                   // Save new scroll position in project:
                 doc.ScrollPos = GetScrollPosition();
                 string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
                 File.WriteAllText(ProjectPath, text);
@@ -365,7 +366,7 @@ namespace DocMgr
             return (obj == null) ? null : obj.ToString();
         }
 
-        public static string? SelectFile(string filter)           // General method to select a file.
+        public static string? SelectFile(string filter)     // General method to select a file.
         {                                                   // Used to select project & document files.
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -508,6 +509,120 @@ namespace DocMgr
                 richTextBox.Focus();
             }
         }
+
+        private void buttonInsertList_Click(object sender, EventArgs e)
+        {
+            string text = richTextBox.SelectedText.Trim();            // Get selected lines to number.
+            int numLines = CountChar(text, '\n') + 1;                 // Count # of lines: /n count plus 1.
+            string rtfText = ReplaceNewLinesWithParagraphEnd(text);   // Convert selected lines to RTF format.
+            int pos = richTextBox.Rtf.IndexOf(rtfText);               // Find position of lines in RTF text.
+
+            if (pos == -1)
+            {
+                MessageBox.Show("List not found.");
+                return;
+            }
+
+            //MessageBox.Show("Index = " + pos + ".  # lines = " + numLines);
+
+            int lineNum = 0;
+            StringBuilder numberedList = new StringBuilder(
+                @"{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}" + "\n");
+
+            foreach (string line in GetLines(text))
+                if (++lineNum == 1)
+                    numberedList.Append($@"\fi-360\li720\sa200\sl276\slmult1\f0\fs22\lang9 {line}\par" + "\n");
+                else
+                    numberedList.Append(@"{\pntext\f0 " + lineNum.ToString() + @".\tab}" +
+                        line + @"\par" + "\n");
+
+            numberedList.Append(@"\pard\sa200\sl276\slmult1\par");
+
+            string replacementText = numberedList.ToString();
+            File.WriteAllText("out.txt", replacementText);
+            richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, replacementText);
+            //richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, "XXX");
+            //MessageBox.Show(line);
+
+            //int charCount = CountCharsInLines(richTextBox.Rtf, numLines);
+            //richTextBox.Rtf = richTextBox.Rtf.Replace()
+        }
+
+        private IEnumerable<string> GetLines(string text)
+        {
+            int pos = 0, len = text.Length, endPos;
+            string nextLine;
+
+            while (pos < len)
+            {
+                endPos = text.IndexOf("\n", pos);
+
+                if (endPos == -1)
+                {
+                    nextLine = text.Substring(pos);
+                    pos = len;
+                }
+                else
+                {
+                    nextLine = text.Substring(pos, endPos - pos);
+                    pos = endPos + 1;
+                }
+
+                yield return nextLine;
+            }
+        }
+
+        private string ReplaceNewLinesWithParagraphEnd(string v)
+        {
+            StringBuilder sb = new StringBuilder(v);
+
+            sb.Replace("\n", "\\par\r\n");  // This is how RTF ends paragraphs:
+            sb.Append("\\par\r\n");
+            return sb.ToString();
+        }
+
+        private int CountChar(string text, char v)
+        {
+            int count = 0;
+
+            foreach (char c in text)
+                if (c == v)
+                    ++count;
+
+            return count;
+        }
+
+
+        /***
+        private void WriteTextToRichTextBox()
+        {
+           // Clear all text from the RichTextBox;
+           //richTextBox.Clear();
+           // Set the font for the opening text to a larger Arial font;
+           richTextBox.SelectionFont = new Font("Arial", 16);
+           // Assign the introduction text to the RichTextBox control.
+           richTextBox.SelectedText = "The following is a list of bulleted items:" + "\n";
+           // Set the Font for the first item to a smaller size Arial font.
+           richTextBox.SelectionFont = new Font("Arial", 12);
+           // Specify that the following items are to be added to a bulleted list.
+           richTextBox.SelectionBullet = true;
+           // Set the color of the item text.
+           richTextBox.SelectionColor = Color.Red;
+           // Assign the text to the bulleted item.
+           richTextBox.SelectedText = "Apples" + "\n";
+           // Apply same font since font settings do not carry to next line.
+           richTextBox.SelectionFont = new Font("Arial", 12);
+           richTextBox.SelectionColor = Color.Orange;
+           richTextBox.SelectedText = "Oranges" + "\n";
+           richTextBox.SelectionFont = new Font("Arial", 12);
+           richTextBox.SelectionColor = Color.Purple;
+           richTextBox.SelectedText = "Grapes" + "\n";
+           // End the bulleted list.
+           richTextBox.SelectionBullet = false;
+           // Specify the font size and string for text displayed below bulleted list.
+           richTextBox.SelectionFont = new Font("Arial", 16);
+           richTextBox.SelectedText = "Bulleted Text Complete!";
+        } ***/
 
         private void ButtonNewProj_Click(object sender, EventArgs e)
         {
