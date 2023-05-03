@@ -531,21 +531,16 @@ namespace DocMgr
 
             foreach (string line in GetLines(text))
                 if (++lineNum == 1)
-                    numberedList.Append($@"\fi-360\li720\sa200\sl276\slmult1\f0\fs22\lang9 {line}\par" + "\n");
+                    numberedList.Append($@"\fi-360\li720\sl276\slmult1\f0\lang9 {line}\par");
                 else
                     numberedList.Append(@"{\pntext\f0 " + lineNum.ToString() + @".\tab}" +
-                        line + @"\par" + "\n");
+                        line + @"\par");
 
-            numberedList.Append(@"\pard\sa200\sl276\slmult1\par");
+            numberedList.Append(@"\pard");
 
             string replacementText = numberedList.ToString();
             File.WriteAllText("out.txt", replacementText);
             richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, replacementText);
-            //richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, "XXX");
-            //MessageBox.Show(line);
-
-            //int charCount = CountCharsInLines(richTextBox.Rtf, numLines);
-            //richTextBox.Rtf = richTextBox.Rtf.Replace()
         }
 
         private IEnumerable<string> GetLines(string text)
