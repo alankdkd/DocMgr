@@ -487,8 +487,8 @@ namespace DocMgr
             if (!loadingDoc)
             {
                 buttonSaveDoc.Enabled = true;
-
-                if (DocName.Text[0] != '*')         // Indicate document modified:
+                                                        // Indicate document modified:
+                if (DocName.Text.Length > 0  &&  DocName.Text[0] != '*') 
                     DocName.Text = DocName.Text.Insert(0, "* ");
             }
         }
