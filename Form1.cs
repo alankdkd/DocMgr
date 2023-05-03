@@ -333,6 +333,11 @@ namespace DocMgr
             if (ProjectPath != null)
             {
                 LoadProject(ProjectPath, out Root);
+                RegistryKey? key = Registry.CurrentUser.CreateSubKey(
+                    @"Software\PatternScope Systems\DocMgr",
+                    RegistryKeyPermissionCheck.ReadWriteSubTree);
+                key.SetValue("LastProjectPath", ProjectPath);
+
                 MakeButtons(Root.SubDocs);
                 richTextBox.Clear();
                 DocName.Text = "";
