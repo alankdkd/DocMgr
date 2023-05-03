@@ -108,6 +108,7 @@
             // 
             // buttonLoadDoc
             // 
+            this.buttonLoadDoc.Enabled = false;
             this.buttonLoadDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonLoadDoc.Location = new System.Drawing.Point(360, 16);
             this.buttonLoadDoc.Name = "buttonLoadDoc";

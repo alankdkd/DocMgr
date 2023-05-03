@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-X
+
 namespace DocMgr
 {
     public partial class FormCreateDoc : Form

@@ -64,7 +64,7 @@ namespace DocMgr
         {
             Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
-            if (doc != null)
+            if (doc != null  && ProjectPath != null)
             {                                   // Save new scroll position in project:
                 doc.ScrollPos = GetScrollPosition();
                 string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
@@ -264,7 +264,8 @@ namespace DocMgr
                     try
                     {
                         Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
-                        LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
+                        buttonLoadDoc.Enabled = true;
+                        //LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
                     }
                     catch (Exception ex)
                     {
@@ -457,6 +458,7 @@ namespace DocMgr
                 return;
 
             lastDocName = DocName.Text;
+            richTextBox.Clear();
 
             if (lastDocName[0] == '*')
                 lastDocName = lastDocName.Remove(0, 2);
@@ -467,7 +469,7 @@ namespace DocMgr
             foreach (Doc doc in Root.SubDocs)
                 if (doc.DocName == lastDocName)
                 {
-                    richTextBox.Clear();
+                    //richTextBox.Clear();
                     buttonRemoveDoc.Enabled = false;
                     Root.SubDocs.Remove(doc);
                     MakeButtons(Root.SubDocs);
@@ -641,6 +643,8 @@ namespace DocMgr
                     ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
                     DocName.Text = "";
                     MakeButtons(Root.SubDocs);
+                    buttonLoadDoc.Enabled = true;
+                    LoadProjectDlg.AddProject(ProjectName.Text, CurrentFilePath);
                 }
             }
         }
