@@ -16,16 +16,31 @@ namespace DocMgr
         bool loadingDoc = false;
 
         private Doc? Root = new Doc("Root");
-        private static Point ButtonListStart { get; } = new Point(10, 80);
+        private static Point ButtonListStart { get; set; } = new Point(10, 80);
         public DocMgr()
         {
             InitializeComponent();
+            ArrangeLayout();
             richTextBox.VScroll += (s, e) => {
                 HandleScroll();
             };
             richTextBox.MouseWheel += (s, e) => {
                 HandleScroll();
             };
+        }
+
+        private void ArrangeLayout()
+        {
+            Point newStart = ButtonListStart;
+            newStart.Y = label2.Location.Y
+                + label2.Height + 5;
+            ButtonListStart = newStart;
+
+            /*** To do: 1. Adjust button widths according to name lengths,
+             *   2. Adjust text box X position according to button widths,
+             *   3. Adjust doc & project names according to text box position,
+             *   4. Adjust control buttons on right edge according to text box.
+             ***/
         }
 
         public enum ScrollBarType : uint
