@@ -73,6 +73,9 @@ namespace DocMgr
         }
         public static void AddProject(string name, string path)
         {
+            if (ProjectAlreadyThere(name))
+                return;
+
             int numProjects = GetNumProjects();
             string projIndex = "Project" + numProjects++;
 
@@ -89,6 +92,31 @@ namespace DocMgr
                    RegistryKeyPermissionCheck.ReadWriteSubTree);
                 key.SetValue("NumProjects", numProjects);
             }
+        }
+
+        private static bool ProjectAlreadyThere(string name)
+        {
+            int numProjects = GetNumProjects();
+
+            for (int i = 0; i < numProjects; ++i)
+                if (GetProjectName(i) == name)
+                    return true;                // Project already there.
+
+            return false;
+        }
+
+        private static string GetProjectName(int i)
+        {
+            string projIndex = "Project" + i;
+
+            RegistryKey? key = Registry.CurrentUser.OpenSubKey(
+                @"Software\PatternScope Systems\DocMgr\" + projIndex,
+                RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+            if (key == null)
+                return "";
+
+            return key.GetValue("Name").ToString();
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)

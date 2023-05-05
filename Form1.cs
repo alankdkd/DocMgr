@@ -265,7 +265,7 @@ namespace DocMgr
                     {
                         Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
                         buttonLoadDoc.Enabled = true;
-                        //LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
+                        LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
                     }
                     catch (Exception ex)
                     {
@@ -520,7 +520,14 @@ namespace DocMgr
         private void buttonInsertList_Click(object sender, EventArgs e)
         {
             string text = richTextBox.SelectedText.Trim();            // Get selected lines to number.
-            int numLines = CountChar(text, '\n') + 1;                 // Count # of lines: /n count plus 1.
+
+            if (text.Length == 0)
+            {
+                MessageBox.Show("No text lines are selected.");
+                return;
+            }
+
+            //int numLines = CountChar(text, '\n') + 1;                 // Count # of lines: /n count plus 1.
             string rtfText = ReplaceNewLinesWithParagraphEnd(text);   // Convert selected lines to RTF format.
             int pos = richTextBox.Rtf.IndexOf(rtfText);               // Find position of lines in RTF text.
 
@@ -583,16 +590,16 @@ namespace DocMgr
             return sb.ToString();
         }
 
-        private int CountChar(string text, char v)
-        {
-            int count = 0;
+        //private int CountChar(string text, char v)
+        //{
+        //    int count = 0;
 
-            foreach (char c in text)
-                if (c == v)
-                    ++count;
+        //    foreach (char c in text)
+        //        if (c == v)
+        //            ++count;
 
-            return count;
-        }
+        //    return count;
+        //}
 
 
         /***
