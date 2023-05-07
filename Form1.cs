@@ -21,12 +21,6 @@ namespace DocMgr
         {
             InitializeComponent();
             ArrangeLayout();
-            richTextBox.VScroll += (s, e) => {
-                HandleScroll();
-            };
-            richTextBox.MouseWheel += (s, e) => {
-                HandleScroll();
-            };
         }
 
         private void ArrangeLayout()
@@ -75,23 +69,16 @@ namespace DocMgr
         [DllImport("user32.dll")]
         static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);// DllImports.
 
-        private void HandleScroll()
+        private void SaveScrollPosition()
         {
-            try
-            {
-                Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
+            Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
-                if (doc != null && ProjectPath != null)
-                {                                   // Save new scroll position in project:
-                    doc.ScrollPos = GetScrollPosition();
-                    string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
-                    File.WriteAllText(ProjectPath, text);
-                    return;
-                }
-            }
-            catch(Exception e)
-            {
-                // Ignore it.  Hallucinates that another process has the file.
+            if (doc != null && ProjectPath != null)
+            {                                   // Save new scroll position in project:
+                doc.ScrollPos = GetScrollPosition();
+                string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+                File.WriteAllText(ProjectPath, text);
+                return;
             }
         }
 
@@ -340,6 +327,8 @@ namespace DocMgr
 
         private void LoadProject(string projectPath, out Doc? Root)
         {
+            SaveScrollPosition();
+
             if (File.Exists(projectPath))
             {                               // Load project file:
                 string? docList = File.ReadAllText(projectPath);
@@ -381,6 +370,8 @@ namespace DocMgr
 
         private void buttonClose_Click(object sender, EventArgs e)
         {
+            SaveScrollPosition();
+            
             if (DocName.Text.StartsWith('*'))
                 if (MessageBox.Show("Save changes before closing?", "Closing",
                     MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -520,6 +511,8 @@ namespace DocMgr
 
         private void buttonSaveDoc_Click(object sender, EventArgs e)
         {
+            SaveScrollPosition();
+
             if (CurrentFilePath != null && DocName.Text.Length > 0)
             {
                 // DOESN'T WORK FOR EMPTY DOC:
@@ -582,6 +575,8 @@ namespace DocMgr
 
         private void ButtonNewDoc_Click(object sender, EventArgs e)
         {
+            SaveScrollPosition();
+
             FormCreateDoc fcd = new FormCreateDoc();
 
             var tmp = fcd.ShowDialog();
@@ -720,6 +715,8 @@ namespace DocMgr
 
         private void ButtonNewProj_Click(object sender, EventArgs e)
         {
+            SaveScrollPosition();
+
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
