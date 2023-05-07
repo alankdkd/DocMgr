@@ -77,14 +77,21 @@ namespace DocMgr
 
         private void HandleScroll()
         {
-            Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
+            try
+            {
+                Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
-            if (doc != null  && ProjectPath != null)
-            {                                   // Save new scroll position in project:
-                doc.ScrollPos = GetScrollPosition();
-                string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
-                File.WriteAllText(ProjectPath, text);
-                return;
+                if (doc != null && ProjectPath != null)
+                {                                   // Save new scroll position in project:
+                    doc.ScrollPos = GetScrollPosition();
+                    string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+                    File.WriteAllText(ProjectPath, text);
+                    return;
+                }
+            }
+            catch(Exception e)
+            {
+                // Ignore it.  Hallucinates that another process has the file.
             }
         }
 
