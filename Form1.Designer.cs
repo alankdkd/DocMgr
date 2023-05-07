@@ -41,7 +41,7 @@
             this.ButtonNewDoc = new System.Windows.Forms.Button();
             this.ButtonNewProj = new System.Windows.Forms.Button();
             this.ButtonSaveAs = new System.Windows.Forms.Button();
-            this.buttonInsertList = new System.Windows.Forms.Button();
+            this.buttonNumberLines = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // richTextBox
@@ -185,23 +185,23 @@
             this.ButtonSaveAs.UseVisualStyleBackColor = true;
             this.ButtonSaveAs.Click += new System.EventHandler(this.ButtonSaveAs_Click);
             // 
-            // buttonInsertList
+            // buttonNumberLines
             // 
-            this.buttonInsertList.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.buttonInsertList.Location = new System.Drawing.Point(1090, 279);
-            this.buttonInsertList.Name = "buttonInsertList";
-            this.buttonInsertList.Size = new System.Drawing.Size(175, 31);
-            this.buttonInsertList.TabIndex = 14;
-            this.buttonInsertList.Text = "&Insert List";
-            this.buttonInsertList.UseVisualStyleBackColor = true;
-            this.buttonInsertList.Click += new System.EventHandler(this.buttonInsertList_Click);
+            this.buttonNumberLines.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonNumberLines.Location = new System.Drawing.Point(1090, 279);
+            this.buttonNumberLines.Name = "buttonNumberLines";
+            this.buttonNumberLines.Size = new System.Drawing.Size(175, 31);
+            this.buttonNumberLines.TabIndex = 14;
+            this.buttonNumberLines.Text = "&Number Lines";
+            this.buttonNumberLines.UseVisualStyleBackColor = true;
+            this.buttonNumberLines.Click += new System.EventHandler(this.buttonNumberLines_Click);
             // 
             // DocMgr
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1296, 985);
-            this.Controls.Add(this.buttonInsertList);
+            this.Controls.Add(this.buttonNumberLines);
             this.Controls.Add(this.ButtonSaveAs);
             this.Controls.Add(this.ButtonNewProj);
             this.Controls.Add(this.ButtonNewDoc);
@@ -210,11 +210,11 @@
             this.Controls.Add(this.buttonRemoveDoc);
             this.Controls.Add(this.buttonLoadDoc);
             this.Controls.Add(this.buttonLoadProj);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.ProjectName);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.DocName);
             this.Controls.Add(this.richTextBox);
+            this.Controls.Add(this.label1);
             this.Name = "DocMgr";
             this.Text = "DocMgr";
             this.Load += new System.EventHandler(this.DocMgr_Load);
@@ -239,6 +239,6 @@
         private Button ButtonNewDoc;
         private Button ButtonNewProj;
         private Button ButtonSaveAs;
-        private Button buttonInsertList;
+        private Button buttonNumberLines;
     }
 }

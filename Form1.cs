@@ -33,7 +33,7 @@ namespace DocMgr
         {
             Point newStart = ButtonListStart;
             newStart.Y = label2.Location.Y
-                + label2.Height + 5;
+                + label2.Height + 6;
             ButtonListStart = newStart;
 
             /*** To do: 1. Adjust button widths according to name lengths,
@@ -164,6 +164,7 @@ namespace DocMgr
         private void MakeButtons(List<Doc>? subDocs)    // Make a button on the left side
         {                                               // for each of project's documents.
             Point next = ButtonListStart;
+            var buttons = new List<Button>();
             RemoveOldButtons();
 
             if (subDocs == null)
@@ -180,10 +181,72 @@ namespace DocMgr
                 b.Click += SelectDocClick;
                 b.Location = next;
                 next.Y += BUTTON_SPACING;
-                b.Size = new Size(120, 30);
-                Controls.Add(b);
+                b.Size = new Size(120, 35);
+                buttons.Add(b);
+            }
+
+            ResizeAndAddButtons(buttons);
+            ArrangeControls();
+        }
+
+        private void ArrangeControls()
+        {
+            DocName.Left = richTextBox.Left;
+
+            using (Graphics g = CreateGraphics())
+            {
+                var size = g.MeasureString(ProjectName.Text, Font);
+
+                int projWidth = (int)Math.Round(size.Width);
+                ProjectName.Width = projWidth;
+                ProjectName.Left = richTextBox.Right - projWidth;
+                label1.Left = ProjectName.Left - label1.Width;
+            }
+
+            foreach (Control c in Controls)
+                if (c.GetType() == typeof(Button)
+                    && Math.Abs(c.Left - richTextBox.Right) < 70)
+                       c.Left = richTextBox.Right + 10;
+
+            Width = buttonClose.Right + 25;
+            int leftTopButtons = richTextBox.Left;
+
+            Button[] topButtons = new Button[] { buttonLoadProj, buttonLoadDoc, buttonSaveDoc, ButtonSaveAs };
+            foreach (Button b in topButtons)
+            {
+                b.Left = leftTopButtons;
+                leftTopButtons += (b.Width + 32);
             }
         }
+
+        private void ResizeAndAddButtons(List<Button> buttons)
+        {
+            float buttonWidth = 120;
+
+            if (buttons.Count() == 0)
+                return;
+
+            Graphics g = buttons[0].CreateGraphics();
+            Font f = buttons[0].Font;
+
+
+            foreach (Button b in buttons)
+            {
+                var size = g.MeasureString(b.Text, f);
+                float width = size.Width;
+
+                if (width > buttonWidth)
+                    buttonWidth = width;
+            }
+
+            foreach (Button b in buttons)
+            {
+                b.Width = (int)Math.Round(buttonWidth);
+                Controls.Add(b);
+            }
+
+            richTextBox.Left = (int)Math.Round(buttons[0].Left + buttonWidth) + 10;
+       }
 
         private void RemoveOldButtons()     // Remove every document button.
         {                                   // These are the buttons with non-null Tag.
@@ -532,7 +595,7 @@ namespace DocMgr
             }
         }
 
-        private void buttonInsertList_Click(object sender, EventArgs e)
+        private void buttonNumberLines_Click(object sender, EventArgs e)
         {
             string text = richTextBox.SelectedText.Trim();            // Get selected lines to number.
 
