@@ -10,10 +10,12 @@ namespace DocMgr
     public partial class DocMgr : Form
     {
         readonly int BUTTON_SPACING = 40;
+        List<Button> buttons;
         readonly Font font = new Font("Calibri", 14, FontStyle.Bold);
         string? CurrentFilePath;
         string? ProjectPath, lastDocName;
         bool loadingDoc = false;
+        int originalLeft;
 
         private Doc? Root = new Doc("Root");
         private static Point ButtonListStart { get; set; } = new Point(10, 80);
@@ -29,6 +31,7 @@ namespace DocMgr
             newStart.Y = label2.Location.Y
                 + label2.Height + 6;
             ButtonListStart = newStart;
+            originalLeft = richTextBox.Left;
 
             /*** To do: 1. Adjust button widths according to name lengths,
              *   2. Adjust text box X position according to button widths,
@@ -158,7 +161,7 @@ namespace DocMgr
         private void MakeButtons(List<Doc>? subDocs)    // Make a button on the left side
         {                                               // for each of project's documents.
             Point next = ButtonListStart;
-            var buttons = new List<Button>();
+            buttons = new List<Button>();
             RemoveOldButtons();
 
             if (subDocs == null)
@@ -218,7 +221,10 @@ namespace DocMgr
             float buttonWidth = 120;
 
             if (buttons.Count() == 0)
+            {
+                richTextBox.Left = originalLeft;
                 return;
+            }
 
             Graphics g = buttons[0].CreateGraphics();
             Font f = buttons[0].Font;
@@ -269,6 +275,8 @@ namespace DocMgr
 
             richTextBox.Clear();
             Button but = sender as Button;
+            ColorButtonBknd(but);
+
             DocName.Text = but.Name + ':';
 
             if (but.Tag != null)
@@ -294,6 +302,15 @@ namespace DocMgr
             buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
             loadingDoc = false;
+        }
+
+        private void ColorButtonBknd(Button? but)
+        {
+            foreach (Button b in buttons)
+                if (b == but)
+                    b.BackColor = Color.LightBlue;
+                else
+                    b.BackColor = Color.FromArgb(255, 240, 240, 240);
         }
 
         Doc? FindDocByName(string name)
