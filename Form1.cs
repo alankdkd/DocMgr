@@ -327,8 +327,6 @@ namespace DocMgr
 
         private void LoadProject(string projectPath, out Doc? Root)
         {
-            SaveScrollPosition();
-
             if (File.Exists(projectPath))
             {                               // Load project file:
                 string? docList = File.ReadAllText(projectPath);
@@ -403,6 +401,7 @@ namespace DocMgr
         private void buttonLoadProj_Click(object sender, EventArgs e)
         {
             buttonSaveDoc_Click(null, null);            // In case changes not saved.
+            SaveScrollPosition();
             ProjectPath = SelectProjectFile();
             buttonSaveDoc.Enabled = false;
             loadingDoc = true;
@@ -633,7 +632,7 @@ namespace DocMgr
             numberedList.Append(@"\pard");
 
             string replacementText = numberedList.ToString();
-            File.WriteAllText("out.txt", replacementText);
+            //File.WriteAllText("out.txt", replacementText);
             richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, replacementText);
         }
 
