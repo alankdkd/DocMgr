@@ -197,10 +197,10 @@ namespace DocMgr
                 label1.Left = ProjectName.Left - label1.Width;
             }
 
-            foreach (Control c in Controls)
-                if (c.GetType() == typeof(Button)
-                    && Math.Abs(c.Left - richTextBox.Right) < 70)
-                       c.Left = richTextBox.Right + 10;
+            Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
+                ButtonNewProj, buttonRemoveDoc, buttonNumberLines };
+            foreach (Button b in rightButtons)
+                b.Left = richTextBox.Right + 10;
 
             Width = buttonClose.Right + 25;
             int leftTopButtons = richTextBox.Left;
@@ -230,7 +230,7 @@ namespace DocMgr
                 float width = size.Width;
 
                 if (width > buttonWidth)
-                    buttonWidth = width;
+                    buttonWidth = width;    // Get maximum length button name.
             }
 
             foreach (Button b in buttons)
