@@ -308,7 +308,7 @@ namespace DocMgr
         {
             foreach (Button b in buttons)
                 if (b == but)
-                    b.BackColor = Color.LightBlue;
+                    b.BackColor = Color.FromArgb(255, 210, 250, 255);
                 else
                     b.BackColor = Color.FromArgb(255, 240, 240, 240);
         }
@@ -750,6 +750,7 @@ namespace DocMgr
                     MakeButtons(Root.SubDocs);
                     buttonLoadDoc.Enabled = true;
                     LoadProjectDlg.AddProject(ProjectName.Text, CurrentFilePath);
+                    ProjectPath = CurrentFilePath;
                 }
             }
         }
