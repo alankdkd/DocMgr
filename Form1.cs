@@ -179,6 +179,7 @@ namespace DocMgr
                 b.Location = next;
                 next.Y += BUTTON_SPACING;
                 b.Size = new Size(120, 35);
+                b.BackColor = Color.FromArgb(255, 250, 250, 250);
                 buttons.Add(b);
             }
 
@@ -310,7 +311,7 @@ namespace DocMgr
                 if (b == but)
                     b.BackColor = Color.FromArgb(255, 210, 250, 255);
                 else
-                    b.BackColor = Color.FromArgb(255, 240, 240, 240);
+                    b.BackColor = Color.FromArgb(255, 250, 250, 250);
         }
 
         Doc? FindDocByName(string name)
