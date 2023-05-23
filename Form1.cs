@@ -687,6 +687,14 @@ namespace DocMgr
             return sb.ToString();
         }
 
+        private void DocMgr_Resize(object sender, EventArgs e)
+        {
+            Size size = richTextBox.Size;
+            int FormHeight = Height;
+            size.Height = FormHeight - 150;
+            richTextBox.Size = size;
+        }
+
         //private int CountChar(string text, char v)
         //{
         //    int count = 0;

@@ -219,6 +219,7 @@
             this.Text = "DocMgr";
             this.Load += new System.EventHandler(this.DocMgr_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.DocMgr_KeyPress);
+            this.Resize += new System.EventHandler(this.DocMgr_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();
 
