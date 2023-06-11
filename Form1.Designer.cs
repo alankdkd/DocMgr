@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.richTextBox = new System.Windows.Forms.RichTextBox();
             this.DocName = new System.Windows.Forms.Label();
             this.buttonClose = new System.Windows.Forms.Button();
@@ -42,6 +43,7 @@
             this.ButtonNewProj = new System.Windows.Forms.Button();
             this.ButtonSaveAs = new System.Windows.Forms.Button();
             this.buttonNumberLines = new System.Windows.Forms.Button();
+            this.toolTips = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // richTextBox
@@ -63,6 +65,7 @@
             this.DocName.Name = "DocName";
             this.DocName.Size = new System.Drawing.Size(0, 23);
             this.DocName.TabIndex = 2;
+            this.DocName.MouseHover += new System.EventHandler(this.DocName_MouseHover);
             // 
             // buttonClose
             // 
@@ -84,6 +87,7 @@
             this.ProjectName.Name = "ProjectName";
             this.ProjectName.Size = new System.Drawing.Size(0, 15);
             this.ProjectName.TabIndex = 4;
+            this.ProjectName.MouseHover += new System.EventHandler(this.ProjectName_MouseHover);
             // 
             // label1
             // 
@@ -241,5 +245,6 @@
         private Button ButtonNewProj;
         private Button ButtonSaveAs;
         private Button buttonNumberLines;
+        private ToolTip toolTips;
     }
 }

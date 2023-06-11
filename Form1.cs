@@ -180,6 +180,7 @@ namespace DocMgr
                 next.Y += BUTTON_SPACING;
                 b.Size = new Size(120, 35);
                 b.BackColor = Color.FromArgb(255, 250, 250, 250);
+                b.MouseHover += button_MouseHover;
                 buttons.Add(b);
             }
 
@@ -354,6 +355,7 @@ namespace DocMgr
                     {
                         Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
                         buttonLoadDoc.Enabled = true;
+                        Root.DocPath = projectPath;
                         LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
                     }
                     catch (Exception ex)
@@ -700,6 +702,25 @@ namespace DocMgr
             int FormHeight = Height;
             size.Height = FormHeight - 150;
             richTextBox.Size = size;
+        }
+
+        private void button_MouseHover(object sender, EventArgs e)
+        {
+            foreach (Doc doc in Root.SubDocs)
+                if ((sender as Button).Text  ==  "&" + doc.DocName)
+                    toolTips.Show(doc.DocPath, sender as Button);
+        }
+
+        private void ProjectName_MouseHover(object sender, EventArgs e)
+        {
+             toolTips.Show(Root.DocPath, sender as Label);
+        }
+
+        private void DocName_MouseHover(object sender, EventArgs e)
+        {
+            foreach (Doc doc in Root.SubDocs)
+                if ((sender as Label).Text == doc.DocName + ":")
+                    toolTips.Show(doc.DocPath, sender as Label);
         }
 
         //private int CountChar(string text, char v)
