@@ -258,8 +258,7 @@ namespace DocMgr
                 changed = false;
 
                 foreach (Control cont in Controls)
-                    if (cont is Button && ((cont as Button).Tag != null  ||
-                        (lastDocName != null && (cont as Button).Name != null  && (cont as Button).Name == lastDocName)))
+                    if ((cont is Button) && (cont.Left == ButtonListStart.X))
                     {
                         Controls.Remove(cont as Button);
                         changed = true;
@@ -371,7 +370,6 @@ namespace DocMgr
                 MessageBox.Show("Project file '" + projectPath + "' not found.");
                 Root = new Doc("Root");
                 DocName.Text = "";
-                buttonRemoveDoc.Enabled = false;
             }
 
             buttonRemoveDoc.Enabled = false;
