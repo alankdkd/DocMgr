@@ -604,10 +604,21 @@ namespace DocMgr
                 buttonSaveDoc.Enabled = true;
                 SaveProject(ProjectPath, Root);
                 DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                HighlightThisButton("&" + fcd.textBoxDocName.Text);
                 richTextBox.Clear();
                 richTextBox.Font = font;
                 richTextBox.Focus();
             }
+        }
+
+        private void HighlightThisButton(string text)
+        {
+            foreach (Control con in Controls)
+                if ((con is Button)  &&  (con.Text == text))
+                {
+                    ColorButtonBknd(con as Button);
+                    return;
+                }
         }
 
         private void buttonNumberLines_Click(object sender, EventArgs e)
