@@ -12,11 +12,14 @@ namespace DocMgr
 {
     public partial class FormCreateDoc : Form
     {
-        public FormCreateDoc()
+        string InitialFolder;
+
+        public FormCreateDoc(string initialFolder = @"C:\")
         {
             InitializeComponent();
             buttonClose.Enabled = true;
             buttonSelect.CenterCursorInButton();
+            InitialFolder = initialFolder;
         }
 
         private void buttonSelect_Click(object sender, EventArgs e)
@@ -29,6 +32,7 @@ namespace DocMgr
                 ofd.Filter = "rtf files (*.rtf)|*.rtf|All files (*.*)|*.*";
                 ofd.CheckFileExists = false;
                 ofd.CheckPathExists = false;
+                ofd.InitialDirectory = InitialFolder;
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {

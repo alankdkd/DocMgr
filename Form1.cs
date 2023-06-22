@@ -13,7 +13,7 @@ namespace DocMgr
         List<Button> buttons;
         readonly Font font = new Font("Calibri", 14, FontStyle.Bold);
         string? CurrentFilePath;
-        string? ProjectPath, lastDocName;
+        static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
         int originalLeft;
 
@@ -467,10 +467,7 @@ namespace DocMgr
         {                                                   // Used to select project & document files.
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                string? path = GetLastProjectPath();        // From Registry.
-
-                if (path == null)
-                    path = "c:\\";                          // Default path.
+                string? path = GetDefaultPath();
 
                 openFileDialog.InitialDirectory = path;
                 openFileDialog.Filter = filter;
@@ -480,6 +477,19 @@ namespace DocMgr
 
                 return null;
             }
+        }
+
+        static string GetDefaultPath()
+        {
+            string? path = Path.GetDirectoryName(ProjectPath); // Assume same as project.
+
+            if (path == null)
+                path = GetLastProjectPath();        // From Registry.
+
+            if (path == null)
+                path = "c:\\";                      // Default path.
+
+            return path;
         }
 
         private void buttonLoadDoc_Click(object sender, EventArgs e)        // Add & load an existing .rtf
@@ -592,7 +602,7 @@ namespace DocMgr
         {
             SaveScrollPosition();
 
-            FormCreateDoc fcd = new FormCreateDoc();
+            FormCreateDoc fcd = new FormCreateDoc(GetDefaultPath());
 
             var tmp = fcd.ShowDialog();
 
