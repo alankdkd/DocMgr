@@ -73,7 +73,7 @@
             this.buttonClose.BackColor = System.Drawing.SystemColors.Control;
             this.buttonClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonClose.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.buttonClose.Location = new System.Drawing.Point(1090, 14);
+            this.buttonClose.Location = new System.Drawing.Point(1090, 16);
             this.buttonClose.Name = "buttonClose";
             this.buttonClose.Size = new System.Drawing.Size(175, 31);
             this.buttonClose.TabIndex = 3;
@@ -84,22 +84,22 @@
             // ProjectName
             // 
             this.ProjectName.AutoSize = true;
-            this.ProjectName.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.ProjectName.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ProjectName.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ProjectName.Location = new System.Drawing.Point(971, 64);
             this.ProjectName.Name = "ProjectName";
-            this.ProjectName.Size = new System.Drawing.Size(0, 15);
+            this.ProjectName.Size = new System.Drawing.Size(0, 18);
             this.ProjectName.TabIndex = 4;
             this.ProjectName.MouseHover += new System.EventHandler(this.ProjectName_MouseHover);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.label1.Location = new System.Drawing.Point(918, 64);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 15);
+            this.label1.Size = new System.Drawing.Size(59, 18);
             this.label1.TabIndex = 5;
             this.label1.Text = "Project: ";
             // 
@@ -133,7 +133,7 @@
             this.buttonRemoveDoc.BackColor = System.Drawing.SystemColors.Control;
             this.buttonRemoveDoc.Enabled = false;
             this.buttonRemoveDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.buttonRemoveDoc.Location = new System.Drawing.Point(1090, 212);
+            this.buttonRemoveDoc.Location = new System.Drawing.Point(1090, 214);
             this.buttonRemoveDoc.Name = "buttonRemoveDoc";
             this.buttonRemoveDoc.Size = new System.Drawing.Size(175, 31);
             this.buttonRemoveDoc.TabIndex = 8;
@@ -157,11 +157,11 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label2.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label2.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.label2.Location = new System.Drawing.Point(9, 60);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(73, 15);
+            this.label2.Size = new System.Drawing.Size(82, 18);
             this.label2.TabIndex = 10;
             this.label2.Text = "Documents:";
             // 
@@ -169,7 +169,7 @@
             // 
             this.ButtonNewDoc.BackColor = System.Drawing.SystemColors.Control;
             this.ButtonNewDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ButtonNewDoc.Location = new System.Drawing.Point(1090, 79);
+            this.ButtonNewDoc.Location = new System.Drawing.Point(1090, 81);
             this.ButtonNewDoc.Name = "ButtonNewDoc";
             this.ButtonNewDoc.Size = new System.Drawing.Size(175, 31);
             this.ButtonNewDoc.TabIndex = 11;
@@ -181,7 +181,7 @@
             // 
             this.ButtonNewProj.BackColor = System.Drawing.SystemColors.Control;
             this.ButtonNewProj.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ButtonNewProj.Location = new System.Drawing.Point(1090, 144);
+            this.ButtonNewProj.Location = new System.Drawing.Point(1090, 146);
             this.ButtonNewProj.Name = "ButtonNewProj";
             this.ButtonNewProj.Size = new System.Drawing.Size(175, 31);
             this.ButtonNewProj.TabIndex = 12;
@@ -193,7 +193,7 @@
             // 
             this.ButtonSaveAs.BackColor = System.Drawing.SystemColors.Control;
             this.ButtonSaveAs.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ButtonSaveAs.Location = new System.Drawing.Point(796, 14);
+            this.ButtonSaveAs.Location = new System.Drawing.Point(796, 16);
             this.ButtonSaveAs.Name = "ButtonSaveAs";
             this.ButtonSaveAs.Size = new System.Drawing.Size(175, 31);
             this.ButtonSaveAs.TabIndex = 13;
@@ -205,7 +205,7 @@
             // 
             this.buttonNumberLines.BackColor = System.Drawing.SystemColors.Control;
             this.buttonNumberLines.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.buttonNumberLines.Location = new System.Drawing.Point(1090, 279);
+            this.buttonNumberLines.Location = new System.Drawing.Point(1090, 281);
             this.buttonNumberLines.Name = "buttonNumberLines";
             this.buttonNumberLines.Size = new System.Drawing.Size(175, 31);
             this.buttonNumberLines.TabIndex = 14;

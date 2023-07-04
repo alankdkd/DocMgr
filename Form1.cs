@@ -192,7 +192,7 @@ namespace DocMgr
 
             using (Graphics g = CreateGraphics())
             {
-                var size = g.MeasureString(ProjectName.Text, Font);
+                var size = g.MeasureString(ProjectName.Text, ProjectName.Font);
 
                 int projWidth = (int)Math.Round(size.Width);
                 ProjectName.Width = projWidth;
@@ -435,11 +435,7 @@ namespace DocMgr
             if (ProjectPath != null)
             {
                 LoadProject(ProjectPath, out Root);
-                RegistryKey? key = Registry.CurrentUser.CreateSubKey(
-                    @"Software\PatternScope Systems\DocMgr",
-                    RegistryKeyPermissionCheck.ReadWriteSubTree);
-                key.SetValue("LastProjectPath", ProjectPath);
-                key.Close();
+                SetProjectPath(ProjectPath);
 
                 MakeButtons(Root.SubDocs);
                 DocName.Text = "";
@@ -450,6 +446,15 @@ namespace DocMgr
             }
 
             loadingDoc = false;
+        }
+
+        private static void SetProjectPath(string ProjectPath)
+        {
+            RegistryKey? key = Registry.CurrentUser.CreateSubKey(
+                BASE_REGISTRY_KEY,
+                RegistryKeyPermissionCheck.ReadWriteSubTree);
+            key.SetValue("LastProjectPath", ProjectPath);
+            key.Close();
         }
 
         private string? SelectProjectFile()
@@ -644,21 +649,22 @@ namespace DocMgr
 
         private void buttonSaveDoc_Click(object sender, EventArgs e)
         {
+            bool saveOk = false;
+
             if (CurrentFilePath != null && DocName.Text.Length > 0)
             {
                 // DOESN'T WORK FOR EMPTY DOC:
                 try
                 {
-                    if (richTextBox.Text.Trim().Length == 0)
+                    if (richTextBox.Text.Trim().Length == 0  &&  File.Exists(CurrentFilePath))
                         if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
                             + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
-                            == DialogResult.OK)
-                        {
-                            SaveScrollPosition();
-                            richTextBox.SaveFile(CurrentFilePath);
-                        }
-                        else
+                            != DialogResult.OK)
                             return;
+
+                    SaveScrollPosition();
+                    richTextBox.SaveFile(CurrentFilePath);
+                    saveOk = true;
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -673,11 +679,11 @@ namespace DocMgr
                 //string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
                 //File.WriteAllText(CurrentFilePath, text);
 
-                if (DocName.Text[0] == '*')
+                if (saveOk  &&  DocName.Text[0] == '*')
                     DocName.Text = DocName.Text.Remove(0, 2);
             }
 
-            buttonSaveDoc.Enabled = false;
+            buttonSaveDoc.Enabled = !saveOk;
             richTextBox.Focus();
         }
 
@@ -698,6 +704,7 @@ namespace DocMgr
             foreach (Doc doc in Root.SubDocs)
                 if (doc.DocName == lastDocName)
                 {
+                    //richTextBox.Clear();
                     buttonRemoveDoc.Enabled = false;
                     Root.SubDocs.Remove(doc);
                     MakeButtons(Root.SubDocs);
@@ -729,7 +736,8 @@ namespace DocMgr
 
             FormCreateDoc fcd = new FormCreateDoc(GetDefaultPath());
 
-            var tmp = fcd.ShowDialog();
+            if (fcd.ShowDialog() != DialogResult.OK)
+                return;
 
             bool success = fcd.labelPath.Text.Length > 0 && fcd.textBoxDocName.Text.Length > 0;
 
@@ -741,6 +749,7 @@ namespace DocMgr
                 buttonSaveDoc.Enabled = true;
                 SaveProject(ProjectPath, Root);
                 DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                SetProjectsLastDoc(CurrentFilePath);
                 HighlightThisButton("&" + fcd.textBoxDocName.Text);
                 richTextBox.Clear();
                 richTextBox.Font = font;
@@ -913,12 +922,14 @@ namespace DocMgr
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    CurrentFilePath = ofd.FileName;
+                    CurrentFilePath = ProjectPath = ofd.FileName;
                     Root = new Doc("Root");
                     SaveProject(CurrentFilePath, Root);
+                    SetProjectPath(CurrentFilePath);
                     richTextBox.Clear();
                     ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
                     DocName.Text = "";
+                    Root.DocPath = CurrentFilePath;
                     MakeButtons(Root.SubDocs);
                 }
             }

@@ -40,6 +40,7 @@ namespace DocMgr
                     textBoxDocName.Text = Path.GetFileNameWithoutExtension(ofd.FileName);
                     textBoxDocName.Enabled = true; ;
                     buttonCreate.Enabled = true;
+                    DialogResult = DialogResult.OK;
                 }
 
                 buttonCreate.Enabled = textBoxDocName.Text.Length > 0;
