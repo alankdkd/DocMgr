@@ -61,7 +61,8 @@
             // 
             this.DocName.AutoSize = true;
             this.DocName.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.DocName.Location = new System.Drawing.Point(143, 55);
+            this.DocName.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.DocName.Location = new System.Drawing.Point(143, 56);
             this.DocName.Name = "DocName";
             this.DocName.Size = new System.Drawing.Size(0, 23);
             this.DocName.TabIndex = 2;
@@ -69,6 +70,7 @@
             // 
             // buttonClose
             // 
+            this.buttonClose.BackColor = System.Drawing.SystemColors.Control;
             this.buttonClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.buttonClose.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonClose.Location = new System.Drawing.Point(1090, 14);
@@ -76,14 +78,15 @@
             this.buttonClose.Size = new System.Drawing.Size(175, 31);
             this.buttonClose.TabIndex = 3;
             this.buttonClose.Text = "&Close";
-            this.buttonClose.UseVisualStyleBackColor = true;
+            this.buttonClose.UseVisualStyleBackColor = false;
             this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
             // ProjectName
             // 
             this.ProjectName.AutoSize = true;
             this.ProjectName.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.ProjectName.Location = new System.Drawing.Point(971, 65);
+            this.ProjectName.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.ProjectName.Location = new System.Drawing.Point(971, 64);
             this.ProjectName.Name = "ProjectName";
             this.ProjectName.Size = new System.Drawing.Size(0, 15);
             this.ProjectName.TabIndex = 4;
@@ -93,7 +96,8 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(918, 66);
+            this.label1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.label1.Location = new System.Drawing.Point(918, 64);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 15);
             this.label1.TabIndex = 5;
@@ -101,17 +105,19 @@
             // 
             // buttonLoadProj
             // 
+            this.buttonLoadProj.BackColor = System.Drawing.SystemColors.Control;
             this.buttonLoadProj.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonLoadProj.Location = new System.Drawing.Point(142, 16);
             this.buttonLoadProj.Name = "buttonLoadProj";
             this.buttonLoadProj.Size = new System.Drawing.Size(175, 31);
             this.buttonLoadProj.TabIndex = 6;
             this.buttonLoadProj.Text = "Load &Project...";
-            this.buttonLoadProj.UseVisualStyleBackColor = true;
+            this.buttonLoadProj.UseVisualStyleBackColor = false;
             this.buttonLoadProj.Click += new System.EventHandler(this.buttonLoadProj_Click);
             // 
             // buttonLoadDoc
             // 
+            this.buttonLoadDoc.BackColor = System.Drawing.SystemColors.Control;
             this.buttonLoadDoc.Enabled = false;
             this.buttonLoadDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonLoadDoc.Location = new System.Drawing.Point(360, 16);
@@ -119,11 +125,12 @@
             this.buttonLoadDoc.Size = new System.Drawing.Size(175, 31);
             this.buttonLoadDoc.TabIndex = 7;
             this.buttonLoadDoc.Text = "&Load Document...";
-            this.buttonLoadDoc.UseVisualStyleBackColor = true;
+            this.buttonLoadDoc.UseVisualStyleBackColor = false;
             this.buttonLoadDoc.Click += new System.EventHandler(this.buttonLoadDoc_Click);
             // 
             // buttonRemoveDoc
             // 
+            this.buttonRemoveDoc.BackColor = System.Drawing.SystemColors.Control;
             this.buttonRemoveDoc.Enabled = false;
             this.buttonRemoveDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonRemoveDoc.Location = new System.Drawing.Point(1090, 212);
@@ -131,11 +138,12 @@
             this.buttonRemoveDoc.Size = new System.Drawing.Size(175, 31);
             this.buttonRemoveDoc.TabIndex = 8;
             this.buttonRemoveDoc.Text = "&Remove Document";
-            this.buttonRemoveDoc.UseVisualStyleBackColor = true;
+            this.buttonRemoveDoc.UseVisualStyleBackColor = false;
             this.buttonRemoveDoc.Click += new System.EventHandler(this.buttonRemoveDoc_Click);
             // 
             // buttonSaveDoc
             // 
+            this.buttonSaveDoc.BackColor = System.Drawing.SystemColors.Control;
             this.buttonSaveDoc.Enabled = false;
             this.buttonSaveDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonSaveDoc.Location = new System.Drawing.Point(578, 16);
@@ -143,13 +151,14 @@
             this.buttonSaveDoc.Size = new System.Drawing.Size(175, 31);
             this.buttonSaveDoc.TabIndex = 9;
             this.buttonSaveDoc.Text = "&Save Document";
-            this.buttonSaveDoc.UseVisualStyleBackColor = true;
+            this.buttonSaveDoc.UseVisualStyleBackColor = false;
             this.buttonSaveDoc.Click += new System.EventHandler(this.buttonSaveDoc_Click);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label2.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.label2.Location = new System.Drawing.Point(9, 60);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(73, 15);
@@ -158,52 +167,57 @@
             // 
             // ButtonNewDoc
             // 
+            this.ButtonNewDoc.BackColor = System.Drawing.SystemColors.Control;
             this.ButtonNewDoc.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ButtonNewDoc.Location = new System.Drawing.Point(1090, 79);
             this.ButtonNewDoc.Name = "ButtonNewDoc";
             this.ButtonNewDoc.Size = new System.Drawing.Size(175, 31);
             this.ButtonNewDoc.TabIndex = 11;
             this.ButtonNewDoc.Text = "&New Document...";
-            this.ButtonNewDoc.UseVisualStyleBackColor = true;
+            this.ButtonNewDoc.UseVisualStyleBackColor = false;
             this.ButtonNewDoc.Click += new System.EventHandler(this.ButtonNewDoc_Click);
             // 
             // ButtonNewProj
             // 
+            this.ButtonNewProj.BackColor = System.Drawing.SystemColors.Control;
             this.ButtonNewProj.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ButtonNewProj.Location = new System.Drawing.Point(1090, 144);
             this.ButtonNewProj.Name = "ButtonNewProj";
             this.ButtonNewProj.Size = new System.Drawing.Size(175, 31);
             this.ButtonNewProj.TabIndex = 12;
             this.ButtonNewProj.Text = "New Pro&ject...";
-            this.ButtonNewProj.UseVisualStyleBackColor = true;
+            this.ButtonNewProj.UseVisualStyleBackColor = false;
             this.ButtonNewProj.Click += new System.EventHandler(this.ButtonNewProj_Click);
             // 
             // ButtonSaveAs
             // 
+            this.ButtonSaveAs.BackColor = System.Drawing.SystemColors.Control;
             this.ButtonSaveAs.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.ButtonSaveAs.Location = new System.Drawing.Point(796, 14);
             this.ButtonSaveAs.Name = "ButtonSaveAs";
             this.ButtonSaveAs.Size = new System.Drawing.Size(175, 31);
             this.ButtonSaveAs.TabIndex = 13;
             this.ButtonSaveAs.Text = "Save &As...";
-            this.ButtonSaveAs.UseVisualStyleBackColor = true;
+            this.ButtonSaveAs.UseVisualStyleBackColor = false;
             this.ButtonSaveAs.Click += new System.EventHandler(this.ButtonSaveAs_Click);
             // 
             // buttonNumberLines
             // 
+            this.buttonNumberLines.BackColor = System.Drawing.SystemColors.Control;
             this.buttonNumberLines.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.buttonNumberLines.Location = new System.Drawing.Point(1090, 279);
             this.buttonNumberLines.Name = "buttonNumberLines";
             this.buttonNumberLines.Size = new System.Drawing.Size(175, 31);
             this.buttonNumberLines.TabIndex = 14;
             this.buttonNumberLines.Text = "&Number Lines";
-            this.buttonNumberLines.UseVisualStyleBackColor = true;
+            this.buttonNumberLines.UseVisualStyleBackColor = false;
             this.buttonNumberLines.Click += new System.EventHandler(this.buttonNumberLines_Click);
             // 
             // DocMgr
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(1296, 985);
             this.Controls.Add(this.buttonNumberLines);
             this.Controls.Add(this.ButtonSaveAs);

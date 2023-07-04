@@ -16,6 +16,8 @@ namespace DocMgr
         static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
         int originalLeft;
+        static readonly int BAD_INT = int.MinValue;
+        static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
 
         private Doc? Root = new Doc("Root");
         private static Point ButtonListStart { get; set; } = new Point(10, 80);
@@ -110,14 +112,10 @@ namespace DocMgr
             {
                 LoadProject(ProjectPath, out Root);
                 MakeButtons(Root.SubDocs);
-                richTextBox.Clear();
+                LoadProjectsLastDoc(Root.DocName);
 
                 if (Root.SubDocs == null)
                     Root.SubDocs = new List<Doc>();
-
-                if (Root.SubDocs.Count == 1)
-                    ClickSingleButton();            // Auto-load the single document.
-
 
                 // NEXT STEPS: Need to serialize default font.  Then add button to use font dlg to set default font.
                 // (LATER) When new doc created, set font from default font.
@@ -248,7 +246,7 @@ namespace DocMgr
             }
 
             richTextBox.Left = (int)Math.Round(buttons[0].Left + buttonWidth) + 10;
-       }
+        }
 
         private void RemoveOldButtons()     // Remove every document button.
         {                                   // These are the buttons with non-null Tag.
@@ -271,9 +269,10 @@ namespace DocMgr
 
         private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
         {                                                           // clicked to load the document.
-            buttonSaveDoc_Click(null, null);                        // In case changes not saved.
-            loadingDoc = true;
+            if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
+                buttonSaveDoc_Click(null, null);                    // Save changes.
 
+            loadingDoc = true;
             richTextBox.Clear();
             Button but = sender as Button;
             ColorButtonBknd(but);
@@ -290,6 +289,7 @@ namespace DocMgr
                     ScrollToDocPosition(but.Name);
                     buttonSaveDoc.Enabled = false;
                     buttonRemoveDoc.Enabled = ProjectPath != null;
+                    SetProjectsLastDoc(CurrentFilePath);
                 }
                 else
                     MessageBox.Show("File '" + CurrentFilePath + "' was not found.");
@@ -378,8 +378,16 @@ namespace DocMgr
             CurrentFilePath = null;
         }
 
+        private static bool IsNullOrEmpty(string? word)
+        {
+            return word == null || word.Length == 0;
+        }
+
         private void SaveProject(string projectPath, Doc? root)
         {
+            if (IsNullOrEmpty(projectPath))
+                return;
+
             string stringDoc = System.Text.Json.JsonSerializer.Serialize(root);
             File.WriteAllText(projectPath, stringDoc);
         }
@@ -416,7 +424,9 @@ namespace DocMgr
 
         private void buttonLoadProj_Click(object sender, EventArgs e)
         {
-            buttonSaveDoc_Click(null, null);            // In case changes not saved.
+            if (DocName.Text.StartsWith('*'))
+                buttonSaveDoc_Click(null, null);            // In case changes not saved.
+
             SaveScrollPosition();
             ProjectPath = SelectProjectFile();
             buttonSaveDoc.Enabled = false;
@@ -429,13 +439,14 @@ namespace DocMgr
                     @"Software\PatternScope Systems\DocMgr",
                     RegistryKeyPermissionCheck.ReadWriteSubTree);
                 key.SetValue("LastProjectPath", ProjectPath);
+                key.Close();
 
                 MakeButtons(Root.SubDocs);
-                richTextBox.Clear();
                 DocName.Text = "";
 
-                if (Root.SubDocs.Count == 1)
-                    ClickSingleButton();
+                if (!LoadProjectsLastDoc(Root.DocName))
+                    if (Root.SubDocs.Count == 1)
+                        ClickSingleButton();
             }
 
             loadingDoc = false;
@@ -455,12 +466,103 @@ namespace DocMgr
 
         public static string? GetLastProjectPath()
         {
-            RegistryKey? key = Registry.CurrentUser.CreateSubKey(
-                @"Software\PatternScope Systems\DocMgr",
+            return GetRegistryValue("LastProjectPath");
+        }
+
+        private void SetProjectsLastDoc(string currentFilePath)
+        {
+            string ProjName = Path.GetFileNameWithoutExtension(Root.DocPath);
+            RegistryKey? RegKey = GetRegKeyForProject(ProjName);
+
+            if (RegKey == null)
+                return;
+
+            RegKey.SetValue("LastDoc", CurrentFilePath);
+            RegKey.Close();
+        }
+
+        private bool LoadProjectsLastDoc(string? docName)
+        {
+            string ProjName = Path.GetFileNameWithoutExtension(Root.DocPath);
+            RegistryKey? RegKey = GetRegKeyForProject(ProjName);
+            richTextBox.Text = "";
+
+            if (RegKey == null)
+                return false;
+
+            object? LastDocObject = RegKey.GetValue("LastDoc");
+
+            if (LastDocObject != null)
+            {
+                string? LastDoc = LastDocObject as string;
+                LoadDoc(LastDoc);
+            }
+
+            RegKey.Close();
+            return richTextBox.Text != "";
+        }
+
+        private RegistryKey? GetRegKeyForProject(string projName)
+        {
+            RegistryKey? RegKey;
+            int NumProjects = GetRegistryValueInt("NumProjects");
+
+            for (int ProjNum = 0; ProjNum < NumProjects; ++ProjNum)
+            {
+                {
+                    string RegKeyName = BASE_REGISTRY_KEY + @"\Project"
+                        + ProjNum.ToString();
+                    RegKey = Registry.CurrentUser.CreateSubKey(
+                        RegKeyName,
+                        RegistryKeyPermissionCheck.ReadWriteSubTree);
+                    object? obj = RegKey.GetValue("Name");
+
+                    if (obj != null)
+                    {
+                        string ProjName = obj as string;
+
+                        if (ProjName != null  &&  ProjName == projName)
+                            return RegKey;
+                    }
+
+                    RegKey.Close ();
+                }
+            }
+
+            return null;
+        }
+
+        public static string? GetRegistryValue(string itemKey)
+        {
+            RegistryKey? RegKey = Registry.CurrentUser.CreateSubKey(
+                BASE_REGISTRY_KEY,
                 RegistryKeyPermissionCheck.ReadWriteSubTree);
-            object? obj = key.GetValue("LastProjectPath");
+            object? obj = RegKey.GetValue(itemKey);
+            RegKey.Close();
 
             return (obj == null) ? null : obj.ToString();
+        }
+
+        public static void SetRegistryValue(string itemKey, string itemValue)
+        {
+            RegistryKey? RegKey = Registry.CurrentUser.CreateSubKey(
+                BASE_REGISTRY_KEY,
+                RegistryKeyPermissionCheck.ReadWriteSubTree);
+
+            RegKey.SetValue(itemKey, itemValue);
+            RegKey.Close();
+        }
+
+        private int GetRegistryValueInt(string key)
+        {
+            int IntResult;
+            string? StringResult = GetRegistryValue(key);
+
+            if (!IsNullOrEmpty(StringResult))
+                if (int.TryParse(StringResult, out IntResult))
+                    return IntResult;                       // Good result.
+
+            return BAD_INT;                                 // Bad result.
         }
 
         public static string? SelectFile(string filter)     // General method to select a file.
@@ -483,10 +585,10 @@ namespace DocMgr
         {
             string? path = Path.GetDirectoryName(ProjectPath); // Assume same as project.
 
-            if (path == null)
+            if (IsNullOrEmpty(path))
                 path = GetLastProjectPath();        // From Registry.
 
-            if (path == null)
+            if (IsNullOrEmpty(path))
                 path = "c:\\";                      // Default path.
 
             return path;
@@ -495,10 +597,20 @@ namespace DocMgr
         private void buttonLoadDoc_Click(object sender, EventArgs e)        // Add & load an existing .rtf
         {                                                                   // file into the current project.
             buttonSaveDoc_Click(null, null);                                // In case changes not saved.
-            string? docPath = SelectFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
+            string? DocPath = SelectFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
+
+            if (IsNullOrEmpty(DocPath))
+                return;
+
+            LoadDoc(DocPath);
+//            SetRegistryValue("LastDoc", DocPath);
+        }
+
+        private void LoadDoc(string? docPath)
+        {
             loadingDoc = true;
 
-            if (docPath != null)
+            if (!IsNullOrEmpty(docPath))
             {
                 string docName = Path.GetFileNameWithoutExtension(docPath);
 
@@ -517,11 +629,7 @@ namespace DocMgr
 
         private bool DocAlreadyInProject(string docName)
         {
-            foreach (Control cont in Controls)
-                if (cont is Button && cont.Name == docName)
-                    return true;
-
-            return false;
+            return Root.SubDocs.Where(x => x.DocName == docName).Any();
         }
 
         private void WriteUpdatedPath()
@@ -530,18 +638,36 @@ namespace DocMgr
             string jsonString = System.Text.Json.JsonSerializer.Serialize(Root, options);
             string? path = GetLastProjectPath();
 
-            if (path != null)
+            if (!IsNullOrEmpty(path))
                 File.WriteAllText(path, jsonString);
         }
 
         private void buttonSaveDoc_Click(object sender, EventArgs e)
         {
-            SaveScrollPosition();
-
             if (CurrentFilePath != null && DocName.Text.Length > 0)
             {
                 // DOESN'T WORK FOR EMPTY DOC:
-                richTextBox.SaveFile(CurrentFilePath);
+                try
+                {
+                    if (richTextBox.Text.Trim().Length == 0)
+                        if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
+                            + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
+                            == DialogResult.OK)
+                        {
+                            SaveScrollPosition();
+                            richTextBox.SaveFile(CurrentFilePath);
+                        }
+                        else
+                            return;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    MessageBox.Show("File " + CurrentFilePath + " is read-only.");
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Problem saving file " + CurrentFilePath + ".");
+                }
                 // DFW: File.WriteAllText(CurrentFilePath, richTextBox.Rtf);
                 //Root = new Doc("Root");
                 //string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
@@ -557,7 +683,7 @@ namespace DocMgr
 
         private void buttonRemoveDoc_Click(object sender, EventArgs e)      // Just removes from project.
         {                                                                   // .rtf file is untouched.
-            if (DocName.Text == null || DocName.Text.Length == 0 || ProjectPath == null  ||  Root == null)
+            if (IsNullOrEmpty(DocName.Text) || IsNullOrEmpty(ProjectPath))
                 return;
 
             lastDocName = DocName.Text;
@@ -572,7 +698,6 @@ namespace DocMgr
             foreach (Doc doc in Root.SubDocs)
                 if (doc.DocName == lastDocName)
                 {
-                    //richTextBox.Clear();
                     buttonRemoveDoc.Enabled = false;
                     Root.SubDocs.Remove(doc);
                     MakeButtons(Root.SubDocs);
@@ -795,9 +920,6 @@ namespace DocMgr
                     ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
                     DocName.Text = "";
                     MakeButtons(Root.SubDocs);
-                    buttonLoadDoc.Enabled = true;
-                    LoadProjectDlg.AddProject(ProjectName.Text, CurrentFilePath);
-                    ProjectPath = CurrentFilePath;
                 }
             }
         }
