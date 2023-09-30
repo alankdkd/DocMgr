@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Diagnostics;
 
 namespace DocMgr
 {
@@ -20,7 +21,7 @@ namespace DocMgr
         static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
 
         private Doc? Root = new Doc("Root");
-        private static Point ButtonListStart { get; set; } = new Point(10, 80);
+        private static Point ButtonListStart { get; set; } = new Point(10, 78);
         public DocMgr()
         {
             InitializeComponent();
@@ -31,7 +32,7 @@ namespace DocMgr
         {
             Point newStart = ButtonListStart;
             newStart.Y = label2.Location.Y
-                + label2.Height + 6;
+                + label2.Height + 3;
             ButtonListStart = newStart;
             originalLeft = richTextBox.Left;
 
@@ -201,7 +202,7 @@ namespace DocMgr
             }
 
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
-                ButtonNewProj, buttonRemoveDoc, buttonNumberLines };
+                ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines };
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -866,6 +867,13 @@ namespace DocMgr
                 if ((sender as Label).Text == doc.DocName + ":")
                     toolTips.Show(doc.DocPath, sender as Label);
         }
+
+        private void buttonOpenFolder_Click(object sender, EventArgs e)
+        {
+            string ProjectFolder = Path.GetDirectoryName(ProjectPath);
+            Process.Start("explorer", ProjectFolder);
+        }
+
 
         //private int CountChar(string text, char v)
         //{

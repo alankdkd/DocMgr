@@ -44,6 +44,7 @@
             this.ButtonSaveAs = new System.Windows.Forms.Button();
             this.buttonNumberLines = new System.Windows.Forms.Button();
             this.toolTips = new System.Windows.Forms.ToolTip(this.components);
+            this.buttonOpenFolder = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // richTextBox
@@ -205,7 +206,7 @@
             // 
             this.buttonNumberLines.BackColor = System.Drawing.SystemColors.Control;
             this.buttonNumberLines.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.buttonNumberLines.Location = new System.Drawing.Point(1090, 281);
+            this.buttonNumberLines.Location = new System.Drawing.Point(1090, 353);
             this.buttonNumberLines.Name = "buttonNumberLines";
             this.buttonNumberLines.Size = new System.Drawing.Size(175, 31);
             this.buttonNumberLines.TabIndex = 14;
@@ -213,12 +214,25 @@
             this.buttonNumberLines.UseVisualStyleBackColor = false;
             this.buttonNumberLines.Click += new System.EventHandler(this.buttonNumberLines_Click);
             // 
+            // buttonOpenFolder
+            // 
+            this.buttonOpenFolder.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonOpenFolder.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonOpenFolder.Location = new System.Drawing.Point(1090, 284);
+            this.buttonOpenFolder.Name = "buttonOpenFolder";
+            this.buttonOpenFolder.Size = new System.Drawing.Size(175, 31);
+            this.buttonOpenFolder.TabIndex = 15;
+            this.buttonOpenFolder.Text = "&Open Folder";
+            this.buttonOpenFolder.UseVisualStyleBackColor = false;
+            this.buttonOpenFolder.Click += new System.EventHandler(this.buttonOpenFolder_Click);
+            // 
             // DocMgr
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(1296, 985);
+            this.Controls.Add(this.buttonOpenFolder);
             this.Controls.Add(this.buttonNumberLines);
             this.Controls.Add(this.ButtonSaveAs);
             this.Controls.Add(this.ButtonNewProj);
@@ -260,5 +274,6 @@
         private Button ButtonSaveAs;
         private Button buttonNumberLines;
         private ToolTip toolTips;
+        private Button buttonOpenFolder;
     }
 }
