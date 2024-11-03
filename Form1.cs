@@ -930,12 +930,16 @@ namespace DocMgr
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    CurrentFilePath = ProjectPath = ofd.FileName;
+                    ProjectName.Text = Path.GetFileNameWithoutExtension(ofd.FileName);
+                    string FolderPath = Path.GetDirectoryName(ofd.FileName) + "\\" + ProjectName.Text;
+                    string NameAndExtension = Path.GetFileName(ofd.FileName);
+                    CurrentFilePath = ProjectPath = FolderPath + "\\" + NameAndExtension;
+                    Directory.CreateDirectory(FolderPath);
+
                     Root = new Doc("Root");
                     SaveProject(CurrentFilePath, Root);
                     SetProjectPath(CurrentFilePath);
                     richTextBox.Clear();
-                    ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
                     DocName.Text = "";
                     Root.DocPath = CurrentFilePath;
                     MakeButtons(Root.SubDocs);
