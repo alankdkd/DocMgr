@@ -501,7 +501,7 @@ namespace DocMgr
             if (LastDocObject != null)
             {
                 string? LastDoc = LastDocObject as string;
-                LoadDoc(LastDoc);
+                LoadDoc(LastDoc, false);
             }
 
             RegKey.Close();
@@ -612,7 +612,7 @@ namespace DocMgr
 //            SetRegistryValue("LastDoc", DocPath);
         }
 
-        private void LoadDoc(string? docPath)
+        private void LoadDoc(string? docPath, bool addIfMissing = true)
         {
             loadingDoc = true;
 
@@ -620,7 +620,7 @@ namespace DocMgr
             {
                 string docName = Path.GetFileNameWithoutExtension(docPath);
 
-                if (!DocAlreadyInProject(docName))
+                if (!DocAlreadyInProject(docName)  &&  addIfMissing)
                 {
                     Root.AddDoc(docPath);
                     WriteUpdatedPath();
