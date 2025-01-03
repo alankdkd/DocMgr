@@ -45,6 +45,11 @@
             this.buttonNumberLines = new System.Windows.Forms.Button();
             this.toolTips = new System.Windows.Forms.ToolTip(this.components);
             this.buttonOpenFolder = new System.Windows.Forms.Button();
+            this.buttonBackUpFile = new System.Windows.Forms.Button();
+            this.buttonBackUpProject = new System.Windows.Forms.Button();
+            this.buttonArchiveFile = new System.Windows.Forms.Button();
+            this.buttonArchiveProject = new System.Windows.Forms.Button();
+            this.buttonProperties = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // richTextBox
@@ -226,12 +231,77 @@
             this.buttonOpenFolder.UseVisualStyleBackColor = false;
             this.buttonOpenFolder.Click += new System.EventHandler(this.buttonOpenFolder_Click);
             // 
+            // buttonBackUpFile
+            // 
+            this.buttonBackUpFile.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonBackUpFile.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonBackUpFile.Location = new System.Drawing.Point(1090, 422);
+            this.buttonBackUpFile.Name = "buttonBackUpFile";
+            this.buttonBackUpFile.Size = new System.Drawing.Size(175, 31);
+            this.buttonBackUpFile.TabIndex = 16;
+            this.buttonBackUpFile.Text = "&Back Up File";
+            this.buttonBackUpFile.UseVisualStyleBackColor = false;
+            this.buttonBackUpFile.Click += new System.EventHandler(this.buttonBackUpFile_Click);
+            // 
+            // buttonBackUpProject
+            // 
+            this.buttonBackUpProject.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonBackUpProject.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonBackUpProject.Location = new System.Drawing.Point(1090, 465);
+            this.buttonBackUpProject.Name = "buttonBackUpProject";
+            this.buttonBackUpProject.Size = new System.Drawing.Size(175, 31);
+            this.buttonBackUpProject.TabIndex = 17;
+            this.buttonBackUpProject.Text = "Back Up &Project";
+            this.buttonBackUpProject.UseVisualStyleBackColor = false;
+            this.buttonBackUpProject.Click += new System.EventHandler(this.buttonBackUpProject_Click);
+            // 
+            // buttonArchiveFile
+            // 
+            this.buttonArchiveFile.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonArchiveFile.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonArchiveFile.Location = new System.Drawing.Point(1090, 508);
+            this.buttonArchiveFile.Name = "buttonArchiveFile";
+            this.buttonArchiveFile.Size = new System.Drawing.Size(175, 31);
+            this.buttonArchiveFile.TabIndex = 18;
+            this.buttonArchiveFile.Text = "&Archive File";
+            this.buttonArchiveFile.UseVisualStyleBackColor = false;
+            this.buttonArchiveFile.Click += new System.EventHandler(this.buttonArchiveFile_Click);
+            // 
+            // buttonArchiveProject
+            // 
+            this.buttonArchiveProject.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonArchiveProject.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonArchiveProject.Location = new System.Drawing.Point(1090, 551);
+            this.buttonArchiveProject.Name = "buttonArchiveProject";
+            this.buttonArchiveProject.Size = new System.Drawing.Size(175, 31);
+            this.buttonArchiveProject.TabIndex = 19;
+            this.buttonArchiveProject.Text = "&A&rchive Project";
+            this.buttonArchiveProject.UseVisualStyleBackColor = false;
+            this.buttonArchiveProject.Click += new System.EventHandler(this.buttonArchiveProject_Click);
+            // 
+            // buttonProperties
+            // 
+            this.buttonProperties.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonProperties.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.buttonProperties.Location = new System.Drawing.Point(1090, 619);
+            this.buttonProperties.Name = "buttonProperties";
+            this.buttonProperties.Size = new System.Drawing.Size(175, 31);
+            this.buttonProperties.TabIndex = 20;
+            this.buttonProperties.Text = "&Properties...";
+            this.buttonProperties.UseVisualStyleBackColor = false;
+            this.buttonProperties.Click += new System.EventHandler(this.buttonProperties_Click);
+            // 
             // DocMgr
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(1296, 985);
+            this.Controls.Add(this.buttonProperties);
+            this.Controls.Add(this.buttonArchiveProject);
+            this.Controls.Add(this.buttonArchiveFile);
+            this.Controls.Add(this.buttonBackUpProject);
+            this.Controls.Add(this.buttonBackUpFile);
             this.Controls.Add(this.buttonOpenFolder);
             this.Controls.Add(this.buttonNumberLines);
             this.Controls.Add(this.ButtonSaveAs);
@@ -275,5 +345,10 @@
         private Button buttonNumberLines;
         private ToolTip toolTips;
         private Button buttonOpenFolder;
+        private Button buttonBackUpFile;
+        private Button buttonBackUpProject;
+        private Button buttonArchiveFile;
+        private Button buttonArchiveProject;
+        private Button buttonProperties;
     }
 }

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Win32;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System;
 using System.Text;
 using System.Diagnostics;
 
@@ -12,13 +13,43 @@ namespace DocMgr
     {
         readonly int BUTTON_SPACING = 40;
         List<Button> buttons;
-        readonly Font font = new Font("Calibri", 14, FontStyle.Bold);
+        readonly Font SystemFont = new Font("Calibri", 14, FontStyle.Bold);
+        Font font = Properties.Settings.Default.DefaultFont;
+        //TEMP COMMENTED FOR USB BACKUP: string BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+        string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
+        string BackupFolder, ArchiveFolder;
+        string ProjName;
+        
         string? CurrentFilePath;
         static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
         int originalLeft;
         static readonly int BAD_INT = int.MinValue;
         static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
+
+        static private PropertyGrid propertyGrid;
+        //static private MySettings settings;
+
+
+        //public class MySettings
+        //{
+        //    [Category("General Settings")]
+        //    [Description("The title of the application window.")]
+        //    public string WindowTitle { get; set; }
+
+        //    //[Category("General Settings")]
+        //    //[Description("The title of the application window.")]
+        //    //public string WindowTitle { get; set; }
+
+        //    //[Category("Appearance")]
+        //    //[Description("The background color of the application.")]
+        //    //public Color BackgroundColor { get; set; }
+
+        //    //[Category("Behavior")]
+        //    //[Description("Enables or disables logging.")]
+        //    //public bool EnableLogging { get; set; }
+        //}
+
 
         private Doc? Root = new Doc("Root");
         private static Point ButtonListStart { get; set; } = new Point(10, 78);
@@ -35,12 +66,6 @@ namespace DocMgr
                 + label2.Height + 3;
             ButtonListStart = newStart;
             originalLeft = richTextBox.Left;
-
-            /*** To do: 1. Adjust button widths according to name lengths,
-             *   2. Adjust text box X position according to button widths,
-             *   3. Adjust doc & project names according to text box position,
-             *   4. Adjust control buttons on right edge according to text box.
-             ***/
         }
 
         public enum ScrollBarType : uint
@@ -53,7 +78,8 @@ namespace DocMgr
 
         public enum Message : uint
         {
-            WM_VSCROLL = 0x0115
+            WM_VSCROLL = 0x0115,
+            EM_SETSCROLLPOS = 0x04DD
         }
 
         public enum ScrollBarCommands : uint
@@ -75,7 +101,55 @@ namespace DocMgr
         [DllImport("user32.dll")]
         static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);// DllImports.
 
-        private void SaveScrollPosition()
+            // Constants for scroll bar direction
+        private const int SB_VERT = 1; // Vertical scroll bar
+        private const int SIF_RANGE = 0x1;
+        private const int SIF_PAGE = 0x2;
+        private const int SIF_POS = 0x4;
+        private const int SIF_DISABLENOSCROLL = 0x8;
+        private const int SIF_TRACKPOS = 0x10;
+        private const int SIF_ALL = SIF_RANGE | SIF_PAGE | SIF_POS | SIF_TRACKPOS;
+
+        // SCROLLINFO struct
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SCROLLINFO
+        {
+            public uint cbSize;
+            public uint fMask;
+            public int nMin;
+            public int nMax;
+            public uint nPage;
+            public int nPos;
+            public int nTrackPos;
+        }
+
+        // P/Invoke declaration
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int SetScrollInfo(IntPtr hwnd, int nBar, ref SCROLLINFO lpsi, bool redraw);
+
+        // Method to set scroll position  DFW
+        //public static void SetVerticalScrollPosition(Control control, int position)
+        //{
+        //    if (!control.IsHandleCreated)
+        //    {
+        //        throw new InvalidOperationException("Control handle is not created.");
+        //    }
+
+        //    SCROLLINFO si = new SCROLLINFO
+        //    {
+        //        cbSize = (uint)Marshal.SizeOf(typeof(SCROLLINFO)),
+        //        fMask = SIF_POS | SIF_RANGE | SIF_PAGE,
+        //        nMin = 0,
+        //        nMax = 10000, // Example range; customize as needed
+        //        nPage = 10, // Example page size
+        //        nPos = position
+        //    };
+
+        //    // Set the scroll info
+        //    SetScrollInfo(control.Handle, SB_VERT, ref si, true);
+        //}
+
+    private void SaveScrollPosition()
         {
             Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
@@ -93,10 +167,35 @@ namespace DocMgr
             return GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
         private bool SetScrollPosition(int nPos)
         {
-            return PostMessage(richTextBox.Handle, (int)Message.WM_VSCROLL,
-                (IntPtr)((int)ScrollBarCommands.SB_THUMBPOSITION + 0x10000 * nPos), (IntPtr)0);
+            //SetVerticalScrollPosition(this, nPos);    // DFW.
+            //return true;
+            // DFW:
+            POINT pt = new POINT { x = 0, y = nPos };
+            IntPtr wParam = IntPtr.Zero;
+            IntPtr lParam = (IntPtr)(((int)ScrollBarCommands.SB_THUMBPOSITION) | (nPos << 16));
+            GCHandle handle = GCHandle.Alloc(pt, GCHandleType.Pinned);
+
+            try
+            {
+                IntPtr ptr = handle.AddrOfPinnedObject();
+
+                return SendMessage(richTextBox.Handle, (int)Message.EM_SETSCROLLPOS,
+                    wParam, ptr) != 0;
+            }
+            finally
+            {
+                handle.Free();
+            }
+
         }
 
         private void ButtonSaveAs_Click(object sender, EventArgs e)
@@ -117,6 +216,15 @@ namespace DocMgr
 
                 if (Root.SubDocs == null)
                     Root.SubDocs = new List<Doc>();
+
+                string temp;
+                if (IsNullOrEmpty(BackupsAndArchivesFolder))
+                {
+                    string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    Properties.Settings.Default.BackupsAndArchivesFolder = documentsPath + '\\' + "BackupsAndArchives";
+                    BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+                    Properties.Settings.Default.Save();
+                }
 
                 // NEXT STEPS: Need to serialize default font.  Then add button to use font dlg to set default font.
                 // (LATER) When new doc created, set font from default font.
@@ -171,7 +279,7 @@ namespace DocMgr
                 // Make configurable button:
                 Button b = new Button();
                 b.Text = "&" + doc.DocName;
-                b.Font = font;
+                b.Font = SystemFont;
                 b.Name = doc.DocName;
                 b.Tag = doc.DocPath;
                 b.Click += SelectDocClick;
@@ -202,7 +310,9 @@ namespace DocMgr
             }
 
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
-                ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines };
+                ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
+                buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
+                buttonArchiveProject, buttonProperties};
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -273,6 +383,9 @@ namespace DocMgr
             if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
                 buttonSaveDoc_Click(null, null);                    // Save changes.
 
+            if (DocName.Text.Length > 0)
+                SaveScrollPosition();
+
             loadingDoc = true;
             richTextBox.Clear();
             Button but = sender as Button;
@@ -298,7 +411,7 @@ namespace DocMgr
             else
                 MessageBox.Show("Can't select document.");
 
-            if (richTextBox.Text.Length == 0)
+            //if (richTextBox.Text.Length == 0)
                 richTextBox.Font = font;
 
             buttonRemoveDoc.Enabled = true;
@@ -328,8 +441,15 @@ namespace DocMgr
         {
             Doc? doc = FindDocByName(name);
 
+
+
+            bool iTemp = false;
+            int err;
             if (doc != null)
-                SetScrollPosition(doc.ScrollPos);
+                iTemp = SetScrollPosition(doc.ScrollPos);
+
+            if (!iTemp)
+                err = GetLastError();
         }
 
         private void ClickButtonWithName(string buttonName)     // Load the document with that name.
@@ -619,6 +739,7 @@ namespace DocMgr
             if (!IsNullOrEmpty(docPath))
             {
                 string docName = Path.GetFileNameWithoutExtension(docPath);
+                ProjName = Path.GetFileNameWithoutExtension(Root.DocPath);
 
                 if (!DocAlreadyInProject(docName)  &&  addIfMissing)
                 {
@@ -874,6 +995,169 @@ namespace DocMgr
             Process.Start("explorer", ProjectFolder);
         }
 
+
+        #region BackupsAndArchives
+        private void buttonBackUpFile_Click(object sender, EventArgs e)
+        {
+            if ((BackupFolder = GetMakeBackupFolder(ProjName)) == "")
+                return;                         // Problems.
+
+            HandleOneFile(BackupFolder);
+        }
+
+        private void buttonArchiveFile_Click(object sender, EventArgs e)
+        {
+            if ((ArchiveFolder = GetMakeArchiveFolder(ProjName)) == "")
+                return;                         // Problems.
+
+            HandleOneFile(ArchiveFolder);
+        }
+
+        private void HandleOneFile(string destFolder)
+        {
+            if (Root.SubDocs.Count == 0)
+                return;                         // No docs.
+
+            if (CopySingleDocToFolder(Root.SubDocs, destFolder, DocName.Text))
+            {
+                MessageBox.Show($"{DocName.Text} is saved.");
+                return;
+            }
+
+            MessageBox.Show($"Warning: Document {DocName.Text} was not found and not saved.");
+        }
+
+        private void buttonBackUpProject_Click(object sender, EventArgs e)
+        {
+
+            if ((BackupFolder = GetMakeBackupFolder(ProjName)) == "")
+                return;                         // Problems.
+
+            HandleProject(BackupFolder);
+        }
+
+        private void buttonArchiveProject_Click(object sender, EventArgs e)
+        {
+            if ((ArchiveFolder = GetMakeArchiveFolder(ProjName)) == "")
+                return;                         // Problems.
+
+            HandleProject(ArchiveFolder);
+        }
+
+        private void HandleProject(string destFolder)
+        {
+            if (Root.SubDocs.Count == 0)
+                return;                         // No docs.
+
+            if (CopyDocsToFolder(Root.SubDocs, destFolder))
+            {
+                MessageBox.Show($"{ProjName} is saved.");
+                return;
+            }
+
+            MessageBox.Show($"Warning: Document {DocName.Text} was not found and not saved.");
+        }
+
+        private bool CopySingleDocToFolder(List<Doc> subDocs, string destFolder, string docToCopy)
+        {
+            try
+            {
+                foreach (Doc doc in subDocs)
+                    if (doc.DocName + ':' == docToCopy)             // Match name in GUI.
+                        return CopyFileToFolder(doc, destFolder);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            return false;
+        }
+
+        private bool CopyDocsToFolder(List<Doc> subDocs, string destFolder)
+        {
+            foreach (Doc doc in subDocs)
+                try
+                {
+                    CopyFileToFolder(doc, destFolder);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return false;
+                }
+
+            return true;
+        }
+
+        private bool CopyFileToFolder(Doc doc, string destFolder)
+        {
+            if (!Directory.Exists(destFolder)  ||  !File.Exists(doc.DocPath))
+                return false;
+
+            string destinationFile = Path.Combine(destFolder, Path.GetFileName(doc.DocPath));
+            File.Copy(doc.DocPath, destinationFile, true);
+            return true;
+        }
+
+        private string GetMakeBackupFolder(string projName)
+        {
+            if (string.IsNullOrEmpty(Root.DocPath))
+            {
+                MessageBox.Show("Project name is empty.");
+                return "";                              // Project name blank.
+            }
+
+            BackupFolder = BackupsAndArchivesFolder + '\\' + "Backups" + '\\' + projName;
+
+            return GetMakeFolder(BackupFolder);
+        }
+
+        private string GetMakeArchiveFolder(string projName)
+        {
+            if (string.IsNullOrEmpty(Root.DocPath))
+            {
+                MessageBox.Show("Project name is empty.");
+                return "";                              // Project name blank.
+            }
+
+            ArchiveFolder = BackupsAndArchivesFolder + '\\' + "Archives" 
+                + '\\' + projName + '\\' + DateTime.Now.ToString("s").Replace(':', '.');
+
+            return GetMakeFolder(ArchiveFolder);
+        }
+
+        private void buttonProperties_Click(object sender, EventArgs e)
+        {
+            PropertiesForm prop = new PropertiesForm();
+            prop.SetProperties(Properties.Settings.Default);
+            prop.ShowDialog();
+
+            if (prop.SaveSettings)
+            {
+                Properties.Settings.Default.Save();
+                BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+                font = Properties.Settings.Default.DefaultFont;
+                richTextBox.Font = font;
+            }
+        }
+
+            private string GetMakeFolder(string folderName)
+        {
+            try
+            {
+                if (!Directory.Exists(folderName))
+                    Directory.CreateDirectory(folderName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return "";
+            }
+
+            return folderName;
+        }
+        #endregion
 
         //private int CountChar(string text, char v)
         //{
