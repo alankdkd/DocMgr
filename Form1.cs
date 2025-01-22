@@ -142,7 +142,6 @@ namespace DocMgr
 
             // Set the scroll info
             int rc = SetScrollInfo(control.Handle, SB_VERT, ref si, true);
-            rc = rc;
         }
 
         private void SaveScrollPosition()
@@ -537,8 +536,8 @@ namespace DocMgr
 
         private void DocMgr_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (int)Keys.Escape)
-                buttonClose_Click(sender, e);           // User wants to exit.
+            //if (e.KeyChar == (int)Keys.Escape)
+            //    buttonClose_Click(sender, e);           // User wants to exit.
 
             if (e.KeyChar == 19)                        // Ctrl-S.  Civilized way to do this not apparent.
                 buttonSaveDoc_Click(sender, e);         // Save document.
