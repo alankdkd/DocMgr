@@ -35,12 +35,12 @@ namespace DocMgr
 
         public class MySettings
         {
-            [Category("General Settings")]
+            [Category("Properties")]
             [Description("The path to the BackupsAndArchives folder.")]
             [Editor(typeof(FolderPathEditor), typeof(UITypeEditor))]
             public string BackupsAndArchivesFolder { get; set; }
 
-            [Category("General Settings")]
+            [Category("Properties")]
             [Description("The font to use in new documents.")]
             public Font DefaultFont { get; set; }
         }
@@ -1159,11 +1159,18 @@ namespace DocMgr
         private void buttonProperties_Click(object sender, EventArgs e)
         {
             PropertiesForm prop = new PropertiesForm();
-            prop.SetProperties(Properties.Settings.Default);
+            MySettings mySettings = new ();
+
+            mySettings.DefaultFont = Properties.Settings.Default.DefaultFont;
+            mySettings.BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+
+            prop.SetProperties(mySettings);
             prop.ShowDialog();
 
             if (prop.SaveSettings)
             {
+                Properties.Settings.Default.DefaultFont = mySettings.DefaultFont;
+                Properties.Settings.Default.BackupsAndArchivesFolder = mySettings.BackupsAndArchivesFolder;
                 Properties.Settings.Default.Save();
                 BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
                 font = Properties.Settings.Default.DefaultFont;
