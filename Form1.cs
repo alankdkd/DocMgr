@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 using System;
 using System.Text;
 using System.Diagnostics;
+using System.Drawing.Design;
+using System.ComponentModel;
 
 namespace DocMgr
 {
@@ -13,13 +15,13 @@ namespace DocMgr
     {
         readonly int BUTTON_SPACING = 40;
         List<Button> buttons;
-        readonly Font SystemFont = new Font("Calibri", 14, FontStyle.Bold);
+        public static readonly Font SystemFont = new Font("Calibri", 14, FontStyle.Bold);
         Font font = Properties.Settings.Default.DefaultFont;
-        //TEMP COMMENTED FOR USB BACKUP: string BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
-        string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
+        string BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+        //TEMP FOR USB BACKUP: string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
         string BackupFolder, ArchiveFolder;
         string ProjName;
-        
+
         string? CurrentFilePath;
         static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
@@ -28,8 +30,20 @@ namespace DocMgr
         static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
 
         static private PropertyGrid propertyGrid;
-        //static private MySettings settings;
+        static private MySettings settings;
 
+
+        public class MySettings
+        {
+            [Category("General Settings")]
+            [Description("The path to the BackupsAndArchives folder.")]
+            [Editor(typeof(FolderPathEditor), typeof(UITypeEditor))]
+            public string BackupsAndArchivesFolder { get; set; }
+
+            [Category("General Settings")]
+            [Description("The font to use in new documents.")]
+            public Font DefaultFont { get; set; }
+        }
 
         //public class MySettings
         //{
@@ -128,28 +142,30 @@ namespace DocMgr
         private static extern int SetScrollInfo(IntPtr hwnd, int nBar, ref SCROLLINFO lpsi, bool redraw);
 
         // Method to set scroll position  DFW
-        //public static void SetVerticalScrollPosition(Control control, int position)
-        //{
-        //    if (!control.IsHandleCreated)
-        //    {
-        //        throw new InvalidOperationException("Control handle is not created.");
-        //    }
+        public static void SetVerticalScrollPosition(Control control, int position)
+        {
+            if (!control.IsHandleCreated)
+            {
+                throw new InvalidOperationException("Control handle is not created.");
+            }
 
-        //    SCROLLINFO si = new SCROLLINFO
-        //    {
-        //        cbSize = (uint)Marshal.SizeOf(typeof(SCROLLINFO)),
-        //        fMask = SIF_POS | SIF_RANGE | SIF_PAGE,
-        //        nMin = 0,
-        //        nMax = 10000, // Example range; customize as needed
-        //        nPage = 10, // Example page size
-        //        nPos = position
-        //    };
+            SCROLLINFO si = new SCROLLINFO
+            {
+                cbSize = (uint)Marshal.SizeOf(typeof(SCROLLINFO)),
+               //ORIG:  fMask = SIF_POS | SIF_RANGE | SIF_PAGE,
+                fMask = SIF_POS,
+                nMin = 0,
+                nMax = 90000, // Example range; customize as needed
+                nPage = 10, // Example page size
+                nPos = position
+            };
 
-        //    // Set the scroll info
-        //    SetScrollInfo(control.Handle, SB_VERT, ref si, true);
-        //}
+            // Set the scroll info
+            int rc = SetScrollInfo(control.Handle, SB_VERT, ref si, true);
+            rc = rc;
+        }
 
-    private void SaveScrollPosition()
+        private void SaveScrollPosition()
         {
             Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
 
@@ -165,36 +181,49 @@ namespace DocMgr
         private int GetScrollPosition()
         {
             return GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
+            //int pos = GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
+            //int refinedPos = richTextBox.GetCharIndexFromPosition(new Point(0, 0));
+
+            //return refinedPos;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct POINT
-        {
-            public int x;
-            public int y;
-        }
+        //[StructLayout(LayoutKind.Sequential)]
+        //public struct POINT
+        //{
+        //    public int x;
+        //    public int y;
+        //}
 
         private bool SetScrollPosition(int nPos)
         {
-            //SetVerticalScrollPosition(this, nPos);    // DFW.
+            //SetVerticalScrollPosition(richTextBox, nPos);    // DFW.
             //return true;
+
+            richTextBox.SelectionStart = nPos;
+            richTextBox.SelectionLength = 0;
+            richTextBox.ScrollToCaret();
+
+            return true;
+
+
+
             // DFW:
-            POINT pt = new POINT { x = 0, y = nPos };
-            IntPtr wParam = IntPtr.Zero;
-            IntPtr lParam = (IntPtr)(((int)ScrollBarCommands.SB_THUMBPOSITION) | (nPos << 16));
-            GCHandle handle = GCHandle.Alloc(pt, GCHandleType.Pinned);
+            //POINT pt = new POINT { x = 0, y = nPos };
+            //IntPtr wParam = IntPtr.Zero;
+            //IntPtr lParam = (IntPtr)(((int)ScrollBarCommands.SB_THUMBPOSITION) | (nPos << 16));
+            //GCHandle handle = GCHandle.Alloc(pt, GCHandleType.Pinned);
 
-            try
-            {
-                IntPtr ptr = handle.AddrOfPinnedObject();
+            //try
+            //{
+            //    IntPtr ptr = handle.AddrOfPinnedObject();
 
-                return SendMessage(richTextBox.Handle, (int)Message.EM_SETSCROLLPOS,
-                    wParam, ptr) != 0;
-            }
-            finally
-            {
-                handle.Free();
-            }
+            //    return SendMessage(richTextBox.Handle, (int)Message.EM_SETSCROLLPOS,
+            //        wParam, ptr) != 0;
+            //}
+            //finally
+            //{
+            //    handle.Free();
+            //}
 
         }
 
