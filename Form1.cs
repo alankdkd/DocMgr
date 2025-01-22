@@ -1053,6 +1053,7 @@ namespace DocMgr
                 return;                         // Problems.
 
             HandleProject(ArchiveFolder);
+            SetReadOnlyAttributes(ArchiveFolder);
         }
 
         private void HandleProject(string destFolder)
@@ -1063,7 +1064,6 @@ namespace DocMgr
             if (CopyDocsToFolder(Root.SubDocs, destFolder))
             {
                 MessageBox.Show($"{ProjName} is saved.");
-                SetReadOnlyAttributes(destFolder);
                 return;
             }
 
