@@ -45,26 +45,6 @@ namespace DocMgr
             public Font DefaultFont { get; set; }
         }
 
-        //public class MySettings
-        //{
-        //    [Category("General Settings")]
-        //    [Description("The title of the application window.")]
-        //    public string WindowTitle { get; set; }
-
-        //    //[Category("General Settings")]
-        //    //[Description("The title of the application window.")]
-        //    //public string WindowTitle { get; set; }
-
-        //    //[Category("Appearance")]
-        //    //[Description("The background color of the application.")]
-        //    //public Color BackgroundColor { get; set; }
-
-        //    //[Category("Behavior")]
-        //    //[Description("Enables or disables logging.")]
-        //    //public bool EnableLogging { get; set; }
-        //}
-
-
         private Doc? Root = new Doc("Root");
         private static Point ButtonListStart { get; set; } = new Point(10, 78);
         public DocMgr()
@@ -180,7 +160,11 @@ namespace DocMgr
 
         private int GetScrollPosition()
         {
-            return GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
+            return richTextBox.GetCharIndexFromPosition(new Point(0, 0));
+
+            //ORIG: return GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
+
+
             //int pos = GetScrollPos(richTextBox.Handle, (int)ScrollBarType.SbVert);
             //int refinedPos = richTextBox.GetCharIndexFromPosition(new Point(0, 0));
 
@@ -202,7 +186,6 @@ namespace DocMgr
             richTextBox.SelectionStart = nPos;
             richTextBox.SelectionLength = 0;
             richTextBox.ScrollToCaret();
-
             return true;
 
 
@@ -1081,6 +1064,7 @@ namespace DocMgr
             if (CopyDocsToFolder(Root.SubDocs, destFolder))
             {
                 MessageBox.Show($"{ProjName} is saved.");
+                SetReadOnlyAttributes(destFolder);
                 return;
             }
 
@@ -1158,8 +1142,10 @@ namespace DocMgr
 
         private void buttonProperties_Click(object sender, EventArgs e)
         {
-            PropertiesForm prop = new PropertiesForm();
+            PropertiesForm prop = new ();
             MySettings mySettings = new ();
+            
+            // Copy to MySettings to edit backup path with folder browser:
 
             mySettings.DefaultFont = Properties.Settings.Default.DefaultFont;
             mySettings.BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
@@ -1168,10 +1154,12 @@ namespace DocMgr
             prop.ShowDialog();
 
             if (prop.SaveSettings)
-            {
+            {               // Copy settings back to default for persistence:
                 Properties.Settings.Default.DefaultFont = mySettings.DefaultFont;
                 Properties.Settings.Default.BackupsAndArchivesFolder = mySettings.BackupsAndArchivesFolder;
                 Properties.Settings.Default.Save();
+
+                            // Update current settings:
                 BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
                 font = Properties.Settings.Default.DefaultFont;
                 richTextBox.Font = font;
@@ -1193,6 +1181,27 @@ namespace DocMgr
 
             return folderName;
         }
+
+        private void SetReadOnlyAttributes(string destFolder)
+        {
+            DirectoryInfo dirInfo = new(destFolder);
+
+            if (dirInfo.Exists)
+            {
+                dirInfo.Attributes |= FileAttributes.ReadOnly;
+
+                foreach (var file in dirInfo.GetFiles())
+                {
+                    file.Attributes |= FileAttributes.ReadOnly;
+                }
+
+                foreach (var subDir in dirInfo.GetDirectories())
+                {
+                    SetReadOnlyAttributes(subDir.FullName);
+                }
+            }
+        }
+
         #endregion
 
         //private int CountChar(string text, char v)
