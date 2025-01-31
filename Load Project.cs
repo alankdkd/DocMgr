@@ -50,8 +50,16 @@ namespace DocMgr
             if (key == null)
                 return;
 
-            string projName = key.GetValue("Name").ToString();
-            string projPath = key.GetValue("Path").ToString();
+            object? obj = key.GetValue("Name");
+
+            if (obj == null || !(obj is string projName))
+                return;
+
+            obj = key.GetValue("Path");
+
+            if (obj == null || !(obj is string projPath))
+                return;
+
             projMap[projName] = projPath;
         }
 
@@ -116,7 +124,13 @@ namespace DocMgr
             if (key == null)
                 return "";
 
-            return key.GetValue("Name").ToString();
+            object obj = key.GetValue("Name");
+
+            if (obj == null || !(obj is string))
+                return null;
+
+                //ORIG: return key.GetValue("Name").ToString();
+            return obj.ToString();
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
