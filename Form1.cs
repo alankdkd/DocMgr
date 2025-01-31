@@ -1250,30 +1250,82 @@ namespace DocMgr
         {
             SaveScrollPosition();
 
-            using (OpenFileDialog ofd = new OpenFileDialog())
+            using (FolderBrowserDialog folderDialog = new())
             {
-                ofd.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
-                ofd.CheckFileExists = false;
-                ofd.CheckPathExists = false;
+                folderDialog.Description = "Select Parent Folder for Project";
 
-                if (ofd.ShowDialog() == DialogResult.OK)
+                // Show the folder dialog:
+                if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    ProjectName.Text = Path.GetFileNameWithoutExtension(ofd.FileName);
-                    string FolderPath = Path.GetDirectoryName(ofd.FileName) + "\\" + ProjectName.Text;
-                    string NameAndExtension = Path.GetFileName(ofd.FileName);
-                    CurrentFilePath = ProjectPath = FolderPath + "\\" + NameAndExtension;
-                    Directory.CreateDirectory(FolderPath);
+                    string selectedFolder = folderDialog.SelectedPath;
 
-                    Root = new Doc("Root");
-                    SaveProject(CurrentFilePath, Root);
-                    SetProjectPath(CurrentFilePath);
-                    richTextBox.Clear();
-                    DocName.Text = "";
-                    Root.DocPath = CurrentFilePath;
-                    MakeButtons(Root.SubDocs);
+                    using (CreateFolderDialog createDialog = new(selectedFolder))
+                    {
+                        createDialog.Text = "Enter New Project Name";
+                        
+                        if (createDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string newFolderPath = createDialog.NewFolderPath;
+                            string projFilePath = newFolderPath + '\\' + createDialog.textProjName.Text + ".json";
+                            Root = new Doc("Root");
+                            SaveProject(projFilePath, Root);
+                            SetProjectPath(projFilePath);
+                            richTextBox.Clear();
+                            DocName.Text = "";
+                            Root.DocPath = newFolderPath;
+                            LoadProject(projFilePath, out Root);
+                            MakeButtons(Root.SubDocs);
+                            DocName.Text = "";
+                        }
+                    }
+
+                    // Prompt the user for the new folder name
+                    //Console.Write("Enter the name for the new folder: ");
+                    //string newFolderName = Console.ReadLine();
+
+                    //if (string.IsNullOrWhiteSpace(newFolderName))
+                    //{
+                    //    Console.WriteLine("Folder name cannot be empty.");
+                    //    return;
+                    //}
+
+                    //string newFolderPath = Path.Combine(selectedFolder, newFolderName);
+
+                    //// Check if the folder exists, and create it if not
+                    //if (!Directory.Exists(newFolderPath))
+                    //{
+                    //    Directory.CreateDirectory(newFolderPath);
+                    //    Console.WriteLine($"New folder created at: {newFolderPath}");
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine($"Folder already exists: {newFolderPath}");
+                    //}
                 }
             }
         }
+        //using (OpenFileDialog ofd = new OpenFileDialog())         // ORIG.  WTF?
+        //{
+        //    ofd.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
+        //    ofd.CheckFileExists = false;
+        //    ofd.CheckPathExists = false;
+
+        //    if (ofd.ShowDialog() == DialogResult.OK)
+        //    {
+        //        ProjectName.Text = Path.GetFileNameWithoutExtension(ofd.FileName);
+        //        string FolderPath = Path.GetDirectoryName(ofd.FileName) + "\\" + ProjectName.Text;
+        //        string NameAndExtension = Path.GetFileName(ofd.FileName);
+        //        CurrentFilePath = ProjectPath = FolderPath + "\\" + NameAndExtension;
+        //        Directory.CreateDirectory(FolderPath);
+
+        //        Root = new Doc("Root");
+        //        SaveProject(CurrentFilePath, Root);
+        //        SetProjectPath(CurrentFilePath);
+        //        richTextBox.Clear();
+        //        DocName.Text = "";
+        //        Root.DocPath = CurrentFilePath;
+        //        MakeButtons(Root.SubDocs);
+        //    }
 
         //public static void CenterCursorInButton(this Button but)
         //{
