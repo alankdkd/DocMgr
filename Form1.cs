@@ -489,6 +489,7 @@ namespace DocMgr
                         buttonLoadDoc.Enabled = true;
                         Root.DocPath = projectPath;
                         LoadProjectDlg.AddProject(ProjectName.Text, projectPath);
+                        ProjName = ProjectName.Text;
                     }
                     catch (Exception ex)
                     {
