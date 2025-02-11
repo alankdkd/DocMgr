@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 
 namespace DocMgr
 {
@@ -129,25 +120,25 @@ namespace DocMgr
             if (obj == null || !(obj is string))
                 return null;
 
-                //ORIG: return key.GetValue("Name").ToString();
+            //ORIG: return key.GetValue("Name").ToString();
             return obj.ToString();
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            buttonSelect_Click(sender, e);
+            listBox1_Click(sender, e);
         }
 
-        private void buttonSelect_Click(object sender, EventArgs e)
-        {
-            if (listBox1.SelectedIndex == -1)
-                return;
+        //private void buttonSelect_Click(object sender, EventArgs e)
+        //{
+        //    if (listBox1.SelectedIndex == -1)
+        //        return;
 
-            string projName = listBox1.SelectedItem.ToString();
-            selectedPath = projMap[projName];
-            DialogResult = DialogResult.OK;
-            Close();
-        }
+        //    string projName = listBox1.SelectedItem.ToString();
+        //    selectedPath = projMap[projName];
+        //    DialogResult = DialogResult.OK;
+        //    Close();
+        //}
 
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
@@ -173,7 +164,13 @@ namespace DocMgr
 
         private void listBox1_Click(object sender, EventArgs e)
         {
-            buttonSelect.Enabled = true;
+            if (listBox1.SelectedIndex == -1)
+                return;
+
+            string projName = listBox1.SelectedItem.ToString();
+            selectedPath = projMap[projName];
+            DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }

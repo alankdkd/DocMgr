@@ -1032,7 +1032,7 @@ namespace DocMgr
 
             if (CopySingleDocToFolder(Root.SubDocs, destFolder, DocName.Text))
             {
-                MessageBox.Show($"{DocName.Text} is saved.");
+                MessageBox.Show($"{DocName.Text.Substring(0, DocName.Text.Length - 1)} is saved.");
                 return;
             }
 
