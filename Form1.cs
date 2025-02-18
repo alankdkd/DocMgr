@@ -13,7 +13,9 @@ namespace DocMgr
 {
     public partial class DocMgr : Form
     {
-        readonly int BUTTON_SPACING = 40;
+        readonly int BUTTON_Y_SPACING = 40;
+        readonly int MIN_BUTTON_WIDTH = 120;
+        readonly int BUTTON_COLUMN_GAP = 10;
         List<Button> buttons;
         public static readonly Font SystemFont = new Font("Calibri", 14, FontStyle.Bold);
         Font font = Properties.Settings.Default.DefaultFont;
@@ -122,27 +124,27 @@ namespace DocMgr
         private static extern int SetScrollInfo(IntPtr hwnd, int nBar, ref SCROLLINFO lpsi, bool redraw);
 
         // Method to set scroll position  DFW
-        public static void SetVerticalScrollPosition(Control control, int position)
-        {
-            if (!control.IsHandleCreated)
-            {
-                throw new InvalidOperationException("Control handle is not created.");
-            }
+        //public static void SetVerticalScrollPosition(Control control, int position)
+        //{
+        //    if (!control.IsHandleCreated)
+        //    {
+        //        throw new InvalidOperationException("Control handle is not created.");
+        //    }
 
-            SCROLLINFO si = new SCROLLINFO
-            {
-                cbSize = (uint)Marshal.SizeOf(typeof(SCROLLINFO)),
-               //ORIG:  fMask = SIF_POS | SIF_RANGE | SIF_PAGE,
-                fMask = SIF_POS,
-                nMin = 0,
-                nMax = 90000, // Example range; customize as needed
-                nPage = 10, // Example page size
-                nPos = position
-            };
+        //    SCROLLINFO si = new SCROLLINFO
+        //    {
+        //        cbSize = (uint)Marshal.SizeOf(typeof(SCROLLINFO)),
+        //       //ORIG:  fMask = SIF_POS | SIF_RANGE | SIF_PAGE,
+        //        fMask = SIF_POS,
+        //        nMin = 0,
+        //        nMax = 90000, // Example range; customize as needed
+        //        nPage = 10, // Example page size
+        //        nPos = position
+        //    };
 
-            // Set the scroll info
-            int rc = SetScrollInfo(control.Handle, SB_VERT, ref si, true);
-        }
+        //    // Set the scroll info
+        //    int rc = SetScrollInfo(control.Handle, SB_VERT, ref si, true);
+        //}
 
         private void SaveScrollPosition()
         {
@@ -278,7 +280,7 @@ namespace DocMgr
 
         private void MakeButtons(List<Doc>? subDocs)    // Make a button on the left side
         {                                               // for each of project's documents.
-            Point next = ButtonListStart;
+            //Point next = ButtonListStart;
             buttons = new List<Button>();
             RemoveOldButtons();
 
@@ -294,8 +296,8 @@ namespace DocMgr
                 b.Name = doc.DocName;
                 b.Tag = doc.DocPath;
                 b.Click += SelectDocClick;
-                b.Location = next;
-                next.Y += BUTTON_SPACING;
+                //b.Location = next;
+                //next.Y += BUTTON_SPACING;
                 b.Size = new Size(120, 35);
                 b.BackColor = Color.FromArgb(255, 250, 250, 250);
                 b.MouseHover += button_MouseHover;
@@ -340,7 +342,7 @@ namespace DocMgr
 
         private void ResizeAndAddButtons(List<Button> buttons)
         {
-            float buttonWidth = 120;
+            float buttonWidth = MIN_BUTTON_WIDTH;
 
             if (buttons.Count() == 0)
             {
@@ -350,24 +352,69 @@ namespace DocMgr
 
             Graphics g = buttons[0].CreateGraphics();
             Font f = buttons[0].Font;
+            Point next = ButtonListStart;
+            HashSet<Button> buttonColumn = new();
 
+            // PSEUDOCODE: For each button: Set left.  Increment next.Y.  if past richTextBox.bottom,
+            // increment next.X by max width so far (buttonWidth)
+            //             and reset next.Y to ButtonListStart.Y, and reset buttonWidth to 120.
 
             foreach (Button b in buttons)
             {
                 var size = g.MeasureString(b.Text, f);
                 float width = size.Width;
 
+                b.Location = next;
+                next.Y += BUTTON_Y_SPACING;
+
+                if (b.Bottom > richTextBox.Bottom)
+                {                           // Won't fit; start a new button column:
+                    foreach (Button b2 in buttonColumn)     // Resize and add cur column:
+                    {
+                        b2.Width = (int)buttonWidth;
+                        Controls.Add(b2);
+                    }
+
+                    buttonColumn.Clear();
+                    next.X += ((int)buttonWidth + BUTTON_COLUMN_GAP);
+                    next.Y = ButtonListStart.Y;
+                    buttonWidth = MIN_BUTTON_WIDTH;
+                    b.Location = next;
+                    next.Y += BUTTON_Y_SPACING;
+                }
+
                 if (width > buttonWidth)
                     buttonWidth = width;    // Get maximum length button name.
+
+                buttonColumn.Add(b);
             }
 
-            foreach (Button b in buttons)
+            foreach (Button b2 in buttonColumn)
             {
-                b.Width = (int)Math.Round(buttonWidth);
-                Controls.Add(b);
+                b2.Width = (int)buttonWidth;
+                Controls.Add(b2);
             }
 
-            richTextBox.Left = (int)Math.Round(buttons[0].Left + buttonWidth) + 10;
+            //ORIG: richTextBox.Left = (int)Math.Round(buttons[0].Left + buttonWidth) + 10;
+            richTextBox.Left = next.X + (int)buttonWidth + BUTTON_COLUMN_GAP;
+            CenterToScreen();
+            // ORIG:
+            //foreach (Button b in buttons)
+            //{
+            //    var size = g.MeasureString(b.Text, f);
+            //    float width = size.Width;
+
+            //    if (width > buttonWidth)
+            //        buttonWidth = width;    // Get maximum length button name.
+            //}
+
+            //foreach (Button b in buttons)
+            //{
+            //    b.Width = (int)Math.Round(buttonWidth);
+            //    Controls.Add(b);
+            //}
+
+            //richTextBox.Left = (int)Math.Round(buttons[0].Left + buttonWidth) + 10;
         }
 
         private void RemoveOldButtons()     // Remove every document button.

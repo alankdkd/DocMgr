@@ -129,17 +129,6 @@ namespace DocMgr
             listBox1_Click(sender, e);
         }
 
-        //private void buttonSelect_Click(object sender, EventArgs e)
-        //{
-        //    if (listBox1.SelectedIndex == -1)
-        //        return;
-
-        //    string projName = listBox1.SelectedItem.ToString();
-        //    selectedPath = projMap[projName];
-        //    DialogResult = DialogResult.OK;
-        //    Close();
-        //}
-
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
             string? projectPath = DocMgr.SelectFile("json files (*.json)|*.json|All files (*.*)|*.*");
