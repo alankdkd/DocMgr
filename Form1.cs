@@ -306,7 +306,16 @@ namespace DocMgr
 
             ResizeAndAddButtons(buttons);
             ArrangeControls();
+            CenterWindowIfOverEdge();
         }
+
+        private void CenterWindowIfOverEdge()
+        {
+            //if (WindowExtensions.IsOutOfScreenBounds(this))
+                if (this.IsOutOfScreenBounds())
+                    CenterToScreen();
+        }
+
 
         private void ArrangeControls()
         {
@@ -426,7 +435,8 @@ namespace DocMgr
                 changed = false;
 
                 foreach (Control cont in Controls)
-                    if ((cont is Button) && (cont.Left == ButtonListStart.X))
+                    if ((cont is Button) && (cont.Left < richTextBox.Left - 5)
+                        && cont.Top > ButtonListStart.Y - 2)
                     {
                         Controls.Remove(cont as Button);
                         changed = true;
@@ -1379,5 +1389,22 @@ namespace DocMgr
         //{
         //    Cursor.Position = new Point(but.Left + but.Width / 2, but.Top + but.Height / 2);
         //}
+    }
+
+
+    public static class WindowExtensions
+    {
+        public static bool IsOutOfScreenBounds(this Form form)
+        {
+            // Get the bounds of all screens
+            Rectangle totalScreenBounds = Rectangle.Empty;
+            foreach (var screen in Screen.AllScreens)
+            {
+                totalScreenBounds = Rectangle.Union(totalScreenBounds, screen.Bounds);
+            }
+
+            // Check if the form is outside the total screen bounds
+            return !totalScreenBounds.Contains(form.Bounds);
+        }
     }
 }
