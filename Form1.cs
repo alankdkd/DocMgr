@@ -942,6 +942,7 @@ namespace DocMgr
                 DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
                 SetProjectsLastDoc(CurrentFilePath);
                 HighlightThisButton("&" + fcd.textBoxDocName.Text);
+                buttonSaveDoc_Click(null, null);
                 richTextBox.Clear();
                 richTextBox.Font = font;
                 richTextBox.Focus();
