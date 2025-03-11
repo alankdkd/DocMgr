@@ -157,6 +157,7 @@
             buttonSaveDoc.Size = new Size(175, 31);
             buttonSaveDoc.TabIndex = 9;
             buttonSaveDoc.Text = "&Save Document";
+            toolTips.SetToolTip(buttonSaveDoc, "Ctrl-S");
             buttonSaveDoc.UseVisualStyleBackColor = false;
             buttonSaveDoc.Click += buttonSaveDoc_Click;
             // 
@@ -227,7 +228,7 @@
             buttonOpenFolder.Name = "buttonOpenFolder";
             buttonOpenFolder.Size = new Size(175, 31);
             buttonOpenFolder.TabIndex = 15;
-            buttonOpenFolder.Text = "&Open Folder";
+            buttonOpenFolder.Text = "&Open Folder...";
             buttonOpenFolder.UseVisualStyleBackColor = false;
             buttonOpenFolder.Click += buttonOpenFolder_Click;
             // 
@@ -240,6 +241,7 @@
             buttonBackUpFile.Size = new Size(175, 31);
             buttonBackUpFile.TabIndex = 16;
             buttonBackUpFile.Text = "&Back Up File";
+            toolTips.SetToolTip(buttonBackUpFile, "Update the single backup copy with incremental progress until it's ready to archive.");
             buttonBackUpFile.UseVisualStyleBackColor = false;
             buttonBackUpFile.Click += buttonBackUpFile_Click;
             // 
@@ -252,6 +254,7 @@
             buttonBackUpProject.Size = new Size(175, 31);
             buttonBackUpProject.TabIndex = 17;
             buttonBackUpProject.Text = "Back Up &Project";
+            toolTips.SetToolTip(buttonBackUpProject, "Update the single backup copy with incremental progress until it's ready to archive.");
             buttonBackUpProject.UseVisualStyleBackColor = false;
             buttonBackUpProject.Click += buttonBackUpProject_Click;
             // 
@@ -288,6 +291,7 @@
             buttonProperties.Size = new Size(175, 31);
             buttonProperties.TabIndex = 20;
             buttonProperties.Text = "&Properties...";
+            toolTips.SetToolTip(buttonProperties, "Set the Backup/Archive folder or default font.");
             buttonProperties.UseVisualStyleBackColor = false;
             buttonProperties.Click += buttonProperties_Click;
             // 
