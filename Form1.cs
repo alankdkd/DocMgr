@@ -652,6 +652,14 @@ namespace DocMgr
         {
             string? projectPath = null;
             LoadProjectDlg dlg = new LoadProjectDlg();
+            dlg.StartPosition = FormStartPosition.Manual;
+            dlg.Left = buttonLoadProj.Left - 7;
+            dlg.Top = buttonLoadProj.Bottom + 32;
+
+            if (dlg.NumProjects > 0)
+                Cursor.Position = new Point (dlg.Left + 200, dlg.Top + 162);
+            // else put cursor in Browse button.
+
             DialogResult dr = dlg.ShowDialog();
 
             if (dr == DialogResult.OK)

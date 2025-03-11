@@ -6,6 +6,9 @@ namespace DocMgr
     {
         private Dictionary<string, string> projMap = new Dictionary<string, string>();
         public string selectedPath = "";
+        int numProjects;
+
+        public int NumProjects { get => numProjects; set => numProjects = value; }
 
         public LoadProjectDlg()
         {
@@ -25,9 +28,9 @@ namespace DocMgr
 
         private void ReadPreviousProjects()
         {
-            int numProjects = GetNumProjects();
+            NumProjects = GetNumProjects();
 
-            for (int i = 0; i < numProjects; i++)
+            for (int i = 0; i < NumProjects; i++)
                 ReadNextProject(i);
         }
 
