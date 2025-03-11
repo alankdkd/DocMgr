@@ -1075,6 +1075,10 @@ namespace DocMgr
         private void buttonOpenFolder_Click(object sender, EventArgs e)
         {
             string ProjectFolder = Path.GetDirectoryName(CurrentFilePath);
+
+            if (ProjectFolder == null)
+                ProjectFolder = Path.GetDirectoryName(ProjectPath);
+
             Process.Start("explorer", ProjectFolder);
         }
 
