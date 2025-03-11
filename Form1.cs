@@ -448,11 +448,12 @@ namespace DocMgr
 
         private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
         {                                                           // clicked to load the document.
-            if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
-                buttonSaveDoc_Click(null, null);                    // Save changes.
+            //if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
+            //    buttonSaveDoc_Click(null, null);                    // Save changes.
 
-            if (DocName.Text.Length > 0)
-                SaveScrollPosition();
+            //if (DocName.Text.Length > 0)
+            //    SaveScrollPosition();
+            SaveChanges();
 
             loadingDoc = true;
             richTextBox.Clear();
@@ -930,23 +931,35 @@ namespace DocMgr
             if (fcd.ShowDialog() != DialogResult.OK)
                 return;
 
-            bool success = fcd.labelPath.Text.Length > 0 && fcd.textBoxDocName.Text.Length > 0;
+            bool success = fcd.DocName.Length > 0;
 
             if (success == true  &&  Root != null)
             {
-                CurrentFilePath = fcd.labelPath.Text;
-                Root.AddDoc(fcd.labelPath.Text, fcd.textBoxDocName.Text);
+                SaveChanges();
+                CurrentFilePath = fcd.FilePath;
+                Root.AddDoc(CurrentFilePath, fcd.DocName);
                 MakeButtons(Root.SubDocs);
                 buttonSaveDoc.Enabled = true;
                 SaveProject(ProjectPath, Root);
                 DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
                 SetProjectsLastDoc(CurrentFilePath);
                 HighlightThisButton("&" + fcd.textBoxDocName.Text);
-                buttonSaveDoc_Click(null, null);
+
+                loadingDoc = true;
                 richTextBox.Clear();
+                loadingDoc = false;
                 richTextBox.Font = font;
                 richTextBox.Focus();
             }
+        }
+
+        private void SaveChanges()
+        {
+            if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
+                buttonSaveDoc_Click(null, null);                    // Save changes.
+
+            if (DocName.Text.Length > 0)
+                SaveScrollPosition();
         }
 
         private void HighlightThisButton(string text)

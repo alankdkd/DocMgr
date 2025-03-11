@@ -28,120 +28,108 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.buttonSelect = new System.Windows.Forms.Button();
-            this.buttonCreate = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.labelPath = new System.Windows.Forms.Label();
-            this.textBoxDocName = new System.Windows.Forms.TextBox();
-            this.buttonClose = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(63, 51);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(198, 23);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Select folder/file name:";
+            buttonSelect = new Button();
+            buttonCreate = new Button();
+            label2 = new Label();
+            label3 = new Label();
+            labelPath = new Label();
+            textBoxDocName = new TextBox();
+            buttonClose = new Button();
+            SuspendLayout();
             // 
             // buttonSelect
             // 
-            this.buttonSelect.Location = new System.Drawing.Point(267, 44);
-            this.buttonSelect.Name = "buttonSelect";
-            this.buttonSelect.Size = new System.Drawing.Size(145, 37);
-            this.buttonSelect.TabIndex = 1;
-            this.buttonSelect.Text = "&Select...";
-            this.buttonSelect.UseVisualStyleBackColor = true;
-            this.buttonSelect.Click += new System.EventHandler(this.buttonSelect_Click);
+            buttonSelect.Font = new Font("Calibri", 20.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonSelect.Location = new Point(925, 36);
+            buttonSelect.Name = "buttonSelect";
+            buttonSelect.Size = new Size(46, 38);
+            buttonSelect.TabIndex = 1;
+            buttonSelect.Text = "...";
+            buttonSelect.UseVisualStyleBackColor = true;
+            buttonSelect.Click += buttonSelect_Click;
             // 
             // buttonCreate
             // 
-            this.buttonCreate.Enabled = false;
-            this.buttonCreate.Location = new System.Drawing.Point(267, 207);
-            this.buttonCreate.Name = "buttonCreate";
-            this.buttonCreate.Size = new System.Drawing.Size(145, 37);
-            this.buttonCreate.TabIndex = 2;
-            this.buttonCreate.Text = "&Create";
-            this.buttonCreate.UseVisualStyleBackColor = true;
-            this.buttonCreate.Click += new System.EventHandler(this.buttonCreate_Click);
+            buttonCreate.Enabled = false;
+            buttonCreate.Location = new Point(826, 95);
+            buttonCreate.Name = "buttonCreate";
+            buttonCreate.Size = new Size(145, 37);
+            buttonCreate.TabIndex = 2;
+            buttonCreate.Text = "&Create";
+            buttonCreate.UseVisualStyleBackColor = true;
+            buttonCreate.Click += buttonCreate_Click;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(177, 103);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(84, 23);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "File Path:";
+            label2.AutoSize = true;
+            label2.Location = new Point(110, 43);
+            label2.Name = "label2";
+            label2.Size = new Size(66, 23);
+            label2.TabIndex = 4;
+            label2.Text = "Folder:";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(113, 155);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(148, 23);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Document Name:";
+            label3.AutoSize = true;
+            label3.Location = new Point(28, 95);
+            label3.Name = "label3";
+            label3.Size = new Size(148, 23);
+            label3.TabIndex = 5;
+            label3.Text = "Document Name:";
             // 
             // labelPath
             // 
-            this.labelPath.AutoSize = true;
-            this.labelPath.Location = new System.Drawing.Point(267, 105);
-            this.labelPath.MaximumSize = new System.Drawing.Size(700, 23);
-            this.labelPath.MinimumSize = new System.Drawing.Size(700, 23);
-            this.labelPath.Name = "labelPath";
-            this.labelPath.Size = new System.Drawing.Size(700, 23);
-            this.labelPath.TabIndex = 6;
+            labelPath.AutoSize = true;
+            labelPath.Location = new Point(184, 45);
+            labelPath.MaximumSize = new Size(730, 23);
+            labelPath.MinimumSize = new Size(730, 23);
+            labelPath.Name = "labelPath";
+            labelPath.Size = new Size(730, 23);
+            labelPath.TabIndex = 6;
             // 
             // textBoxDocName
             // 
-            this.textBoxDocName.Enabled = false;
-            this.textBoxDocName.Location = new System.Drawing.Point(267, 152);
-            this.textBoxDocName.Name = "textBoxDocName";
-            this.textBoxDocName.Size = new System.Drawing.Size(199, 31);
-            this.textBoxDocName.TabIndex = 7;
+            textBoxDocName.Location = new Point(182, 92);
+            textBoxDocName.Name = "textBoxDocName";
+            textBoxDocName.Size = new Size(337, 31);
+            textBoxDocName.TabIndex = 7;
+            textBoxDocName.TextChanged += textBoxDocName_TextChanged;
             // 
             // buttonClose
             // 
-            this.buttonClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonClose.Enabled = false;
-            this.buttonClose.Location = new System.Drawing.Point(822, 37);
-            this.buttonClose.Name = "buttonClose";
-            this.buttonClose.Size = new System.Drawing.Size(145, 37);
-            this.buttonClose.TabIndex = 8;
-            this.buttonClose.Text = "&C&lose";
-            this.buttonClose.UseVisualStyleBackColor = true;
-            this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
+            buttonClose.DialogResult = DialogResult.Cancel;
+            buttonClose.Enabled = false;
+            buttonClose.Location = new Point(826, 165);
+            buttonClose.Name = "buttonClose";
+            buttonClose.Size = new Size(145, 37);
+            buttonClose.TabIndex = 8;
+            buttonClose.Text = "&C&lose";
+            buttonClose.UseVisualStyleBackColor = true;
+            buttonClose.Click += buttonClose_Click;
             // 
             // FormCreateDoc
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 23F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1006, 289);
-            this.Controls.Add(this.buttonClose);
-            this.Controls.Add(this.textBoxDocName);
-            this.Controls.Add(this.labelPath);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.buttonCreate);
-            this.Controls.Add(this.buttonSelect);
-            this.Controls.Add(this.label1);
-            this.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Name = "FormCreateDoc";
-            this.Text = "Create New Document";
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FormCreateDoc_KeyPress);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AcceptButton = buttonCreate;
+            AutoScaleDimensions = new SizeF(10F, 23F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1006, 255);
+            Controls.Add(buttonClose);
+            Controls.Add(textBoxDocName);
+            Controls.Add(labelPath);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(buttonCreate);
+            Controls.Add(buttonSelect);
+            Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            Margin = new Padding(4, 5, 4, 5);
+            Name = "FormCreateDoc";
+            Text = "Create New Document";
+            KeyPress += FormCreateDoc_KeyPress;
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
-
-        private Label label1;
         private Button buttonSelect;
         private Button buttonCreate;
         private Label label2;
