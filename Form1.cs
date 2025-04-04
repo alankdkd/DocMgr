@@ -8,6 +8,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Drawing.Design;
 using System.ComponentModel;
+using System.Drawing.Printing;
 
 namespace DocMgr
 {
@@ -53,6 +54,21 @@ namespace DocMgr
         {
             InitializeComponent();
             ArrangeLayout();
+
+            string version = GetSubstringUpToSecondPeriod(Application.ProductVersion);
+            //MessageBox.Show("Version: " + version);
+            Text = "DocMgr v" + version;
+        }
+
+        static string GetSubstringUpToSecondPeriod(string input)
+        {
+            int firstDot = input.IndexOf('.');
+            if (firstDot == -1) return input; // No period found, return the whole string
+
+            int secondDot = input.IndexOf('.', firstDot + 1);
+            if (secondDot == -1) return input; // Only one period found, return the whole string
+
+            return input.Substring(0, secondDot);
         }
 
         private void ArrangeLayout()
@@ -97,7 +113,7 @@ namespace DocMgr
         [DllImport("user32.dll")]
         static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);// DllImports.
 
-            // Constants for scroll bar direction
+        // Constants for scroll bar direction
         private const int SB_VERT = 1; // Vertical scroll bar
         private const int SIF_RANGE = 0x1;
         private const int SIF_PAGE = 0x2;
@@ -213,6 +229,26 @@ namespace DocMgr
 
         private void ButtonSaveAs_Click(object sender, EventArgs e)
         {
+            string? fileName = SelectFile("RTF Files|*.rtf|All Files|*.*", true);
+
+            if (fileName == null)
+                return;
+
+            if (File.Exists(fileName))
+            {
+                CenterCursor(160, 82);
+                if (MessageBox.Show("File " + fileName + " exists.  OK to overwrite?",
+                    "OK to overwrite?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning,
+                    MessageBoxDefaultButton.Button2) // Sets Cancel as the default button.
+                        != DialogResult.OK)
+                    return;
+            }
+
+            SaveScrollPosition();
+            CurrentFilePath = fileName;
+            buttonSaveDoc_Click(null, null);
+            CenterCursor(88, 72);
+            MessageBox.Show("File " + fileName + " saved.");
         }
 
         private void DocMgr_Load(object sender, EventArgs e)
@@ -312,8 +348,8 @@ namespace DocMgr
         private void CenterWindowIfOverEdge()
         {
             //if (WindowExtensions.IsOutOfScreenBounds(this))
-                if (this.IsOutOfScreenBounds())
-                    CenterToScreen();
+            if (this.IsOutOfScreenBounds())
+                CenterToScreen();
         }
 
 
@@ -334,7 +370,7 @@ namespace DocMgr
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
                 ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
                 buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
-                buttonArchiveProject, buttonProperties};
+                buttonArchiveProject, buttonProperties, buttonPrint};
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -481,7 +517,7 @@ namespace DocMgr
                 MessageBox.Show("Can't select document.");
 
             //if (richTextBox.Text.Length == 0)
-                richTextBox.Font = font;
+            richTextBox.Font = font;
 
             buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
@@ -586,7 +622,7 @@ namespace DocMgr
         private void buttonClose_Click(object sender, EventArgs e)
         {
             SaveScrollPosition();
-            
+
             if (DocName.Text.StartsWith('*'))
                 buttonSaveDoc_Click(null, null);        // Save changes.
 
@@ -657,14 +693,14 @@ namespace DocMgr
             dlg.Top = buttonLoadProj.Bottom + 32;
 
             if (dlg.NumProjects > 0)
-                Cursor.Position = new Point (dlg.Left + 200, dlg.Top + 162);
+                Cursor.Position = new Point(dlg.Left + 200, dlg.Top + 162);
             // else put cursor in Browse button.
 
             DialogResult dr = dlg.ShowDialog();
 
             if (dr == DialogResult.OK)
                 projectPath = dlg.selectedPath;
-            
+
             return projectPath;
         }
 
@@ -725,11 +761,11 @@ namespace DocMgr
                     {
                         string ProjName = obj as string;
 
-                        if (ProjName != null  &&  ProjName == projName)
+                        if (ProjName != null && ProjName == projName)
                             return RegKey;
                     }
 
-                    RegKey.Close ();
+                    RegKey.Close();
                 }
             }
 
@@ -769,14 +805,18 @@ namespace DocMgr
             return BAD_INT;                                 // Bad result.
         }
 
-        public static string? SelectFile(string filter)     // General method to select a file.
-        {                                                   // Used to select project & document files.
+        // General method to select a file.
+        // Used to select project & document files.
+        public static string? SelectFile(string filter, bool overwriteOk = false)
+        {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 string? path = GetDefaultPath();
 
+                openFileDialog.Title = "Select File";
                 openFileDialog.InitialDirectory = path;
                 openFileDialog.Filter = filter;
+                openFileDialog.CheckFileExists = !overwriteOk;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                     return openFileDialog.FileName;
@@ -798,6 +838,12 @@ namespace DocMgr
             return path;
         }
 
+        public static void CenterCursor(int xOffset = 0, int yOffset = 0)
+        {
+            Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Width / 2 + xOffset,
+                Screen.PrimaryScreen.Bounds.Height / 2 + yOffset);
+        }
+
         private void buttonLoadDoc_Click(object sender, EventArgs e)        // Add & load an existing .rtf
         {                                                                   // file into the current project.
             buttonSaveDoc_Click(null, null);                                // In case changes not saved.
@@ -807,7 +853,7 @@ namespace DocMgr
                 return;
 
             LoadDoc(DocPath);
-//            SetRegistryValue("LastDoc", DocPath);
+            //            SetRegistryValue("LastDoc", DocPath);
         }
 
         private void LoadDoc(string? docPath, bool addIfMissing = true)
@@ -819,7 +865,7 @@ namespace DocMgr
                 string docName = Path.GetFileNameWithoutExtension(docPath);
                 ProjName = Path.GetFileNameWithoutExtension(Root.DocPath);
 
-                if (!DocAlreadyInProject(docName)  &&  addIfMissing)
+                if (!DocAlreadyInProject(docName) && addIfMissing)
                 {
                     Root.AddDoc(docPath);
                     WriteUpdatedPath();
@@ -856,7 +902,7 @@ namespace DocMgr
                 // DOESN'T WORK FOR EMPTY DOC:
                 try
                 {
-                    if (richTextBox.Text.Trim().Length == 0  &&  File.Exists(CurrentFilePath))
+                    if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath))
                         if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
                             + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
                             != DialogResult.OK)
@@ -870,16 +916,16 @@ namespace DocMgr
                 {
                     MessageBox.Show("File " + CurrentFilePath + " is read-only.");
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Problem saving file " + CurrentFilePath + ".");
+                    MessageBox.Show("Problem saving file " + CurrentFilePath + ": " + ex.Message);
                 }
                 // DFW: File.WriteAllText(CurrentFilePath, richTextBox.Rtf);
                 //Root = new Doc("Root");
                 //string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
                 //File.WriteAllText(CurrentFilePath, text);
 
-                if (saveOk  &&  DocName.Text[0] == '*')
+                if (saveOk && DocName.Text[0] == '*')
                     DocName.Text = DocName.Text.Remove(0, 2);
             }
 
@@ -924,8 +970,8 @@ namespace DocMgr
             if (!loadingDoc)
             {
                 buttonSaveDoc.Enabled = true;
-                                                        // Indicate document modified:
-                if (DocName.Text.Length > 0  &&  DocName.Text[0] != '*') 
+                // Indicate document modified:
+                if (DocName.Text.Length > 0 && DocName.Text[0] != '*')
                     DocName.Text = DocName.Text.Insert(0, "* ");
             }
         }
@@ -941,7 +987,7 @@ namespace DocMgr
 
             bool success = fcd.DocName.Length > 0;
 
-            if (success == true  &&  Root != null)
+            if (success == true && Root != null)
             {
                 SaveChanges();
                 CurrentFilePath = fcd.FilePath;
@@ -973,7 +1019,7 @@ namespace DocMgr
         private void HighlightThisButton(string text)
         {
             foreach (Control con in Controls)
-                if ((con is Button)  &&  (con.Text == text))
+                if ((con is Button) && (con.Text == text))
                 {
                     ColorButtonBknd(con as Button);
                     return;
@@ -1064,13 +1110,13 @@ namespace DocMgr
         private void button_MouseHover(object sender, EventArgs e)
         {
             foreach (Doc doc in Root.SubDocs)
-                if ((sender as Button).Text  ==  "&" + doc.DocName)
+                if ((sender as Button).Text == "&" + doc.DocName)
                     toolTips.Show(doc.DocPath, sender as Button);
         }
 
         private void ProjectName_MouseHover(object sender, EventArgs e)
         {
-             toolTips.Show(Root.DocPath, sender as Label);
+            toolTips.Show(Root.DocPath, sender as Label);
         }
 
         private void DocName_MouseHover(object sender, EventArgs e)
@@ -1162,7 +1208,7 @@ namespace DocMgr
                     if (doc.DocName + ':' == docToCopy)             // Match name in GUI.
                         return CopyFileToFolder(doc, destFolder);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -1188,7 +1234,13 @@ namespace DocMgr
 
         private bool CopyFileToFolder(Doc doc, string destFolder)
         {
-            if (!Directory.Exists(destFolder)  ||  !File.Exists(doc.DocPath))
+            if (destFolder.ToLower().Contains("www."))
+            {
+                WebUtils.SendFileToUrl(doc.DocPath, destFolder);
+                return true;
+            }
+
+            if (!Directory.Exists(destFolder) || !File.Exists(doc.DocPath))
                 return false;
 
             string destinationFile = Path.Combine(destFolder, Path.GetFileName(doc.DocPath));
@@ -1217,7 +1269,7 @@ namespace DocMgr
                 return "";                              // Project name blank.
             }
 
-            ArchiveFolder = BackupsAndArchivesFolder + '\\' + "Archives" 
+            ArchiveFolder = BackupsAndArchivesFolder + '\\' + "Archives"
                 + '\\' + projName + '\\' + DateTime.Now.ToString("s").Replace(':', '.');
 
             return GetMakeFolder(ArchiveFolder);
@@ -1225,9 +1277,9 @@ namespace DocMgr
 
         private void buttonProperties_Click(object sender, EventArgs e)
         {
-            PropertiesForm prop = new ();
-            MySettings mySettings = new ();
-            
+            PropertiesForm prop = new();
+            MySettings mySettings = new();
+
             // Copy to MySettings to edit backup path with folder browser:
 
             mySettings.DefaultFont = Properties.Settings.Default.DefaultFont;
@@ -1242,14 +1294,14 @@ namespace DocMgr
                 Properties.Settings.Default.BackupsAndArchivesFolder = mySettings.BackupsAndArchivesFolder;
                 Properties.Settings.Default.Save();
 
-                            // Update current settings:
+                // Update current settings:
                 BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
                 font = Properties.Settings.Default.DefaultFont;
                 richTextBox.Font = font;
             }
         }
 
-            private string GetMakeFolder(string folderName)
+        private string GetMakeFolder(string folderName)
         {
             try
             {
@@ -1346,7 +1398,7 @@ namespace DocMgr
                     using (CreateFolderDialog createDialog = new(selectedFolder))
                     {
                         createDialog.Text = "Enter New Project Name";
-                        
+
                         if (createDialog.ShowDialog() == DialogResult.OK)
                         {
                             string newFolderPath = createDialog.NewFolderPath;
@@ -1388,6 +1440,52 @@ namespace DocMgr
                 }
             }
         }
+
+        private string documentText;
+        private int currentPageIndex;
+        private PrintDocument printDocument;
+
+        private void buttonPrint_Click(object sender, EventArgs e)
+        {
+            PrintDialog printDialog = new PrintDialog();
+            printDialog.Document = printDocument;
+
+            // Initialize PrintDocument
+            printDocument = new PrintDocument();
+            printDocument.PrintPage += PrintDocument_PrintPage;
+
+            if (printDialog.ShowDialog() == DialogResult.OK)
+            {
+                documentText = richTextBox.Text; // Store text
+                currentPageIndex = 0;
+                printDocument.Print();
+            }
+        }
+
+
+        private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
+        {
+            Font printFont = richTextBox.Font;
+            float lineHeight = printFont.GetHeight(e.Graphics);
+            float yPosition = e.MarginBounds.Top;
+            int charactersOnPage = 0, linesPerPage = 0;
+
+            // Measure how much text fits on the page
+            e.Graphics.MeasureString(documentText.Substring(currentPageIndex), printFont,
+                                     e.MarginBounds.Size, StringFormat.GenericTypographic,
+                                     out charactersOnPage, out linesPerPage);
+
+            // Print the text that fits
+            e.Graphics.DrawString(documentText.Substring(currentPageIndex, charactersOnPage),
+                                  printFont, Brushes.Black, e.MarginBounds);
+
+            // Move index forward
+            currentPageIndex += charactersOnPage;
+
+            // More pages to print?
+            e.HasMorePages = (currentPageIndex < documentText.Length);
+        }
+
         //using (OpenFileDialog ofd = new OpenFileDialog())         // ORIG.  WTF?
         //{
         //    ofd.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";

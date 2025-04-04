@@ -7,7 +7,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Description>DocMgr v0.0.  Manages collection of rich-text-format documents for each project.</Description>
-    <Copyright>Copyright (c) 2023 by Alan D. Balkany</Copyright>
+    <Copyright>Copyright (c) 2025 by Alan D. Balkany</Copyright>
+	<Version>0.1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
