@@ -1441,82 +1441,154 @@ namespace DocMgr
             }
         }
 
-        private string documentText;
-        private int currentPageIndex;
         private PrintDocument printDocument;
+        private int checkPrint;
 
         private void buttonPrint_Click(object sender, EventArgs e)
         {
-            PrintDialog printDialog = new PrintDialog();
-            printDialog.Document = printDocument;
+            PrintDialog printDialog = new PrintDialog { Document = printDocument };
+            //printDialog.Document = printDocument;
 
             // Initialize PrintDocument
             printDocument = new PrintDocument();
+            printDocument.BeginPrint += (s, e) => checkPrint = 0;
             printDocument.PrintPage += PrintDocument_PrintPage;
 
             if (printDialog.ShowDialog() == DialogResult.OK)
-            {
-                documentText = richTextBox.Text; // Store text
-                currentPageIndex = 0;
                 printDocument.Print();
-            }
         }
 
 
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
-            Font printFont = richTextBox.Font;
-            float lineHeight = printFont.GetHeight(e.Graphics);
-            float yPosition = e.MarginBounds.Top;
-            int charactersOnPage = 0, linesPerPage = 0;
+            checkPrint = FormatRange(checkPrint, richTextBox.TextLength, e, richTextBox);
+            e.HasMorePages = checkPrint < richTextBox.TextLength;
 
-            // Measure how much text fits on the page
-            e.Graphics.MeasureString(documentText.Substring(currentPageIndex), printFont,
-                                     e.MarginBounds.Size, StringFormat.GenericTypographic,
-                                     out charactersOnPage, out linesPerPage);
-
-            // Print the text that fits
-            e.Graphics.DrawString(documentText.Substring(currentPageIndex, charactersOnPage),
-                                  printFont, Brushes.Black, e.MarginBounds);
-
-            // Move index forward
-            currentPageIndex += charactersOnPage;
-
-            // More pages to print?
-            e.HasMorePages = (currentPageIndex < documentText.Length);
+            if (!e.HasMorePages)
+                FormatRangeDone(richTextBox);
         }
 
-        //using (OpenFileDialog ofd = new OpenFileDialog())         // ORIG.  WTF?
-        //{
-        //    ofd.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
-        //    ofd.CheckFileExists = false;
-        //    ofd.CheckPathExists = false;
+        // FormatRange: Uses Win32 message to render RTF content to a device context
+        private int FormatRange(int charFrom, int charTo, PrintPageEventArgs e, RichTextBox rtb)
+        {
+            IntPtr hdc = e.Graphics.GetHdc();
 
-        //    if (ofd.ShowDialog() == DialogResult.OK)
+            FORMATRANGE fmtRange;
+            fmtRange.chrg.cpMin = charFrom;
+            fmtRange.chrg.cpMax = charTo;
+
+            fmtRange.hdc = hdc;
+            fmtRange.hdcTarget = hdc;
+
+            RectangleF rect = e.MarginBounds;
+            fmtRange.rc = new RECT
+            {
+                Top = (int)(rect.Top * 14.4f),
+                Bottom = (int)(rect.Bottom * 14.4f),
+                Left = (int)(rect.Left * 14.4f),
+                Right = (int)(rect.Right * 14.4f)
+            };
+            fmtRange.rcPage = fmtRange.rc;
+
+            IntPtr lParam = Marshal.AllocCoTaskMem(Marshal.SizeOf(fmtRange));
+            Marshal.StructureToPtr(fmtRange, lParam, false);
+
+            SendMessage(rtb.Handle, EM_FORMATRANGE, (IntPtr)1, lParam);
+            int textPrinted = (int)SendMessage(rtb.Handle, EM_FORMATRANGE, (IntPtr)1, lParam);
+
+            Marshal.FreeCoTaskMem(lParam);
+            e.Graphics.ReleaseHdc(hdc);
+
+            return textPrinted;
+        }
+
+        private void FormatRangeDone(RichTextBox rtb)
+        {
+            SendMessage(rtb.Handle, EM_FORMATRANGE, (IntPtr)0, IntPtr.Zero);
+        }
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        private const int WM_USER = 0x0400;
+        private const int EM_FORMATRANGE = WM_USER + 57;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FORMATRANGE
+        {
+            public IntPtr hdc;
+            public IntPtr hdcTarget;
+            public RECT rc;
+            public RECT rcPage;
+            public CHARRANGE chrg;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct RECT
+        {
+            public int Left, Top, Right, Bottom;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct CHARRANGE
+        {
+            public int cpMin;
+            public int cpMax;
+        }
+
+        //  OLD PRINTING CODE.  MINIMAL PRINTING CAPABILITY.
+        //private string documentText;
+        //private int currentPageIndex;
+        //private PrintDocument printDocument;    //    private void buttonPrint_Click(object sender, EventArgs e)
         //    {
-        //        ProjectName.Text = Path.GetFileNameWithoutExtension(ofd.FileName);
-        //        string FolderPath = Path.GetDirectoryName(ofd.FileName) + "\\" + ProjectName.Text;
-        //        string NameAndExtension = Path.GetFileName(ofd.FileName);
-        //        CurrentFilePath = ProjectPath = FolderPath + "\\" + NameAndExtension;
-        //        Directory.CreateDirectory(FolderPath);
+        //        PrintDialog printDialog = new PrintDialog();
+        //        printDialog.Document = printDocument;
 
-        //        Root = new Doc("Root");
-        //        SaveProject(CurrentFilePath, Root);
-        //        SetProjectPath(CurrentFilePath);
-        //        richTextBox.Clear();
-        //        DocName.Text = "";
-        //        Root.DocPath = CurrentFilePath;
-        //        MakeButtons(Root.SubDocs);
+        //        // Initialize PrintDocument
+        //        printDocument = new PrintDocument();
+        //        printDocument.PrintPage += PrintDocument_PrintPage;
+
+        //        if (printDialog.ShowDialog() == DialogResult.OK)
+        //        {
+        //            documentText = richTextBox.Text; // Store text
+        //            currentPageIndex = 0;
+        //            printDocument.Print();
+        //        }
         //    }
 
-        //public static void CenterCursorInButton(this Button but)
-        //{
-        //    Cursor.Position = new Point(but.Left + but.Width / 2, but.Top + but.Height / 2);
+
+        //    private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
+        //    {
+        //        Font printFont = richTextBox.Font;
+        //        float lineHeight = printFont.GetHeight(e.Graphics);
+        //        float yPosition = e.MarginBounds.Top;
+        //        int charactersOnPage = 0, linesPerPage = 0;
+
+        //        // Measure how much text fits on the page
+        //        e.Graphics.MeasureString(documentText.Substring(currentPageIndex), printFont,
+        //                                 e.MarginBounds.Size, StringFormat.GenericTypographic,
+        //                                 out charactersOnPage, out linesPerPage);
+
+        //        // Print the text that fits
+        //        e.Graphics.DrawString(documentText.Substring(currentPageIndex, charactersOnPage),
+        //                              printFont, Brushes.Black, e.MarginBounds);
+
+        //        // Move index forward
+        //        currentPageIndex += charactersOnPage;
+
+        //        // More pages to print?
+        //        e.HasMorePages = (currentPageIndex < documentText.Length);
+        //    }
+
+
+        //    //public static void CenterCursorInButton(this Button but)
+        //    //{
+        //    //    Cursor.Position = new Point(but.Left + but.Width / 2, but.Top + but.Height / 2);
+        //    //}
         //}
     }
 
-
-    public static class WindowExtensions
+        public static class WindowExtensions
     {
         public static bool IsOutOfScreenBounds(this Form form)
         {
