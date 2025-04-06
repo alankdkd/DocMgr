@@ -217,7 +217,7 @@
             buttonNumberLines.Name = "buttonNumberLines";
             buttonNumberLines.Size = new Size(175, 31);
             buttonNumberLines.TabIndex = 14;
-            buttonNumberLines.Text = "&Number Lines";
+            buttonNumberLines.Text = "N&umber Lines";
             buttonNumberLines.UseVisualStyleBackColor = false;
             buttonNumberLines.Click += buttonNumberLines_Click;
             // 
@@ -242,7 +242,7 @@
             buttonBackUpProject.Name = "buttonBackUpProject";
             buttonBackUpProject.Size = new Size(175, 31);
             buttonBackUpProject.TabIndex = 17;
-            buttonBackUpProject.Text = "Back Up &Project";
+            buttonBackUpProject.Text = "Bac&k Up Project";
             toolTips.SetToolTip(buttonBackUpProject, "Update the single backup copy with incremental progress until it's ready to archive.");
             buttonBackUpProject.UseVisualStyleBackColor = false;
             buttonBackUpProject.Click += buttonBackUpProject_Click;
@@ -255,7 +255,7 @@
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(175, 31);
             buttonProperties.TabIndex = 20;
-            buttonProperties.Text = "&Properties...";
+            buttonProperties.Text = "Prop&erties...";
             toolTips.SetToolTip(buttonProperties, "Set the Backup/Archive folder or default font.");
             buttonProperties.UseVisualStyleBackColor = false;
             buttonProperties.Click += buttonProperties_Click;
@@ -293,7 +293,7 @@
             buttonArchiveFile.Name = "buttonArchiveFile";
             buttonArchiveFile.Size = new Size(175, 31);
             buttonArchiveFile.TabIndex = 18;
-            buttonArchiveFile.Text = "&Archive File";
+            buttonArchiveFile.Text = "Arc&hive File";
             buttonArchiveFile.UseVisualStyleBackColor = false;
             buttonArchiveFile.Click += buttonArchiveFile_Click;
             // 
@@ -305,7 +305,7 @@
             buttonArchiveProject.Name = "buttonArchiveProject";
             buttonArchiveProject.Size = new Size(175, 31);
             buttonArchiveProject.TabIndex = 19;
-            buttonArchiveProject.Text = "&A&rchive Project";
+            buttonArchiveProject.Text = "Archi&ve Project";
             buttonArchiveProject.UseVisualStyleBackColor = false;
             buttonArchiveProject.Click += buttonArchiveProject_Click;
             // 

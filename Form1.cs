@@ -846,7 +846,9 @@ namespace DocMgr
 
         private void buttonLoadDoc_Click(object sender, EventArgs e)        // Add & load an existing .rtf
         {                                                                   // file into the current project.
-            buttonSaveDoc_Click(null, null);                                // In case changes not saved.
+            if (DocName.Text.StartsWith('*'))
+                buttonSaveDoc_Click(null, null);                            // In case changes not saved.
+
             string? DocPath = SelectFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
 
             if (IsNullOrEmpty(DocPath))
