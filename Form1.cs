@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing.Design;
 using System.ComponentModel;
 using System.Drawing.Printing;
+using System.Text.RegularExpressions;
 
 namespace DocMgr
 {
@@ -24,6 +25,8 @@ namespace DocMgr
         //TEMP FOR USB BACKUP: string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
         string BackupFolder, ArchiveFolder;
         string ProjName;
+        static Margin Margins;
+        static bool HaveMargins = false;
 
         string? CurrentFilePath;
         static string? ProjectPath, lastDocName;
@@ -504,11 +507,22 @@ namespace DocMgr
 
                 if (File.Exists(CurrentFilePath))
                 {
-                    richTextBox.LoadFile(CurrentFilePath);
+                    try
+                    {
+                        richTextBox.LoadFile(CurrentFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Problem loading document: " + ex.Message);
+                        loadingDoc = false;
+                        return;
+                    }
+
                     ScrollToDocPosition(but.Name);
                     buttonSaveDoc.Enabled = false;
                     buttonRemoveDoc.Enabled = ProjectPath != null;
                     SetProjectsLastDoc(CurrentFilePath);
+                    HaveMargins = false;
                 }
                 else
                     MessageBox.Show("File '" + CurrentFilePath + "' was not found.");
@@ -1416,29 +1430,6 @@ namespace DocMgr
                             DocName.Text = "";
                         }
                     }
-
-                    // Prompt the user for the new folder name
-                    //Console.Write("Enter the name for the new folder: ");
-                    //string newFolderName = Console.ReadLine();
-
-                    //if (string.IsNullOrWhiteSpace(newFolderName))
-                    //{
-                    //    Console.WriteLine("Folder name cannot be empty.");
-                    //    return;
-                    //}
-
-                    //string newFolderPath = Path.Combine(selectedFolder, newFolderName);
-
-                    //// Check if the folder exists, and create it if not
-                    //if (!Directory.Exists(newFolderPath))
-                    //{
-                    //    Directory.CreateDirectory(newFolderPath);
-                    //    Console.WriteLine($"New folder created at: {newFolderPath}");
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine($"Folder already exists: {newFolderPath}");
-                    //}
                 }
             }
         }
@@ -1449,10 +1440,19 @@ namespace DocMgr
         private void buttonPrint_Click(object sender, EventArgs e)
         {
             PrintDialog printDialog = new PrintDialog { Document = printDocument };
-            //printDialog.Document = printDocument;
+
+            if (!HaveMargins)
+            {
+                Margins = RtfMarginHelper.GetMargins(CurrentFilePath);
+                HaveMargins = Margins.Left != -1;
+            }
 
             // Initialize PrintDocument
             printDocument = new PrintDocument();
+            printDocument.DefaultPageSettings.Margins.Left = Margins.Left;
+            printDocument.DefaultPageSettings.Margins.Right = Margins.Right;
+            printDocument.DefaultPageSettings.Margins.Top = Margins.Top;
+            printDocument.DefaultPageSettings.Margins.Bottom = Margins.Bottom;
             printDocument.BeginPrint += (s, e) => checkPrint = 0;
             printDocument.PrintPage += PrintDocument_PrintPage;
 
@@ -1541,7 +1541,8 @@ namespace DocMgr
         //  OLD PRINTING CODE.  MINIMAL PRINTING CAPABILITY.
         //private string documentText;
         //private int currentPageIndex;
-        //private PrintDocument printDocument;    //    private void buttonPrint_Click(object sender, EventArgs e)
+        //private PrintDocument printDocument;    
+        //    private void buttonPrint_Click(object sender, EventArgs e)
         //    {
         //        PrintDialog printDialog = new PrintDialog();
         //        printDialog.Document = printDocument;
@@ -1590,7 +1591,7 @@ namespace DocMgr
         //}
     }
 
-        public static class WindowExtensions
+    public static class WindowExtensions
     {
         public static bool IsOutOfScreenBounds(this Form form)
         {
@@ -1603,6 +1604,46 @@ namespace DocMgr
 
             // Check if the form is outside the total screen bounds
             return !totalScreenBounds.Contains(form.Bounds);
+        }
+    }
+
+    public static class RtfMarginHelper
+    {
+        public static Margin GetMarginsFromString(string rtf)
+        {
+            var match = Regex.Match(rtf, @"\\margl(\d+).*?\\margr(\d+).*?\\margt(\d+).*?\\margb(\d+)", RegexOptions.Singleline);
+            if (match.Success)
+            {
+                int left = int.Parse(match.Groups[1].Value);
+                int right = int.Parse(match.Groups[2].Value);
+                int top = int.Parse(match.Groups[3].Value);
+                int bottom = int.Parse(match.Groups[4].Value);
+                return new Margin(left, right, top, bottom);
+            }
+            return new Margin(-1, 0, 0, 0);
+        }
+
+        public static Margin GetMargins(string rtfFilePath)
+        {
+            string rawRtf = File.ReadAllText(rtfFilePath);
+            return RtfMarginHelper.GetMarginsFromString(rawRtf);
+        }
+
+
+    }
+    public struct Margin
+    {
+        public int Left;
+        public int Right;
+        public int Top;
+        public int Bottom;
+
+        public Margin(int left, int right, int top, int bottom)
+        {
+            Left = left;
+            Right = right;
+            Top = top;
+            Bottom = bottom;
         }
     }
 }
