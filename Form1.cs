@@ -1444,7 +1444,7 @@ namespace DocMgr
             if (!HaveMargins)
             {
                 Margins = RtfMarginHelper.GetMargins(CurrentFilePath);
-                HaveMargins = Margins.Left != -1;
+                HaveMargins = true;
             }
 
             // Initialize PrintDocument
