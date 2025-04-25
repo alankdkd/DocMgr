@@ -25,7 +25,7 @@ namespace DocMgr
         //TEMP FOR USB BACKUP: string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
         string BackupFolder, ArchiveFolder;
         string ProjName;
-        static Margin Margins;
+        static Margin MyMargins;    // In twips; 1/1440 inch.  Twentieth of a point.
         static bool HaveMargins = false;
 
         string? CurrentFilePath;
@@ -49,6 +49,26 @@ namespace DocMgr
             [Category("Properties")]
             [Description("The font to use in new documents.")]
             public Font DefaultFont { get; set; }
+
+            [Category("Properties")]
+            [Description("The left margin to use for printing in inches.")]
+            //[Editor(typeof(FolderPathEditor), typeof(NullableIntConverter))]
+            public string MarginLeft { get; set; }
+
+            [Category("Properties")]
+            [Description("The right margin to use for printing in inches.")]
+            //[Editor(typeof(FolderPathEditor), typeof(NullableIntConverter))]
+            public string MarginRight { get; set; }
+
+            [Category("Properties")]
+            [Description("The top margin to use for printing in inches.")]
+            //[Editor(typeof(FolderPathEditor), typeof(NullableIntConverter))]
+            public string MarginTop { get; set; }
+
+            [Category("Properties")]
+            [Description("The bottom margin to use for printing in inches.")]
+            //[Editor(typeof(FolderPathEditor), typeof(NullableIntConverter))]
+            public string MarginBottom { get; set; }
         }
 
         private Doc? Root = new Doc("Root");
@@ -1296,10 +1316,24 @@ namespace DocMgr
             PropertiesForm prop = new();
             MySettings mySettings = new();
 
-            // Copy to MySettings to edit backup path with folder browser:
+            // Copy to MySettings to edit settings according to type:
 
             mySettings.DefaultFont = Properties.Settings.Default.DefaultFont;
             mySettings.BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+
+            if (HaveMargins == false  &&  CurrentFilePath != null)
+                MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
+
+            HaveMargins = true;
+            mySettings.MarginLeft = TwipsToStrInches(MyMargins.Left);
+            mySettings.MarginRight = TwipsToStrInches(MyMargins.Right);
+            mySettings.MarginTop = TwipsToStrInches(MyMargins.Top);
+            mySettings.MarginBottom = TwipsToStrInches(MyMargins.Bottom);
+
+            //mySettings.MarginLeft = FToSUsedMsg(Properties.Settings.Default.MarginLeft);
+            //mySettings.MarginRight = FToSUsedMsg(Properties.Settings.Default.MarginRight);
+            //mySettings.MarginTop = FToSUsedMsg(Properties.Settings.Default.MarginTop);
+            //mySettings.MarginBottom = FToSUsedMsg(Properties.Settings.Default.MarginBottom);
 
             prop.SetProperties(mySettings);
             prop.ShowDialog();
@@ -1308,15 +1342,62 @@ namespace DocMgr
             {               // Copy settings back to default for persistence:
                 Properties.Settings.Default.DefaultFont = mySettings.DefaultFont;
                 Properties.Settings.Default.BackupsAndArchivesFolder = mySettings.BackupsAndArchivesFolder;
+                bool marginsChanged = CopyMarginsAndDetectChange(mySettings);
                 Properties.Settings.Default.Save();
 
                 // Update current settings:
                 BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
                 font = Properties.Settings.Default.DefaultFont;
                 richTextBox.Font = font;
+
+                if (marginsChanged)
+                {
+                    RtfMarginHelper.SetMarginsInDoc(CurrentFilePath, MyMargins);
+                }
+            }
+
+            bool CopyMarginsAndDetectChange(MySettings mySettings)
+            {
+                bool changed = false;
+
+                changed = changed || MyMargins.Left != StrInchesToTwips(mySettings.MarginLeft);
+                changed = changed || MyMargins.Right != StrInchesToTwips(mySettings.MarginRight);
+                changed = changed || MyMargins.Top != StrInchesToTwips(mySettings.MarginTop);
+                changed = changed || MyMargins.Bottom != StrInchesToTwips(mySettings.MarginBottom);
+
+                MyMargins.Left = Properties.Settings.Default.MarginLeft = StrInchesToTwips(mySettings.MarginLeft);
+                MyMargins.Right = Properties.Settings.Default.MarginRight = StrInchesToTwips(mySettings.MarginRight);
+                MyMargins.Top = Properties.Settings.Default.MarginTop = StrInchesToTwips(mySettings.MarginTop);
+                MyMargins.Bottom = Properties.Settings.Default.MarginBottom = StrInchesToTwips(mySettings.MarginBottom);
+
+                return changed;
             }
         }
 
+        private float StrInchesToTwips(string floatOrMessage)
+        {
+            if (float.TryParse(floatOrMessage, out float value))
+                return value * 1440;
+            else
+                return -1;      // "not used" or invalid float.
+        }
+
+        private string TwipsToStrInches(float num)
+        {
+            if (num == -1)
+                return "not used";
+            
+            return TrimSuffix ((num / 1440).ToString("F3"), ".000").TrimEnd('0');
+        }
+
+        public static string TrimSuffix(string input, string suffix)
+        {
+            if (input != null && suffix != null && input.EndsWith(suffix))
+            {
+                return input.Substring(0, input.Length - suffix.Length);
+            }
+            return input;
+        }
         private string GetMakeFolder(string folderName)
         {
             try
@@ -1441,19 +1522,27 @@ namespace DocMgr
         {
             PrintDialog printDialog = new PrintDialog { Document = printDocument };
 
-            if (!HaveMargins)
+            if (!HaveMargins  &&  File.Exists(CurrentFilePath))
             {
-                Margins = RtfMarginHelper.GetMargins(CurrentFilePath);
+                MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
                 HaveMargins = true;
             }
 
             // Initialize PrintDocument
             printDocument = new PrintDocument();
-            printDocument.DefaultPageSettings.Margins.Left = Margins.Left;
-            printDocument.DefaultPageSettings.Margins.Right = Margins.Right;
-            printDocument.DefaultPageSettings.Margins.Top = Margins.Top;
-            printDocument.DefaultPageSettings.Margins.Bottom = Margins.Bottom;
-            printDocument.BeginPrint += (s, e) => checkPrint = 0;
+
+            if (MyMargins.Left != -1)     // MyMargins in twips, PrintDoc in 1/100ths:
+                printDocument.DefaultPageSettings.Margins.Left = (int)Math.Round(MyMargins.Left / 14.4);
+
+            if (MyMargins.Right != -1)
+                printDocument.DefaultPageSettings.Margins.Right = (int)Math.Round(MyMargins.Right / 14.4);
+
+            if (MyMargins.Top != -1)
+                printDocument.DefaultPageSettings.Margins.Top = (int)Math.Round(MyMargins.Top / 14.4);
+
+            if (MyMargins.Bottom != -1)
+                printDocument.DefaultPageSettings.Margins.Bottom = (int)Math.Round(MyMargins.Bottom / 14.4);
+
             printDocument.PrintPage += PrintDocument_PrintPage;
 
             if (printDialog.ShowDialog() == DialogResult.OK)
@@ -1620,7 +1709,7 @@ namespace DocMgr
                 int bottom = int.Parse(match.Groups[4].Value);
                 return new Margin(left, right, top, bottom);
             }
-            return new Margin(-1, 0, 0, 0);
+            return new Margin(-1, -1, -1, -1);
         }
 
         public static Margin GetMargins(string rtfFilePath)
@@ -1629,21 +1718,86 @@ namespace DocMgr
             return RtfMarginHelper.GetMarginsFromString(rawRtf);
         }
 
+        /// <summary>
+        /// Set the margins in the rtf doc.  Uses twips (1/1440 inch).
+        /// </summary>
+        public static void SetMarginsInDoc(string rtfFilePath, Margin mar)
+        {
+            if (mar.NotDefined())
+                return;
 
+            string rawRtf = File.ReadAllText(rtfFilePath);
+                                                // Store as twips:
+            int left = (int) Math.Round(mar.Left);
+            int right = (int)Math.Round(mar.Right);
+            int top = (int)Math.Round(mar.Top);
+            int bottom = (int) Math.Round(mar.Bottom);
+
+            string rtfWithMargins = RtfMarginHelper.SetMarginsInString(rawRtf, left, right, top, bottom);
+            File.WriteAllText(rtfFilePath, rtfWithMargins);
+        }
+
+        public static string SetMarginsInString(string rtf, int left, int right, int top, int bottom)
+        {
+            return RtfMarginHelper.AddRtfMargins(rtf, left, right, top, bottom);
+        }
+
+        /// <summary>
+        /// AddRtfMargins
+        /// </summary>
+        /// Updates margins in the rtf string.  ChatGPT generated.
+public static string AddRtfMargins(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
+        {
+            // Validate input
+            if (string.IsNullOrWhiteSpace(rtf) || !rtf.StartsWith(@"{\rtf"))
+                throw new ArgumentException("Invalid RTF document.");
+
+            // Prepare the margin definitions
+            string marginInfo = $@"\margl{leftTwips}\margr{rightTwips}\margt{topTwips}\margb{bottomTwips}";
+
+            // Insert right after the \rtfN header
+            int insertionIndex = rtf.IndexOf(@"\rtf");
+            if (insertionIndex == -1)
+                throw new InvalidOperationException("RTF header not found.");
+
+            // Find end of \rtfN where N is the version number (e.g., \rtf1)
+            int versionEnd = rtf.IndexOf(' ', insertionIndex);
+            if (versionEnd == -1)
+                versionEnd = insertionIndex + 5; // fallback
+
+            // Inject margin info
+            return rtf.Insert(versionEnd + 1, marginInfo);
+        }
+
+        //public static string SetMarginsInStringDFW(string rtf, int left, int right, int top, int bottom)
+        //{
+        //    string pattern = @"\\margl\d+\\margr\d+\\margt\d+\\margb\d+";
+        //    string replacement = $"\\margl{left}\\margr{right}\\margt{top}\\margb{bottom}";
+
+        //    if (Regex.IsMatch(rtf, pattern))
+        //        return Regex.Replace(rtf, pattern, replacement);
+        //    else
+        //        return replacement + rtf; // inject at top if not found
+        //}
     }
     public struct Margin
     {
-        public int Left;
-        public int Right;
-        public int Top;
-        public int Bottom;
+        public float Left;
+        public float Right;
+        public float Top;
+        public float Bottom;
 
-        public Margin(int left, int right, int top, int bottom)
+        public Margin(float left, float right, float top, float bottom)
         {
             Left = left;
             Right = right;
             Top = top;
             Bottom = bottom;
+        }
+
+        internal bool NotDefined()
+        {
+            return Left == -1;
         }
     }
 }
