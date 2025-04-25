@@ -1703,7 +1703,7 @@ namespace DocMgr
         {
             int? left = null, right = null, top = null, bottom = null;
 
-            var matches = Regex.Matches(rtf, @"\\marg([lrtb])(\d+)");
+            var matches = Regex.Matches(rtf, @"\\marg([lrtb])(-?\d+)");
             foreach (Match m in matches)
             {
                 switch (m.Groups[1].Value)
@@ -1720,19 +1720,19 @@ namespace DocMgr
 
             return new Margin(-1, -1, -1, -1);      // Margins not fully specified
         }
-        public static Margin GetMarginsFromStringOLD(string rtf)
-        {
-            var match = Regex.Match(rtf, @"\\margl(\d+).*?\\margr(\d+).*?\\margt(\d+).*?\\margb(\d+)", RegexOptions.Singleline);
-            if (match.Success)
-            {
-                int left = int.Parse(match.Groups[1].Value);
-                int right = int.Parse(match.Groups[2].Value);
-                int top = int.Parse(match.Groups[3].Value);
-                int bottom = int.Parse(match.Groups[4].Value);
-                return new Margin(left, right, top, bottom);
-            }
-            return new Margin(-1, -1, -1, -1);
-        }
+        //public static Margin GetMarginsFromStringOLD(string rtf)
+        //{
+        //    var match = Regex.Match(rtf, @"\\margl(\d+).*?\\margr(\d+).*?\\margt(\d+).*?\\margb(\d+)", RegexOptions.Singleline);
+        //    if (match.Success)
+        //    {
+        //        int left = int.Parse(match.Groups[1].Value);
+        //        int right = int.Parse(match.Groups[2].Value);
+        //        int top = int.Parse(match.Groups[3].Value);
+        //        int bottom = int.Parse(match.Groups[4].Value);
+        //        return new Margin(left, right, top, bottom);
+        //    }
+        //    return new Margin(-1, -1, -1, -1);
+        //}
 
         public static Margin GetMargins(string rtfFilePath)
         {
@@ -1767,7 +1767,8 @@ namespace DocMgr
         public static string SetRtfMargins(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
         {
             // Remove any existing margin settings
-            string cleanedRtf = Regex.Replace(rtf, @"\\marg[lrtb]\d+", "");
+            string cleanedRtf = Regex.Replace(rtf, @"\\marg[lrtb]-?\d+", "");
+            cleanedRtf = Regex.Replace(cleanedRtf, @"\\marg[lrtb]sxn-?\d+", "");
 
             // Build new margin string
             string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
