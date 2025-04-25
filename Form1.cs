@@ -1322,6 +1322,7 @@ namespace DocMgr
             mySettings.BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
 
             if (HaveMargins == false  &&  CurrentFilePath != null)
+            if (HaveMargins == false  &&  CurrentFilePath != null)
                 MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
 
             HaveMargins = true;
@@ -1700,6 +1701,27 @@ namespace DocMgr
     {
         public static Margin GetMarginsFromString(string rtf)
         {
+            int? left = null, right = null, top = null, bottom = null;
+
+            var matches = Regex.Matches(rtf, @"\\marg([lrtb])(\d+)");
+            foreach (Match m in matches)
+            {
+                switch (m.Groups[1].Value)
+                {
+                    case "l": left = int.Parse(m.Groups[2].Value); break;
+                    case "r": right = int.Parse(m.Groups[2].Value); break;
+                    case "t": top = int.Parse(m.Groups[2].Value); break;
+                    case "b": bottom = int.Parse(m.Groups[2].Value); break;
+                }
+            }
+
+            if (left.HasValue && right.HasValue && top.HasValue && bottom.HasValue)
+                return new Margin (left.Value, right.Value, top.Value, bottom.Value);
+
+            return new Margin(-1, -1, -1, -1);      // Margins not fully specified
+        }
+        public static Margin GetMarginsFromStringOLD(string rtf)
+        {
             var match = Regex.Match(rtf, @"\\margl(\d+).*?\\margr(\d+).*?\\margt(\d+).*?\\margb(\d+)", RegexOptions.Singleline);
             if (match.Success)
             {
@@ -1739,14 +1761,87 @@ namespace DocMgr
 
         public static string SetMarginsInString(string rtf, int left, int right, int top, int bottom)
         {
-            return RtfMarginHelper.AddRtfMargins(rtf, left, right, top, bottom);
+            return RtfMarginHelper.SetRtfMargins(rtf, left, right, top, bottom);
+        }
+
+        public static string SetRtfMargins(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
+        {
+            // Remove any existing margin settings
+            string cleanedRtf = Regex.Replace(rtf, @"\\marg[lrtb]\d+", "");
+
+            // Build new margin string
+            string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
+
+            // Find insertion point: right after \paperw...\paperh... block
+            var match = Regex.Match(cleanedRtf, @"(\\paperw\d+\\paperh\d+)");
+            if (match.Success)
+            {
+                int insertPos = match.Index + match.Length;
+                return cleanedRtf.Insert(insertPos, marginTags);
+            }
+
+            match = Regex.Match(cleanedRtf, @"(\\paperh\d+\\paperw\d+)");
+            if (match.Success)
+            {
+                int insertPos = match.Index + match.Length;
+                return cleanedRtf.Insert(insertPos, marginTags);
+            }
+
+            var headerMatch = Regex.Match(rtf, @"(\\rtf\d+)", RegexOptions.Singleline);
+            if (headerMatch.Success)
+            {
+                int insertIndex = headerMatch.Index + headerMatch.Length;
+                //string paperAndMargins = "\\paperw12240\\paperh15840\\margl1440\\margr1440\\margt1440\\margb1440";
+                rtf = rtf.Insert(insertIndex, marginTags);
+                return rtf;
+            }
+
+            // If no paper size or header found, return original
+            return cleanedRtf;
+        }
+        public static string InsertRtfMargins(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
+        {
+            // Define the margin tags
+            string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
+
+            // Find the paper size tag to inject after it (usually near \paperw and \paperh)
+            int insertIndex = rtf.IndexOf(@"\paperw");
+            if (insertIndex == -1) return rtf;
+
+            // Move to the end of the line containing paper settings (e.g., end of \paperhNNNN)
+            int nextSpace = rtf.IndexOf('\\', insertIndex + 1);
+            if (nextSpace == -1) return rtf;
+
+            // Insert the margin settings right after paper settings
+            return rtf.Insert(nextSpace, marginTags);
+        }
+
+        public static string AddRtfMarginsPREV(string rtf, int left, int right, int top, int bottom)
+        {
+            // Convert margins (in inches) to twips if needed:
+            // If your inputs are already in twips, skip the multiplication.
+            int leftTwips = left;
+            int rightTwips = right;
+            int topTwips = top;
+            int bottomTwips = bottom;
+
+            // Insert margin tags after the first occurrence of \rtfN (e.g., \rtf1)
+            int headerEnd = rtf.IndexOf("\\rtf");
+            if (headerEnd == -1) return rtf; // Not valid RTF
+
+            int insertPoint = rtf.IndexOf('{', headerEnd);
+            if (insertPoint == -1) return rtf;
+
+            string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
+
+            return rtf.Insert(insertPoint + 1, marginTags);
         }
 
         /// <summary>
         /// AddRtfMargins
         /// </summary>
         /// Updates margins in the rtf string.  ChatGPT generated.
-public static string AddRtfMargins(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
+        public static string AddRtfMarginsOLD(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
         {
             // Validate input
             if (string.IsNullOrWhiteSpace(rtf) || !rtf.StartsWith(@"{\rtf"))
