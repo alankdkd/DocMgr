@@ -1517,12 +1517,13 @@ namespace DocMgr
         }
 
         private PrintDocument printDocument;
+        private PrintRange Printer_PrintRange;
+        private int Printer_FromPage, Printer_ToPage, Printer_CurrentPage;
         private int checkPrint;
+
 
         private void buttonPrint_Click(object sender, EventArgs e)
         {
-            PrintDialog printDialog = new PrintDialog { Document = printDocument };
-
             if (!HaveMargins  &&  File.Exists(CurrentFilePath))
             {
                 MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
@@ -1546,16 +1547,36 @@ namespace DocMgr
 
             printDocument.PrintPage += PrintDocument_PrintPage;
 
+            PrintDialog printDialog = new PrintDialog { Document = printDocument };  // Connect dialog & doc.
+            printDialog.AllowSomePages = true;                  // Enables Page Range option
+            printDialog.AllowSelection = true;                  // Enables Selection option (optional)
+            printDialog.PrinterSettings.FromPage = printDialog.PrinterSettings.ToPage = 1;  // Nice default.
+
             if (printDialog.ShowDialog() == DialogResult.OK)
+            {
+                Printer_FromPage = printDialog.PrinterSettings.FromPage;
+                Printer_ToPage = printDialog.PrinterSettings.ToPage;
+                Printer_CurrentPage = 1;
+                Printer_PrintRange = printDialog.PrinterSettings.PrintRange;
+
                 printDocument.Print();
+            }
         }
 
 
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
             checkPrint = FormatRange(checkPrint, richTextBox.TextLength, e, richTextBox);
-            e.HasMorePages = checkPrint < richTextBox.TextLength;
 
+            //if (Printer_PrintRange == PrintRange.AllPages)
+                e.HasMorePages = checkPrint < richTextBox.TextLength;
+
+            if (Printer_PrintRange == PrintRange.SomePages)
+            {
+                if (++Printer_CurrentPage > Printer_ToPage)
+                    e.HasMorePages = false;
+            }
+            
             if (!e.HasMorePages)
                 FormatRangeDone(richTextBox);
         }
@@ -1768,7 +1789,7 @@ namespace DocMgr
         {
             // Remove any existing margin settings
             string cleanedRtf = Regex.Replace(rtf, @"\\marg[lrtb]-?\d+", "");
-            cleanedRtf = Regex.Replace(cleanedRtf, @"\\marg[lrtb]sxn-?\d+", "");
+            cleanedRtf = Regex.Replace(cleanedRtf, @"\\marg[lrtb]sxn-?\d+", "");  // Takes out section margins.  Kludge.
 
             // Build new margin string
             string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
@@ -1817,53 +1838,53 @@ namespace DocMgr
             return rtf.Insert(nextSpace, marginTags);
         }
 
-        public static string AddRtfMarginsPREV(string rtf, int left, int right, int top, int bottom)
-        {
-            // Convert margins (in inches) to twips if needed:
-            // If your inputs are already in twips, skip the multiplication.
-            int leftTwips = left;
-            int rightTwips = right;
-            int topTwips = top;
-            int bottomTwips = bottom;
+        //public static string AddRtfMarginsPREV(string rtf, int left, int right, int top, int bottom)
+        //{
+        //    // Convert margins (in inches) to twips if needed:
+        //    // If your inputs are already in twips, skip the multiplication.
+        //    int leftTwips = left;
+        //    int rightTwips = right;
+        //    int topTwips = top;
+        //    int bottomTwips = bottom;
 
-            // Insert margin tags after the first occurrence of \rtfN (e.g., \rtf1)
-            int headerEnd = rtf.IndexOf("\\rtf");
-            if (headerEnd == -1) return rtf; // Not valid RTF
+        //    // Insert margin tags after the first occurrence of \rtfN (e.g., \rtf1)
+        //    int headerEnd = rtf.IndexOf("\\rtf");
+        //    if (headerEnd == -1) return rtf; // Not valid RTF
 
-            int insertPoint = rtf.IndexOf('{', headerEnd);
-            if (insertPoint == -1) return rtf;
+        //    int insertPoint = rtf.IndexOf('{', headerEnd);
+        //    if (insertPoint == -1) return rtf;
 
-            string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
+        //    string marginTags = $"\\margl{leftTwips}\\margr{rightTwips}\\margt{topTwips}\\margb{bottomTwips}";
 
-            return rtf.Insert(insertPoint + 1, marginTags);
-        }
+        //    return rtf.Insert(insertPoint + 1, marginTags);
+        //}
 
         /// <summary>
         /// AddRtfMargins
         /// </summary>
         /// Updates margins in the rtf string.  ChatGPT generated.
-        public static string AddRtfMarginsOLD(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
-        {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(rtf) || !rtf.StartsWith(@"{\rtf"))
-                throw new ArgumentException("Invalid RTF document.");
+        //public static string AddRtfMarginsOLD(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
+        //{
+        //    // Validate input
+        //    if (string.IsNullOrWhiteSpace(rtf) || !rtf.StartsWith(@"{\rtf"))
+        //        throw new ArgumentException("Invalid RTF document.");
 
-            // Prepare the margin definitions
-            string marginInfo = $@"\margl{leftTwips}\margr{rightTwips}\margt{topTwips}\margb{bottomTwips}";
+        //    // Prepare the margin definitions
+        //    string marginInfo = $@"\margl{leftTwips}\margr{rightTwips}\margt{topTwips}\margb{bottomTwips}";
 
-            // Insert right after the \rtfN header
-            int insertionIndex = rtf.IndexOf(@"\rtf");
-            if (insertionIndex == -1)
-                throw new InvalidOperationException("RTF header not found.");
+        //    // Insert right after the \rtfN header
+        //    int insertionIndex = rtf.IndexOf(@"\rtf");
+        //    if (insertionIndex == -1)
+        //        throw new InvalidOperationException("RTF header not found.");
 
-            // Find end of \rtfN where N is the version number (e.g., \rtf1)
-            int versionEnd = rtf.IndexOf(' ', insertionIndex);
-            if (versionEnd == -1)
-                versionEnd = insertionIndex + 5; // fallback
+        //    // Find end of \rtfN where N is the version number (e.g., \rtf1)
+        //    int versionEnd = rtf.IndexOf(' ', insertionIndex);
+        //    if (versionEnd == -1)
+        //        versionEnd = insertionIndex + 5; // fallback
 
-            // Inject margin info
-            return rtf.Insert(versionEnd + 1, marginInfo);
-        }
+        //    // Inject margin info
+        //    return rtf.Insert(versionEnd + 1, marginInfo);
+        //}
 
         //public static string SetMarginsInStringDFW(string rtf, int left, int right, int top, int bottom)
         //{
