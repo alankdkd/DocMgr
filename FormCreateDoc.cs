@@ -33,12 +33,6 @@ namespace DocMgr
             textBoxDocName.Select();
         }
 
-        //private void CenterCursor(int xOffset = 0, int yOffset = 0)
-        //{
-        //    Cursor.Position = new Point(Screen.PrimaryScreen.Bounds.Width / 2 + xOffset,
-        //        Screen.PrimaryScreen.Bounds.Height / 2 + yOffset);
-        //}
-
         private void buttonSelect_Click(object sender, EventArgs e)
         {
             string folder = FolderSelector.SelectFolder();

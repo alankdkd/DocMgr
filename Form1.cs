@@ -1370,7 +1370,8 @@ namespace DocMgr
 
                 if (marginsChanged)
                 {
-                    RtfMarginHelper.SetMarginsInDoc(CurrentFilePath, MyMargins);
+                    //RtfMarginHelper.SetMarginsInDoc(CurrentFilePath, MyMargins);
+                    buttonSaveDoc_Click(null, null);
                 }
             }
 
@@ -1415,7 +1416,10 @@ namespace DocMgr
         {
             if (num == -1)
                 return "not used";
-            
+
+            if (num == 0)
+                return "0";
+
             return TrimSuffix ((num / 1440).ToString("F3"), ".000").TrimEnd('0');
         }
 
@@ -1894,8 +1898,8 @@ namespace DocMgr
                 return rtf;
             }
 
-            // If no paper size or header found, return original
-            return cleanedRtf;
+            // If no paper size or header found, return original.
+            return rtf;
         }
 
         public static string InsertRtfMargins(string rtf, int leftTwips, int rightTwips, int topTwips, int bottomTwips)
