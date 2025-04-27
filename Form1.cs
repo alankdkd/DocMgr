@@ -25,7 +25,7 @@ namespace DocMgr
         //TEMP FOR USB BACKUP: string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
         string BackupFolder, ArchiveFolder;
         string ProjName;
-        static Margin MyMargins;    // In twips; 1/1440 inch.  Twentieth of a point.
+        static MarginSt MyMargins;    // In twips; 1/1440 inch.  Twentieth of a point.
         static bool HaveMargins = false;
 
         string? CurrentFilePath;
@@ -949,9 +949,16 @@ namespace DocMgr
 
                     SaveScrollPosition();
                     //ORIG: richTextBox.SaveFile(CurrentFilePath);
-                    string rtfWithMargins = RtfMarginHelper.AddMarginsToRtf(richTextBox.Rtf, MyMargins);
-                    File.WriteAllText(CurrentFilePath, rtfWithMargins);
 
+                    string rtfWithMargins;
+                    UpdateMargins();
+
+                    if (MyMargins.IsNull())
+                        rtfWithMargins = richTextBox.Rtf;   // Margins not used; just use existing text.
+                    else
+                        rtfWithMargins = RtfMarginHelper.AddMarginsToRtf(richTextBox.Rtf, MyMargins);
+
+                    File.WriteAllText(CurrentFilePath, rtfWithMargins);
                     saveOk = true;
                 }
                 catch (UnauthorizedAccessException)
@@ -1326,12 +1333,11 @@ namespace DocMgr
 
             mySettings.DefaultFont = Properties.Settings.Default.DefaultFont;
             mySettings.BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
+            UpdateMargins();
+            //if (HaveMargins == false  &&  CurrentFilePath != null)
+            //    MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
 
-            if (HaveMargins == false  &&  CurrentFilePath != null)
-            if (HaveMargins == false  &&  CurrentFilePath != null)
-                MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
-
-            HaveMargins = true;
+            //HaveMargins = true;
             mySettings.MarginLeft = TwipsToStrInches(MyMargins.Left);
             mySettings.MarginRight = TwipsToStrInches(MyMargins.Right);
             mySettings.MarginTop = TwipsToStrInches(MyMargins.Top);
@@ -1379,6 +1385,17 @@ namespace DocMgr
 
                 return changed;
             }
+        }
+
+        private void UpdateMargins()
+        {
+            if (HaveMargins == false)
+                if (CurrentFilePath == null)
+                    MyMargins = MarginSt.NullMargin;
+                else
+                    MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
+
+            HaveMargins = true;
         }
 
         private float StrInchesToTwips(string floatOrMessage)
@@ -1529,12 +1546,12 @@ namespace DocMgr
 
         private void buttonPrint_Click(object sender, EventArgs e)
         {
-            if (!HaveMargins  &&  File.Exists(CurrentFilePath))
-            {
-                MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
-                HaveMargins = true;
-            }
-
+            //if (!HaveMargins  &&  File.Exists(CurrentFilePath))
+            //{
+            //    MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
+            //    HaveMargins = true;
+            //}
+            UpdateMargins();
             // Initialize PrintDocument
             printDocument = new PrintDocument();
 
@@ -1653,10 +1670,10 @@ namespace DocMgr
             RectangleF rect = e.MarginBounds;
             fmtRange.rc = new RECT
             {
-                Top = (int)(rect.Top * 14.4f),
-                Bottom = (int)(rect.Bottom * 14.4f),
-                Left = (int)(rect.Left * 14.4f),
-                Right = (int)(rect.Right * 14.4f)
+                Top = (int)Math.Round(rect.Top * 14.4f),
+                Bottom = (int)Math.Round(rect.Bottom * 14.4f),
+                Left = (int)Math.Round(rect.Left * 14.4f),
+                Right = (int)Math.Round(rect.Right * 14.4f)
             };
             fmtRange.rcPage = fmtRange.rc;
 
@@ -1777,7 +1794,7 @@ namespace DocMgr
 
     public static class RtfMarginHelper
     {
-        public static Margin GetMarginsFromString(string rtf)
+        public static MarginSt GetMarginsFromString(string rtf)
         {
             int? left = null, right = null, top = null, bottom = null;
 
@@ -1794,23 +1811,23 @@ namespace DocMgr
             }
 
             if (left.HasValue && right.HasValue && top.HasValue && bottom.HasValue)
-                return new Margin (left.Value, right.Value, top.Value, bottom.Value);
+                return new MarginSt (left.Value, right.Value, top.Value, bottom.Value);
 
-            return new Margin(-1, -1, -1, -1);      // Margins not fully specified
+            return new MarginSt(-1, -1, -1, -1);      // Margins not fully specified
         }
 
-        public static Margin GetMargins(string rtfFilePath)
+        public static MarginSt GetMargins(string rtfFilePath)
         {
             string rawRtf = File.ReadAllText(rtfFilePath);
             return RtfMarginHelper.GetMarginsFromString(rawRtf);
         }
 
         /// <summary>
-        /// Set the margins in the rtf doc.  Uses twips (1/1440 inch).
+        /// Set the margins in the given rtf file.  Uses twips (1/1440 inch).
         /// </summary>
-        public static void SetMarginsInDoc(string rtfFilePath, Margin mar)
+        public static void SetMarginsInDoc(string rtfFilePath, MarginSt mar)
         {
-            if (mar.NotDefined())
+            if (mar.IsNull())
                 return;
 
             string rawRtf = File.ReadAllText(rtfFilePath);
@@ -1818,7 +1835,12 @@ namespace DocMgr
             File.WriteAllText(rtfFilePath, rtfWithMargins);
         }
 
-        public static string AddMarginsToRtf(string rawRtf, Margin mar)
+        /// AddMarginsToRtf
+        /// 
+        /// <summary>
+        /// Insert margin info into the given rtf string.
+        /// </summary>
+        public static string AddMarginsToRtf(string rawRtf, MarginSt mar)
         {            
             int left = (int)Math.Round(mar.Left);       // Store as twips:
             int right = (int)Math.Round(mar.Right);
@@ -1889,14 +1911,15 @@ namespace DocMgr
         }
     }
 
-    public struct Margin
+    public struct MarginSt
     {
         public float Left;
         public float Right;
         public float Top;
         public float Bottom;
+        public static readonly MarginSt NullMargin = new MarginSt(-1, -1, -1, -1);
 
-        public Margin(float left, float right, float top, float bottom)
+        public MarginSt(float left, float right, float top, float bottom)
         {
             Left = left;
             Right = right;
@@ -1904,7 +1927,7 @@ namespace DocMgr
             Bottom = bottom;
         }
 
-        internal bool NotDefined()
+        internal bool IsNull()
         {
             return Left == -1;
         }

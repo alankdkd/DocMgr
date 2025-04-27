@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright (c) 2025 by Alan D. Balkany")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("DocMgr v0.0.  Manages collection of rich-text-format documents for each project.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("0.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0.0+34d225b12270b4b7b476b25b9650b99c91e098b9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("0.1.0.0+e41fa95dc12293ca4a57a13e70d9b8af843082c5")]
 [assembly: System.Reflection.AssemblyProductAttribute("DocMgr")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DocMgr")]
 [assembly: System.Reflection.AssemblyVersionAttribute("0.1.0.0")]
