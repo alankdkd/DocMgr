@@ -1575,6 +1575,7 @@ namespace DocMgr
             {
                 startPrintPos = richTextBox.SelectionStart;
                 endPrintPos = startPrintPos + richTextBox.SelectionLength;
+                checkPrint = startPrintPos;
             }
 
             if (Printer_CurrentPage == 0)
