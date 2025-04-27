@@ -15,6 +15,8 @@ namespace DocMgr
         public PropertiesForm()
         {
             InitializeComponent();
+            CenterToScreen();
+            DocMgr.CenterCursor();
         }
 
         //ORIG: internal void SetProperties(Properties.Settings settings)
