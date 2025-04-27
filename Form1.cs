@@ -512,7 +512,7 @@ namespace DocMgr
 
             //if (DocName.Text.Length > 0)
             //    SaveScrollPosition();
-            SaveChanges();
+             SaveChanges();
 
             loadingDoc = true;
             richTextBox.Clear();
@@ -670,6 +670,9 @@ namespace DocMgr
 
             if (e.KeyChar == 19)                        // Ctrl-S.  Civilized way to do this not apparent.
                 buttonSaveDoc_Click(sender, e);         // Save document.
+
+            if (e.KeyChar == 16)                        // Ctrl-P.  Print
+                buttonPrint_Click(sender, e);           // Invoke print.
 
             if (DocName.Text.Length == 0)
             {
@@ -1521,7 +1524,6 @@ namespace DocMgr
         private int Printer_FromPage, Printer_ToPage, Printer_CurrentPage;
         private int checkPrint;
 
-
         private void buttonPrint_Click(object sender, EventArgs e)
         {
             if (!HaveMargins  &&  File.Exists(CurrentFilePath))
@@ -1558,27 +1560,72 @@ namespace DocMgr
                 Printer_ToPage = printDialog.PrinterSettings.ToPage;
                 Printer_CurrentPage = 1;
                 Printer_PrintRange = printDialog.PrinterSettings.PrintRange;
+                checkPrint = 0;
 
                 printDocument.Print();
             }
         }
 
-
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
-            checkPrint = FormatRange(checkPrint, richTextBox.TextLength, e, richTextBox);
+            int startPrintPos = 0;
+            int endPrintPos = richTextBox.TextLength;
 
-            //if (Printer_PrintRange == PrintRange.AllPages)
-                e.HasMorePages = checkPrint < richTextBox.TextLength;
+            if (Printer_PrintRange == PrintRange.Selection)
+            {
+                startPrintPos = richTextBox.SelectionStart;
+                endPrintPos = startPrintPos + richTextBox.SelectionLength;
+            }
 
+            if (Printer_CurrentPage == 0)
+                checkPrint = startPrintPos;
+
+            // First, calculate the logical page we are about to print
+            int logicalPage = Printer_CurrentPage;// + 1; // Pages are 1-based
+
+            // Check if we should print this page
             if (Printer_PrintRange == PrintRange.SomePages)
             {
-                if (++Printer_CurrentPage > Printer_ToPage)
+                if (logicalPage < Printer_FromPage)
+                {
+                    // Skip this page without printing anything
+                    checkPrint = SkipOnePage(checkPrint, endPrintPos, e);
+                    Printer_CurrentPage++;
+                    e.HasMorePages = true;
+                    return;
+                }
+                else if (logicalPage > Printer_ToPage)
+                {
                     e.HasMorePages = false;
+                    FormatRangeDone(richTextBox);
+                    return;
+                }
             }
-            
+
+            // Actually print this page
+            checkPrint = FormatRange(checkPrint, endPrintPos, e, richTextBox);
+
+            // Are there more pages?
+            e.HasMorePages = (checkPrint < endPrintPos);
+
+            Printer_CurrentPage++;
+
             if (!e.HasMorePages)
+            {
                 FormatRangeDone(richTextBox);
+            }
+        }
+
+        // Helper to simulate skipping one page without outputting anything
+        private int SkipOnePage(int start, int end, PrintPageEventArgs e)
+        {
+            // Create a dummy graphics object to simulate formatting without printing
+            using (var dummyBitmap = new Bitmap(1, 1))
+            using (var g = Graphics.FromImage(dummyBitmap))
+            {
+                PrintPageEventArgs fakeArgs = new PrintPageEventArgs(g, e.MarginBounds, e.PageBounds, e.PageSettings);
+                return FormatRange(start, end, fakeArgs, richTextBox);
+            }
         }
 
         // FormatRange: Uses Win32 message to render RTF content to a device context
