@@ -1208,12 +1208,17 @@ namespace DocMgr
             if (Root.SubDocs.Count == 0)
                 return;                         // No docs.
 
+            Cursor.Current = Cursors.WaitCursor;
+
             if (CopySingleDocToFolder(Root.SubDocs, destFolder, DocName.Text))
             {
+                Cursor.Current = Cursors.Default;
+                CenterCursor(31, 75);
                 MessageBox.Show($"{DocName.Text.Substring(0, DocName.Text.Length - 1)} is saved.");
                 return;
             }
 
+            Cursor.Current = Cursors.Default;
             MessageBox.Show($"Warning: Document {DocName.Text} was not found and not saved.");
         }
 
@@ -1813,7 +1818,7 @@ namespace DocMgr
             if (left.HasValue && right.HasValue && top.HasValue && bottom.HasValue)
                 return new MarginSt (left.Value, right.Value, top.Value, bottom.Value);
 
-            return new MarginSt(-1, -1, -1, -1);      // Margins not fully specified
+            return MarginSt.NullMargin;      // Margins not fully specified
         }
 
         public static MarginSt GetMargins(string rtfFilePath)
@@ -1929,7 +1934,7 @@ namespace DocMgr
 
         internal bool IsNull()
         {
-            return Left == -1;
+            return Left == -1 && Right == -1 && Top == -1 && Bottom == -1;
         }
     }
 }
