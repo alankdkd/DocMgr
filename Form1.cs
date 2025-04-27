@@ -1406,7 +1406,7 @@ namespace DocMgr
 
         private float StrInchesToTwips(string floatOrMessage)
         {
-            if (float.TryParse(floatOrMessage, out float value))
+            if (float.TryParse(floatOrMessage, out float value)  &&  value != -1)
                 return value * 1440;
             else
                 return -1;      // "not used" or invalid float.
@@ -1555,16 +1555,10 @@ namespace DocMgr
 
         private void buttonPrint_Click(object sender, EventArgs e)
         {
-            //if (!HaveMargins  &&  File.Exists(CurrentFilePath))
-            //{
-            //    MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
-            //    HaveMargins = true;
-            //}
-            UpdateMargins();
-            // Initialize PrintDocument
-            printDocument = new PrintDocument();
+            UpdateMargins();            
+            printDocument = new PrintDocument();    // Initialize PrintDocument
 
-            if (MyMargins.Left != -1)     // MyMargins in twips, PrintDoc in 1/100ths:
+            if (MyMargins.Left != -1)               // MyMargins in twips, PrintDoc in 1/100ths:
                 printDocument.DefaultPageSettings.Margins.Left = (int)Math.Round(MyMargins.Left / 14.4);
 
             if (MyMargins.Right != -1)
@@ -1579,8 +1573,8 @@ namespace DocMgr
             printDocument.PrintPage += PrintDocument_PrintPage;
 
             PrintDialog printDialog = new PrintDialog { Document = printDocument };  // Connect dialog & doc.
-            printDialog.AllowSomePages = true;                              // Enables Page Range option
-            printDialog.AllowSelection = richTextBox.SelectionLength > 0;   // Enables Selection option
+            printDialog.AllowSomePages = true;                              // Enables Page Range option.
+            printDialog.AllowSelection = richTextBox.SelectionLength > 0;   // Enables Selection option.
             printDialog.PrinterSettings.FromPage = printDialog.PrinterSettings.ToPage = 1;  // Nice default.
 
             if (printDialog.ShowDialog() == DialogResult.OK)
