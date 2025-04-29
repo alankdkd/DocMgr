@@ -550,8 +550,8 @@ namespace DocMgr
             else
                 MessageBox.Show("Can't select document.");
 
-            //if (richTextBox.Text.Length == 0)
-            richTextBox.Font = font;
+            if (richTextBox.Text.Length == 0)
+                richTextBox.Font = font;
 
             buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
@@ -1611,12 +1611,12 @@ namespace DocMgr
                 Printer_CurrentPosition = startPrintPos;
 
             // First, calculate the logical page we are about to print
-            int logicalPage = Printer_CurrentPage;// + 1; // Pages are 1-based
+            //int logicalPage = Printer_CurrentPage;// + 1; // Pages are 1-based
 
             // Check if we should print this page
             if (Printer_PrintRange == PrintRange.SomePages)
             {
-                if (logicalPage < Printer_FromPage)
+                if (Printer_CurrentPage < Printer_FromPage)
                 {
                     // Skip this page without printing anything
                     Printer_CurrentPosition = SkipOnePage(Printer_CurrentPosition, endPrintPos, e);
@@ -1624,7 +1624,7 @@ namespace DocMgr
                     e.HasMorePages = true;
                     return;
                 }
-                else if (logicalPage > Printer_ToPage)
+                else if (Printer_CurrentPage > Printer_ToPage)
                 {
                     e.HasMorePages = false;
                     FormatRangeDone(richTextBox);

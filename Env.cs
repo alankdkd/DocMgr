@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DocMgr
 {
-    internal static class Env
-    {
-        //Font font = new Font();
-    }
+    //internal static class Env
+    //{
+    //    //Font font = new Font();
+    //}
 }
