@@ -16,7 +16,7 @@ namespace DocMgr
         {
             InitializeComponent();
             CenterToScreen();
-            DocMgr.CenterCursor();
+            DocMgr.CenterCursor(-50, -170);
         }
 
         //ORIG: internal void SetProperties(Properties.Settings settings)

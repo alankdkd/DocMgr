@@ -989,6 +989,7 @@ namespace DocMgr
 
             lastDocName = DocName.Text;
             richTextBox.Clear();
+            CurrentFilePath = null;
 
             if (lastDocName[0] == '*')
                 lastDocName = lastDocName.Remove(0, 2);
@@ -1339,19 +1340,11 @@ namespace DocMgr
             mySettings.DefaultFont = Properties.Settings.Default.DefaultFont;
             mySettings.BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
             UpdateMargins();
-            //if (HaveMargins == false  &&  CurrentFilePath != null)
-            //    MyMargins = RtfMarginHelper.GetMargins(CurrentFilePath);
 
-            //HaveMargins = true;
             mySettings.MarginLeft = TwipsToStrInches(MyMargins.Left);
             mySettings.MarginRight = TwipsToStrInches(MyMargins.Right);
             mySettings.MarginTop = TwipsToStrInches(MyMargins.Top);
             mySettings.MarginBottom = TwipsToStrInches(MyMargins.Bottom);
-
-            //mySettings.MarginLeft = FToSUsedMsg(Properties.Settings.Default.MarginLeft);
-            //mySettings.MarginRight = FToSUsedMsg(Properties.Settings.Default.MarginRight);
-            //mySettings.MarginTop = FToSUsedMsg(Properties.Settings.Default.MarginTop);
-            //mySettings.MarginBottom = FToSUsedMsg(Properties.Settings.Default.MarginBottom);
 
             prop.SetProperties(mySettings);
             prop.ShowDialog();

@@ -229,7 +229,7 @@
             buttonBackUpFile.Name = "buttonBackUpFile";
             buttonBackUpFile.Size = new Size(175, 31);
             buttonBackUpFile.TabIndex = 16;
-            buttonBackUpFile.Text = "&Back Up File";
+            buttonBackUpFile.Text = "&Back Up Document";
             toolTips.SetToolTip(buttonBackUpFile, "Update the single backup copy with incremental progress until it's ready to archive.");
             buttonBackUpFile.UseVisualStyleBackColor = false;
             buttonBackUpFile.Click += buttonBackUpFile_Click;

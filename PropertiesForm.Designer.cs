@@ -28,50 +28,51 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
-            this.buttonSave = new System.Windows.Forms.Button();
-            this.buttonCancel = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            propertyGrid = new PropertyGrid();
+            buttonSave = new Button();
+            buttonCancel = new Button();
+            SuspendLayout();
             // 
             // propertyGrid
             // 
-            this.propertyGrid.Location = new System.Drawing.Point(23, 22);
-            this.propertyGrid.Name = "propertyGrid";
-            this.propertyGrid.Size = new System.Drawing.Size(754, 390);
-            this.propertyGrid.TabIndex = 0;
+            propertyGrid.Location = new Point(23, 22);
+            propertyGrid.Name = "propertyGrid";
+            propertyGrid.Size = new Size(754, 390);
+            propertyGrid.TabIndex = 0;
             // 
             // buttonSave
             // 
-            this.buttonSave.Location = new System.Drawing.Point(804, 49);
-            this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(123, 43);
-            this.buttonSave.TabIndex = 1;
-            this.buttonSave.Text = "&Save";
-            this.buttonSave.UseVisualStyleBackColor = true;
-            this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
+            buttonSave.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonSave.Location = new Point(804, 49);
+            buttonSave.Name = "buttonSave";
+            buttonSave.Size = new Size(123, 43);
+            buttonSave.TabIndex = 1;
+            buttonSave.Text = "&Save";
+            buttonSave.UseVisualStyleBackColor = true;
+            buttonSave.Click += buttonSave_Click;
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(804, 129);
-            this.buttonCancel.Name = "buttonCancel";
-            this.buttonCancel.Size = new System.Drawing.Size(123, 43);
-            this.buttonCancel.TabIndex = 2;
-            this.buttonCancel.Text = "&Cancel";
-            this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            buttonCancel.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonCancel.Location = new Point(804, 129);
+            buttonCancel.Name = "buttonCancel";
+            buttonCancel.Size = new Size(123, 43);
+            buttonCancel.TabIndex = 2;
+            buttonCancel.Text = "&Cancel";
+            buttonCancel.UseVisualStyleBackColor = true;
+            buttonCancel.Click += buttonCancel_Click;
             // 
             // PropertiesForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(958, 441);
-            this.Controls.Add(this.buttonCancel);
-            this.Controls.Add(this.buttonSave);
-            this.Controls.Add(this.propertyGrid);
-            this.Name = "PropertiesForm";
-            this.Text = "DocMgr Properties";
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(958, 441);
+            Controls.Add(buttonCancel);
+            Controls.Add(buttonSave);
+            Controls.Add(propertyGrid);
+            Name = "PropertiesForm";
+            Text = "DocMgr Properties";
+            ResumeLayout(false);
         }
 
         #endregion
