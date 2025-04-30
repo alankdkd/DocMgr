@@ -313,7 +313,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = SystemColors.ControlDark;
+            BackColor = SystemColors.ControlDarkDark;
             ClientSize = new Size(1296, 985);
             Controls.Add(buttonPrint);
             Controls.Add(buttonProperties);

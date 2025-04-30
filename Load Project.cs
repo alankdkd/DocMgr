@@ -134,7 +134,7 @@ namespace DocMgr
 
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
-            string? projectPath = DocMgr.SelectFile("json files (*.json)|*.json|All files (*.*)|*.*");
+            string? projectPath = DocMgr.OpenFile("json files (*.json)|*.json|All files (*.*)|*.*");
             RegistryKey? key;
 
             if (projectPath != null)

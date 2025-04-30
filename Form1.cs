@@ -252,7 +252,7 @@ namespace DocMgr
 
         private void ButtonSaveAs_Click(object sender, EventArgs e)
         {
-            string? fileName = SelectFile("RTF Files|*.rtf|All Files|*.*", true);
+            string? fileName = SaveFile("RTF Files|*.rtf|All Files|*.*", true);
 
             if (fileName == null)
                 return;
@@ -668,7 +668,7 @@ namespace DocMgr
             //if (e.KeyChar == (int)Keys.Escape)
             //    buttonClose_Click(sender, e);           // User wants to exit.
 
-            if (e.KeyChar == 19)                        // Ctrl-S.  Civilized way to do this not apparent.
+            if (e.KeyChar == 19  &&  buttonSaveDoc.Enabled) // Ctrl-S.  Civilized way to do this not apparent.
                 buttonSaveDoc_Click(sender, e);         // Save document.
 
             if (e.KeyChar == 16)                        // Ctrl-P.  Print
@@ -844,7 +844,7 @@ namespace DocMgr
 
         // General method to select a file.
         // Used to select project & document files.
-        public static string? SelectFile(string filter, bool overwriteOk = false)
+        public static string? OpenFile(string filter, bool overwriteOk = false)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -857,6 +857,26 @@ namespace DocMgr
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                     return openFileDialog.FileName;
+
+                return null;
+            }
+        }
+
+        // General method to save a file.
+        // Used to for Save As.
+        public static string? SaveFile(string filter, bool overwriteOk = false)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                string? path = GetDefaultPath();
+
+                saveFileDialog.Title = "Select File";
+                saveFileDialog.InitialDirectory = path;
+                saveFileDialog.Filter = filter;
+                saveFileDialog.CheckFileExists = !overwriteOk;
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    return saveFileDialog.FileName;
 
                 return null;
             }
@@ -886,7 +906,7 @@ namespace DocMgr
             if (DocName.Text.StartsWith('*'))
                 buttonSaveDoc_Click(null, null);                            // In case changes not saved.
 
-            string? DocPath = SelectFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
+            string? DocPath = OpenFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
 
             if (IsNullOrEmpty(DocPath))
                 return;
