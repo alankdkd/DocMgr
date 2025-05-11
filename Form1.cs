@@ -507,12 +507,7 @@ namespace DocMgr
 
         private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
         {                                                           // clicked to load the document.
-            //if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
-            //    buttonSaveDoc_Click(null, null);                    // Save changes.
-
-            //if (DocName.Text.Length > 0)
-            //    SaveScrollPosition();
-             SaveChanges();
+            SaveChanges();
 
             loadingDoc = true;
             richTextBox.Clear();
@@ -551,7 +546,7 @@ namespace DocMgr
                 MessageBox.Show("Can't select document.");
 
             if (richTextBox.Text.Length == 0)
-                richTextBox.Font = font;
+                richTextBox.Font = Properties.Settings.Default.DefaultFont;
 
             buttonRemoveDoc.Enabled = true;
             richTextBox.Focus();
@@ -674,11 +669,11 @@ namespace DocMgr
             if (e.KeyChar == 16)                        // Ctrl-P.  Print
                 buttonPrint_Click(sender, e);           // Invoke print.
 
-            if (DocName.Text.Length == 0)
-            {
-                DocName.Text = "Document";              // Default name for new document.
-                buttonRemoveDoc.Enabled = false;
-            }
+            //if (DocName.Text.Length == 0)
+            //{
+            //    DocName.Text = "Document";              // Default name for new document.
+            //    buttonRemoveDoc.Enabled = false;
+            //}
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -956,7 +951,17 @@ namespace DocMgr
         {
             bool saveOk = false;
 
-            if (CurrentFilePath != null && DocName.Text.Length > 0)
+            if (DocName.Text.Length == 0)
+            {
+                string? fileName = SaveFile("RTF Files|*.rtf|All Files|*.*", true);
+
+                if (fileName == null)
+                    return;
+
+                DocName.Text = fileName;
+            }
+
+            if (CurrentFilePath != null)
             {
                 // DOESN'T WORK FOR EMPTY DOC:
                 try
@@ -1266,6 +1271,8 @@ namespace DocMgr
             if (Root.SubDocs.Count == 0)
                 return;                         // No docs.
 
+            SaveProject(destFolder + '\\' + ProjName + ".json", Root);
+
             if (CopyDocsToFolder(Root.SubDocs, destFolder))
             {
                 MessageBox.Show($"{ProjName} is saved.");
@@ -1529,16 +1536,16 @@ namespace DocMgr
         {
             SaveScrollPosition();
 
-            using (FolderBrowserDialog folderDialog = new())
-            {
-                folderDialog.Description = "Select Parent Folder for Project";
+            //using (FolderBrowserDialog folderDialog = new())
+            //{
+            //    folderDialog.Description = "Select Parent Folder for Project";
 
                 // Show the folder dialog:
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    string selectedFolder = folderDialog.SelectedPath;
+                //if (folderDialog.ShowDialog() == DialogResult.OK)
+                //{
+                    //string selectedFolder = folderDialog.SelectedPath;
 
-                    using (CreateFolderDialog createDialog = new(selectedFolder))
+                    using (CreateFolderDialog createDialog = new(Root.DocPath))
                     {
                         createDialog.Text = "Enter New Project Name";
 
@@ -1557,8 +1564,8 @@ namespace DocMgr
                             DocName.Text = "";
                         }
                     }
-                }
-            }
+                //}
+            //}
         }
 
         private PrintDocument printDocument;
@@ -1589,6 +1596,7 @@ namespace DocMgr
             printDialog.AllowSomePages = true;                              // Enables Page Range option.
             printDialog.AllowSelection = richTextBox.SelectionLength > 0;   // Enables Selection option.
             printDialog.PrinterSettings.FromPage = printDialog.PrinterSettings.ToPage = 1;  // Nice default.
+            CenterCursor();
 
             if (printDialog.ShowDialog() == DialogResult.OK)
             {

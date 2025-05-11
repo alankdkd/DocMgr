@@ -101,6 +101,7 @@
             AcceptButton = buttonOk;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlDark;
             ClientSize = new Size(800, 164);
             Controls.Add(buttonCancel);
             Controls.Add(buttonOk);

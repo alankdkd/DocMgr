@@ -293,7 +293,7 @@
             buttonArchiveFile.Name = "buttonArchiveFile";
             buttonArchiveFile.Size = new Size(175, 31);
             buttonArchiveFile.TabIndex = 18;
-            buttonArchiveFile.Text = "Arc&hive File";
+            buttonArchiveFile.Text = "Arc&hive Document";
             buttonArchiveFile.UseVisualStyleBackColor = false;
             buttonArchiveFile.Click += buttonArchiveFile_Click;
             // 

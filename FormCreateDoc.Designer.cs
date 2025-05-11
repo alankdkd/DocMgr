@@ -112,6 +112,7 @@
             AcceptButton = buttonCreate;
             AutoScaleDimensions = new SizeF(10F, 23F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.ControlDark;
             ClientSize = new Size(1006, 255);
             Controls.Add(buttonClose);
             Controls.Add(textBoxDocName);
