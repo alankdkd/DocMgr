@@ -257,15 +257,15 @@ namespace DocMgr
             if (fileName == null)
                 return;
 
-            if (File.Exists(fileName))
-            {
-                CenterCursor(160, 82);
-                if (MessageBox.Show("File " + fileName + " exists.  OK to overwrite?",
-                    "OK to overwrite?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning,
-                    MessageBoxDefaultButton.Button2) // Sets Cancel as the default button.
-                        != DialogResult.OK)
-                    return;
-            }
+            //if (File.Exists(fileName))
+            //{
+            //    CenterCursor(160, 82);
+            //    if (MessageBox.Show("File " + fileName + " exists.  OK to overwrite?",
+            //        "OK to overwrite?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning,
+            //        MessageBoxDefaultButton.Button2) // Sets Cancel as the default button.
+            //            != DialogResult.OK)
+            //        return;
+            //}
 
             SaveScrollPosition();
             CurrentFilePath = fileName;
@@ -951,22 +951,13 @@ namespace DocMgr
         {
             bool saveOk = false;
 
-            if (DocName.Text.Length == 0)
-            {
-                string? fileName = SaveFile("RTF Files|*.rtf|All Files|*.*", true);
-
-                if (fileName == null)
-                    return;
-
-                DocName.Text = fileName;
-            }
-
-            if (CurrentFilePath != null)
-            {
-                // DOESN'T WORK FOR EMPTY DOC:
+            //if (CurrentFilePath != null)
+            //{
+            //    // DOESN'T WORK FOR EMPTY DOC:
                 try
                 {
-                    if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath))
+                    if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath)
+                        && !RichTextBoxContainsImage(richTextBox))
                         if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
                             + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
                             != DialogResult.OK)
@@ -976,19 +967,32 @@ namespace DocMgr
                     //ORIG: richTextBox.SaveFile(CurrentFilePath);
 
                     string rtfWithMargins;
-                    UpdateMargins();
+
+                    if (File.Exists(CurrentFilePath))
+                        UpdateMargins();
 
                     if (MyMargins.IsNull())
                         rtfWithMargins = richTextBox.Rtf;   // Margins not used; just use existing text.
                     else
                         rtfWithMargins = RtfMarginHelper.AddMarginsToRtf(richTextBox.Rtf, MyMargins);
 
-                    File.WriteAllText(CurrentFilePath, rtfWithMargins);
+                if (DocName.Text.Length == 0)
+                {
+                    string? fileName = SaveFile("RTF Files|*.rtf|All Files|*.*", true);
+
+                    if (fileName == null)
+                        return;
+
+                    CurrentFilePath = fileName;
+                    DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                }
+
+                File.WriteAllText(CurrentFilePath, rtfWithMargins);
                     saveOk = true;
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    MessageBox.Show("File " + CurrentFilePath + " is read-only.");
+                    MessageBox.Show("File " + CurrentFilePath + " is read-only or otherwise unauthorized.");
                 }
                 catch (Exception ex)
                 {
@@ -1001,10 +1005,16 @@ namespace DocMgr
 
                 if (saveOk && DocName.Text[0] == '*')
                     DocName.Text = DocName.Text.Remove(0, 2);
-            }
+            //}
 
             buttonSaveDoc.Enabled = !saveOk;
             richTextBox.Focus();
+        }
+
+        bool RichTextBoxContainsImage(RichTextBox richTextBox)
+        {
+            string rtf = richTextBox.Rtf;
+            return rtf.Contains(@"\pict");
         }
 
         private void buttonRemoveDoc_Click(object sender, EventArgs e)      // Just removes from project.
@@ -1271,10 +1281,14 @@ namespace DocMgr
             if (Root.SubDocs.Count == 0)
                 return;                         // No docs.
 
+            Cursor.Current = Cursors.WaitCursor;
+
             SaveProject(destFolder + '\\' + ProjName + ".json", Root);
 
             if (CopyDocsToFolder(Root.SubDocs, destFolder))
             {
+                Cursor.Current = Cursors.Default;
+                CenterCursor(31, 75);
                 MessageBox.Show($"{ProjName} is saved.");
                 return;
             }
