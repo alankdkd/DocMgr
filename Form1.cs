@@ -1549,37 +1549,49 @@ namespace DocMgr
         private void ButtonNewProj_Click(object sender, EventArgs e)
         {
             SaveScrollPosition();
+            string parentFolder = GetParentFolderOfFilesFolder(Root.DocPath);
 
-            //using (FolderBrowserDialog folderDialog = new())
-            //{
-            //    folderDialog.Description = "Select Parent Folder for Project";
+            using (CreateFolderDialog createDialog = new(parentFolder))
+            {
+                createDialog.Text = "Enter New Project Name";
 
-                // Show the folder dialog:
-                //if (folderDialog.ShowDialog() == DialogResult.OK)
-                //{
-                    //string selectedFolder = folderDialog.SelectedPath;
+                if (createDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string newFolderPath = createDialog.NewFolderPath;
+                    string projFilePath = newFolderPath + '\\' + createDialog.textProjName.Text + ".json";
+                    Root = new Doc("Root");
+                    SaveProject(projFilePath, Root);
+                    SetProjectPath(projFilePath);
+                    richTextBox.Clear();
+                    DocName.Text = "";
+                    Root.DocPath = newFolderPath;
+                    LoadProject(projFilePath, out Root);
+                    MakeButtons(Root.SubDocs);
+                    DocName.Text = "";
+                }
+            }
+        }
 
-                    using (CreateFolderDialog createDialog = new(Root.DocPath))
-                    {
-                        createDialog.Text = "Enter New Project Name";
+        private string GetParentFolderOfFilesFolder(string? docPath)
+        {
+            string projFolder;
 
-                        if (createDialog.ShowDialog() == DialogResult.OK)
-                        {
-                            string newFolderPath = createDialog.NewFolderPath;
-                            string projFilePath = newFolderPath + '\\' + createDialog.textProjName.Text + ".json";
-                            Root = new Doc("Root");
-                            SaveProject(projFilePath, Root);
-                            SetProjectPath(projFilePath);
-                            richTextBox.Clear();
-                            DocName.Text = "";
-                            Root.DocPath = newFolderPath;
-                            LoadProject(projFilePath, out Root);
-                            MakeButtons(Root.SubDocs);
-                            DocName.Text = "";
-                        }
-                    }
-                //}
-            //}
+            try
+            {
+                if (!IsNullOrEmpty(docPath))
+                {
+                    int lastSlashPos = docPath.LastIndexOf('\\');
+                    int secondLastSlashPos = docPath.LastIndexOf("\\", lastSlashPos - 1);
+                    projFolder = docPath.Substring(0, secondLastSlashPos);
+
+                    if (projFolder.Length > 0)
+                        return projFolder;
+                }
+            }
+            catch { }
+
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            return documentsPath + "\\Projects";
         }
 
         private PrintDocument printDocument;
