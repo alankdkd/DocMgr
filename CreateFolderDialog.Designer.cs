@@ -42,15 +42,15 @@
             label1.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
             label1.Location = new Point(33, 45);
             label1.Name = "label1";
-            label1.Size = new Size(123, 23);
+            label1.Size = new Size(300, 23);
             label1.TabIndex = 0;
-            label1.Text = "Parent Folder:";
+            label1.Text = "Parent Folder of New Project Folder:";
             // 
             // label2
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(33, 96);
+            label2.Location = new Point(210, 96);
             label2.Name = "label2";
             label2.Size = new Size(123, 23);
             label2.TabIndex = 2;
@@ -59,24 +59,24 @@
             // textParentFolder
             // 
             textParentFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            textParentFolder.Location = new Point(162, 40);
+            textParentFolder.Location = new Point(336, 40);
             textParentFolder.Name = "textParentFolder";
-            textParentFolder.Size = new Size(464, 31);
+            textParentFolder.Size = new Size(639, 31);
             textParentFolder.TabIndex = 3;
             // 
             // textProjName
             // 
             textProjName.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            textProjName.Location = new Point(162, 91);
+            textProjName.Location = new Point(336, 91);
             textProjName.Name = "textProjName";
-            textProjName.Size = new Size(464, 31);
+            textProjName.Size = new Size(639, 31);
             textProjName.TabIndex = 4;
             // 
             // buttonOk
             // 
             buttonOk.DialogResult = DialogResult.OK;
             buttonOk.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonOk.Location = new Point(667, 38);
+            buttonOk.Location = new Point(994, 38);
             buttonOk.Name = "buttonOk";
             buttonOk.Size = new Size(94, 34);
             buttonOk.TabIndex = 5;
@@ -88,7 +88,7 @@
             // 
             buttonCancel.DialogResult = DialogResult.Cancel;
             buttonCancel.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonCancel.Location = new Point(667, 87);
+            buttonCancel.Location = new Point(994, 87);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(94, 34);
             buttonCancel.TabIndex = 6;
@@ -102,7 +102,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlDark;
-            ClientSize = new Size(800, 164);
+            ClientSize = new Size(1121, 164);
             Controls.Add(buttonCancel);
             Controls.Add(buttonOk);
             Controls.Add(textProjName);

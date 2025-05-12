@@ -294,6 +294,7 @@
             buttonArchiveFile.Size = new Size(175, 31);
             buttonArchiveFile.TabIndex = 18;
             buttonArchiveFile.Text = "Arc&hive Document";
+            toolTips.SetToolTip(buttonArchiveFile, "Save a time-stamped permanent copy.");
             buttonArchiveFile.UseVisualStyleBackColor = false;
             buttonArchiveFile.Click += buttonArchiveFile_Click;
             // 
@@ -306,6 +307,7 @@
             buttonArchiveProject.Size = new Size(175, 31);
             buttonArchiveProject.TabIndex = 19;
             buttonArchiveProject.Text = "Archi&ve Project";
+            toolTips.SetToolTip(buttonArchiveProject, "Save a time-stamped permanent copy.");
             buttonArchiveProject.UseVisualStyleBackColor = false;
             buttonArchiveProject.Click += buttonArchiveProject_Click;
             // 

@@ -35,14 +35,22 @@ namespace DocMgr
             NewFolderPath = Path.Combine(textParentFolder.Text, newFolderName);
 
             // Check if the folder exists, and create it if not
-            if (!Directory.Exists(NewFolderPath))
+            try
             {
-                Directory.CreateDirectory(NewFolderPath);
-                Close();
+                if (!Directory.Exists(NewFolderPath))
+                {
+                    Directory.CreateDirectory(NewFolderPath);
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Folder already exists: " + newFolderName);
+                    this.DialogResult = DialogResult.None;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Folder already exists:" + newFolderName);
+                MessageBox.Show("Problem creating folder: " + newFolderName);
                 this.DialogResult = DialogResult.None;
             }
         }

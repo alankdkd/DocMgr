@@ -1249,8 +1249,9 @@ namespace DocMgr
             if (CopySingleDocToFolder(Root.SubDocs, destFolder, DocName.Text))
             {
                 Cursor.Current = Cursors.Default;
-                CenterCursor(31, 75);
-                MessageBox.Show($"{DocName.Text.Substring(0, DocName.Text.Length - 1)} is saved.");
+                CenterCursor(162, 88);
+                MessageBox.Show($"{DocName.Text.Substring(0, DocName.Text.Length - 1)} is saved to "
+                    + destFolder + ".");
                 return;
             }
 
@@ -1288,8 +1289,9 @@ namespace DocMgr
             if (CopyDocsToFolder(Root.SubDocs, destFolder))
             {
                 Cursor.Current = Cursors.Default;
-                CenterCursor(31, 75);
-                MessageBox.Show($"{ProjName} is saved.");
+                CenterCursor(162, 88);
+                MessageBox.Show($"Project {ProjName} is saved to "
+                    + destFolder + ".");
                 return;
             }
 
