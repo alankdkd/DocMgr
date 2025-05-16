@@ -48,9 +48,10 @@
             buttonBackUpProject = new Button();
             buttonProperties = new Button();
             buttonPrint = new Button();
-            buttonOpenFolder = new Button();
             buttonArchiveFile = new Button();
             buttonArchiveProject = new Button();
+            buttonFind = new Button();
+            buttonOpenFolder = new Button();
             SuspendLayout();
             // 
             // richTextBox
@@ -273,18 +274,6 @@
             buttonPrint.UseVisualStyleBackColor = false;
             buttonPrint.Click += buttonPrint_Click;
             // 
-            // buttonOpenFolder
-            // 
-            buttonOpenFolder.BackColor = SystemColors.Control;
-            buttonOpenFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonOpenFolder.Location = new Point(1090, 284);
-            buttonOpenFolder.Name = "buttonOpenFolder";
-            buttonOpenFolder.Size = new Size(175, 31);
-            buttonOpenFolder.TabIndex = 15;
-            buttonOpenFolder.Text = "&Open Folder...";
-            buttonOpenFolder.UseVisualStyleBackColor = false;
-            buttonOpenFolder.Click += buttonOpenFolder_Click;
-            // 
             // buttonArchiveFile
             // 
             buttonArchiveFile.BackColor = SystemColors.Control;
@@ -311,12 +300,39 @@
             buttonArchiveProject.UseVisualStyleBackColor = false;
             buttonArchiveProject.Click += buttonArchiveProject_Click;
             // 
+            // buttonFind
+            // 
+            buttonFind.BackColor = SystemColors.Control;
+            buttonFind.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonFind.Location = new Point(1090, 755);
+            buttonFind.Name = "buttonFind";
+            buttonFind.Size = new Size(175, 31);
+            buttonFind.TabIndex = 22;
+            buttonFind.Text = "&Find...";
+            toolTips.SetToolTip(buttonFind, "Set the Backup/Archive folder or default font.");
+            buttonFind.UseVisualStyleBackColor = false;
+            buttonFind.Visible = false;
+            buttonFind.Click += buttonFind_Click;
+            // 
+            // buttonOpenFolder
+            // 
+            buttonOpenFolder.BackColor = SystemColors.Control;
+            buttonOpenFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonOpenFolder.Location = new Point(1090, 284);
+            buttonOpenFolder.Name = "buttonOpenFolder";
+            buttonOpenFolder.Size = new Size(175, 31);
+            buttonOpenFolder.TabIndex = 15;
+            buttonOpenFolder.Text = "&Open Folder...";
+            buttonOpenFolder.UseVisualStyleBackColor = false;
+            buttonOpenFolder.Click += buttonOpenFolder_Click;
+            // 
             // DocMgr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlDarkDark;
             ClientSize = new Size(1296, 985);
+            Controls.Add(buttonFind);
             Controls.Add(buttonPrint);
             Controls.Add(buttonProperties);
             Controls.Add(buttonArchiveProject);
@@ -342,6 +358,7 @@
             Text = "DocMgr";
             WindowState = FormWindowState.Maximized;
             Load += DocMgr_Load;
+            KeyDown += DocMgr_KeyDown;
             KeyPress += DocMgr_KeyPress;
             Resize += DocMgr_Resize;
             ResumeLayout(false);
@@ -372,5 +389,6 @@
         private Button buttonArchiveProject;
         private Button buttonProperties;
         private Button buttonPrint;
+        private Button buttonFind;
     }
 }

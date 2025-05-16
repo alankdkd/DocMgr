@@ -81,6 +81,7 @@ namespace DocMgr
             string version = GetSubstringUpToSecondPeriod(Application.ProductVersion);
             //MessageBox.Show("Version: " + version);
             Text = "DocMgr v" + version;
+            this.KeyPreview = true; // Enable KeyPreview programmatically
         }
 
         static string GetSubstringUpToSecondPeriod(string input)
@@ -663,17 +664,14 @@ namespace DocMgr
             //if (e.KeyChar == (int)Keys.Escape)
             //    buttonClose_Click(sender, e);           // User wants to exit.
 
-            if (e.KeyChar == 19  &&  buttonSaveDoc.Enabled) // Ctrl-S.  Civilized way to do this not apparent.
+            if (e.KeyChar == 19 && buttonSaveDoc.Enabled) // Ctrl-S.  Civilized way to do this not apparent.
                 buttonSaveDoc_Click(sender, e);         // Save document.
 
-            if (e.KeyChar == 16)                        // Ctrl-P.  Print
+            if (e.KeyChar == 16)                        // Ctrl-P.  Print.
                 buttonPrint_Click(sender, e);           // Invoke print.
 
-            //if (DocName.Text.Length == 0)
-            //{
-            //    DocName.Text = "Document";              // Default name for new document.
-            //    buttonRemoveDoc.Enabled = false;
-            //}
+            if (e.KeyChar == 6)                        // Ctrl-F.  Find.
+                buttonFind_Click(sender, e);           // Invoke find.
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -954,27 +952,27 @@ namespace DocMgr
             //if (CurrentFilePath != null)
             //{
             //    // DOESN'T WORK FOR EMPTY DOC:
-                try
-                {
-                    if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath)
-                        && !RichTextBoxContainsImage(richTextBox))
-                        if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
-                            + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
-                            != DialogResult.OK)
-                            return;
+            try
+            {
+                if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath)
+                    && !RichTextBoxContainsImage(richTextBox))
+                    if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
+                        + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
+                        != DialogResult.OK)
+                        return;
 
-                    SaveScrollPosition();
-                    //ORIG: richTextBox.SaveFile(CurrentFilePath);
+                SaveScrollPosition();
+                //ORIG: richTextBox.SaveFile(CurrentFilePath);
 
-                    string rtfWithMargins;
+                string rtfWithMargins;
 
-                    if (File.Exists(CurrentFilePath))
-                        UpdateMargins();
+                if (File.Exists(CurrentFilePath))
+                    UpdateMargins();
 
-                    if (MyMargins.IsNull())
-                        rtfWithMargins = richTextBox.Rtf;   // Margins not used; just use existing text.
-                    else
-                        rtfWithMargins = RtfMarginHelper.AddMarginsToRtf(richTextBox.Rtf, MyMargins);
+                if (MyMargins.IsNull())
+                    rtfWithMargins = richTextBox.Rtf;   // Margins not used; just use existing text.
+                else
+                    rtfWithMargins = RtfMarginHelper.AddMarginsToRtf(richTextBox.Rtf, MyMargins);
 
                 if (DocName.Text.Length == 0)
                 {
@@ -988,23 +986,23 @@ namespace DocMgr
                 }
 
                 File.WriteAllText(CurrentFilePath, rtfWithMargins);
-                    saveOk = true;
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    MessageBox.Show("File " + CurrentFilePath + " is read-only or otherwise unauthorized.");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Problem saving file " + CurrentFilePath + ": " + ex.Message);
-                }
-                // DFW: File.WriteAllText(CurrentFilePath, richTextBox.Rtf);
-                //Root = new Doc("Root");
-                //string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
-                //File.WriteAllText(CurrentFilePath, text);
+                saveOk = true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("File " + CurrentFilePath + " is read-only or otherwise unauthorized.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Problem saving file " + CurrentFilePath + ": " + ex.Message);
+            }
+            // DFW: File.WriteAllText(CurrentFilePath, richTextBox.Rtf);
+            //Root = new Doc("Root");
+            //string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
+            //File.WriteAllText(CurrentFilePath, text);
 
-                if (saveOk && DocName.Text[0] == '*')
-                    DocName.Text = DocName.Text.Remove(0, 2);
+            if (saveOk && DocName.Text[0] == '*')
+                DocName.Text = DocName.Text.Remove(0, 2);
             //}
 
             buttonSaveDoc.Enabled = !saveOk;
@@ -1283,7 +1281,6 @@ namespace DocMgr
                 return;                         // No docs.
 
             Cursor.Current = Cursors.WaitCursor;
-
             SaveProject(destFolder + '\\' + ProjName + ".json", Root);
 
             if (CopyDocsToFolder(Root.SubDocs, destFolder))
@@ -1442,7 +1439,7 @@ namespace DocMgr
 
         private float StrInchesToTwips(string floatOrMessage)
         {
-            if (float.TryParse(floatOrMessage, out float value)  &&  value != -1)
+            if (float.TryParse(floatOrMessage, out float value) && value != -1)
                 return value * 1440;
             else
                 return -1;      // "not used" or invalid float.
@@ -1456,7 +1453,7 @@ namespace DocMgr
             if (num == 0)
                 return "0";
 
-            return TrimSuffix ((num / 1440).ToString("F3"), ".000").TrimEnd('0');
+            return TrimSuffix((num / 1440).ToString("F3"), ".000").TrimEnd('0');
         }
 
         public static string TrimSuffix(string input, string suffix)
@@ -1603,7 +1600,7 @@ namespace DocMgr
 
         private void buttonPrint_Click(object sender, EventArgs e)
         {
-            UpdateMargins();            
+            UpdateMargins();
             printDocument = new PrintDocument();    // Initialize PrintDocument
 
             if (MyMargins.Left != -1)               // MyMargins in twips, PrintDoc in 1/100ths:
@@ -1752,6 +1749,145 @@ namespace DocMgr
         private const int WM_USER = 0x0400;
         private const int EM_FORMATRANGE = WM_USER + 57;
 
+        private void buttonFind_Click(object sender, EventArgs e)
+        {
+            string newRtfText = /*RtfHighlighter.*/HighlightSearchStringInRtf(richTextBox.Rtf, "ansi");
+            richTextBox.Rtf = newRtfText;
+        }
+
+
+        //public class RtfHighlighter
+        //{
+        //public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
+        //{
+        //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
+        //        return rtf;
+
+        //    // Load RTF into RichTextBox
+        //    RichTextBox rtb = new RichTextBox();
+        //    rtb.Rtf = rtf;
+        //    string plainText = rtb.Text;
+
+        //    // Build regex pattern
+        //    string pattern = Regex.Escape(searchString);
+        //    if (wholeWord)
+        //        pattern = $@"\b{pattern}\b";
+
+        //    RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+        //    Regex regex = new Regex(pattern, options);
+
+        //    // Find matches
+        //    MatchCollection matches = regex.Matches(plainText);
+        //    if (matches.Count == 0)
+        //        return rtf;
+
+        //    // Apply yellow background highlight to matches
+        //    foreach (Match match in matches)
+        //    {
+        //        rtb.Select(match.Index, match.Length);
+        //        rtb.SelectionBackColor = Color.Yellow;
+        //        RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+        //    }
+
+        //    return rtb.Rtf;
+        //}
+        //public static string HighlightSearchStringInRtf(string rtf, string searchText)
+        //{
+        //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchText))
+        //        return rtf;
+
+        //    // Ensure searchText is RTF-escaped
+        //    string escapedSearch = Regex.Escape(searchText);
+
+        //    // Find or insert the color table
+        //    var colorTableRegex = new Regex(@"(\\colortbl[^;]*;)", RegexOptions.IgnoreCase);
+        //    Match match = colorTableRegex.Match(rtf);
+        //    int yellowIndex;
+
+        //    if (match.Success)
+        //    {
+        //        // Append yellow if not already present
+        //        if (!match.Value.Contains(@"\red255\green255\blue0"))
+        //        {
+        //            string newColorTable = match.Value.Insert(match.Value.Length - 1, @"\red255\green255\blue0;");
+        //            rtf = rtf.Remove(match.Index, match.Length).Insert(match.Index, newColorTable);
+        //            yellowIndex = CountColorEntries(newColorTable);
+        //        }
+        //        else
+        //        {
+        //            yellowIndex = GetColorIndex(match.Value, @"\red255\green255\blue0");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // No color table found; insert after \rtf1... header
+        //        var headerMatch = Regex.Match(rtf, @"{\\rtf1[^\n]*");
+        //        if (!headerMatch.Success) return rtf; // invalid RTF
+
+        //        yellowIndex = 1;
+        //        string colorTable = @"{\colortbl;\red255\green255\blue0;}";
+        //        int insertPos = headerMatch.Index + headerMatch.Length;
+        //        rtf = rtf.Insert(insertPos, colorTable);
+        //    }
+
+        //    // Insert highlight tags around the search string
+        //    string highlightStart = $@"\highlight{yellowIndex} ";
+        //    string highlightEnd = @"\highlight0 ";
+
+        //    string rtfEscapedSearch = Regex.Escape(searchText);
+        //    var contentRegex = new Regex(rtfEscapedSearch, RegexOptions.IgnoreCase);
+        //    rtf = contentRegex.Replace(rtf, $"{highlightStart}{searchText}{highlightEnd}", 1); // first occurrence only
+
+        //    return rtf;
+        //}
+
+        //private static int CountColorEntries(string colorTable)
+        //{
+        //    return new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable).Count;
+        //}
+
+        //private static int GetColorIndex(string colorTable, string color)
+        //{
+        //    var matches = new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable);
+        //    for (int i = 0; i < matches.Count; i++)
+        //    {
+        //        if (matches[i].Value.Contains(color)) return i + 1; // RTF color index starts at 1
+        //    }
+        //    return 1;
+        //}
+        //}
+
+        public static class RichTextBoxScroller
+        {
+            [DllImport("user32.dll")]
+            private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+            private const int EM_GETFIRSTVISIBLELINE = 0x00CE;
+            private const int EM_LINESCROLL = 0x00B6;
+
+            public static void ScrollToOffsetCenter(RichTextBox rtb, int offset)
+            {
+                if (offset < 0 || offset > rtb.TextLength)
+                    return;
+
+                int lineIndex = rtb.GetLineFromCharIndex(offset);
+
+                // Get the number of visible lines in the RichTextBox
+                int charIndexTopLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, 1));
+                int firstVisibleLine = rtb.GetLineFromCharIndex(charIndexTopLeft);
+                int charIndexBottomLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, rtb.ClientSize.Height - 1));
+                int lastVisibleLine = rtb.GetLineFromCharIndex(charIndexBottomLeft);
+
+                int visibleLines = lastVisibleLine - firstVisibleLine;
+                int targetTopLine = Math.Max(0, lineIndex - visibleLines / 2);
+
+                int currentTopLine = SendMessage(rtb.Handle, EM_GETFIRSTVISIBLELINE, IntPtr.Zero, IntPtr.Zero);
+                int delta = targetTopLine - currentTopLine;
+
+                SendMessage(rtb.Handle, EM_LINESCROLL, IntPtr.Zero, (IntPtr)delta);
+            }
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         private struct FORMATRANGE
         {
@@ -1826,6 +1962,69 @@ namespace DocMgr
         //    //    Cursor.Position = new Point(but.Left + but.Width / 2, but.Top + but.Height / 2);
         //    //}
         //}
+        public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
+        {
+            if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
+                return rtf;
+
+            // Load RTF into RichTextBox
+            RichTextBox rtb = new RichTextBox();
+            rtb.Rtf = rtf;
+            string plainText = rtb.Text;
+
+            // Build regex pattern
+            string pattern = Regex.Escape(searchString);
+            if (wholeWord)
+                pattern = $@"\b{pattern}\b";
+
+            RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+            Regex regex = new Regex(pattern, options);
+
+            // Find matches
+            MatchCollection matches = regex.Matches(plainText);
+            if (matches.Count == 0)
+                return rtf;
+
+            // Apply yellow background highlight to matches
+            foreach (Match match in matches)
+            {
+                rtb.Select(match.Index, match.Length);
+                rtb.SelectionBackColor = Color.Yellow;
+ // COMMENTED OUT TO COMPILE:               RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+            }
+
+            return rtb.Rtf;
+        }
+
+        private void DocMgr_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.Home)
+            {
+                // Ctrl + Home is pressed
+                ScrollToBeginning(richTextBox);
+                // MessageBox.Show("Ctrl + Home was pressed.");
+                e.Handled = true; // Optional: Prevent further processing
+            }
+
+            if (e.Control && e.KeyCode == Keys.End)
+            {
+                // Ctrl + End is pressed
+                ScrollToEnd(richTextBox);
+                // MessageBox.Show("Ctrl + Home was pressed.");
+                e.Handled = true; // Optional: Prevent further processing
+            }
+        }
+        private void ScrollToBeginning(RichTextBox richTextBox)
+        {
+            richTextBox.SelectionStart = 0; // Set selection start to the beginning
+            richTextBox.ScrollToCaret(); // Scroll to the caret
+        }
+
+        private void ScrollToEnd(RichTextBox richTextBox)
+        {
+            richTextBox.SelectionStart = richTextBox.Text.Length; // Set selection start to the end
+            richTextBox.ScrollToCaret(); // Scroll to the caret
+        }
     }
 
     public static class WindowExtensions
