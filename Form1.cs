@@ -253,7 +253,7 @@ namespace DocMgr
 
         private void ButtonSaveAs_Click(object sender, EventArgs e)
         {
-            string? fileName = SaveFile("RTF Files|*.rtf|All Files|*.*", true);
+            string? fileName = GetSaveFileName("RTF Files|*.rtf|All Files|*.*", true);
 
             if (fileName == null)
                 return;
@@ -270,6 +270,7 @@ namespace DocMgr
 
             SaveScrollPosition();
             CurrentFilePath = fileName;
+            DocName.Text = Path.GetFileNameWithoutExtension(fileName);
             buttonSaveDoc_Click(null, null);
             CenterCursor(88, 72);
             MessageBox.Show("File " + fileName + " saved.");
@@ -857,7 +858,7 @@ namespace DocMgr
 
         // General method to save a file.
         // Used to for Save As.
-        public static string? SaveFile(string filter, bool overwriteOk = false)
+        public static string? GetSaveFileName(string filter, bool overwriteOk = false)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
@@ -976,7 +977,7 @@ namespace DocMgr
 
                 if (DocName.Text.Length == 0)
                 {
-                    string? fileName = SaveFile("RTF Files|*.rtf|All Files|*.*", true);
+                    string? fileName = GetSaveFileName("RTF Files|*.rtf|All Files|*.*", true);
 
                     if (fileName == null)
                         return;
