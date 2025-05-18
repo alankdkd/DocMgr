@@ -255,7 +255,7 @@ namespace DocMgr
         {
             string? fileName = GetSaveFileName("RTF Files|*.rtf|All Files|*.*", true);
 
-            if (fileName == null)
+            if (string.IsNullOrEmpty(fileName))
                 return;
 
             //if (File.Exists(fileName))
@@ -270,7 +270,7 @@ namespace DocMgr
 
             SaveScrollPosition();
             CurrentFilePath = fileName;
-            DocName.Text = Path.GetFileNameWithoutExtension(fileName);
+            DocName.Text = Path.GetFileNameWithoutExtension(fileName) + ":";
             buttonSaveDoc_Click(null, null);
             CenterCursor(88, 72);
             MessageBox.Show("File " + fileName + " saved.");
@@ -352,7 +352,7 @@ namespace DocMgr
             {
                 // Make configurable button:
                 Button b = new Button();
-                b.Text = "&" + doc.DocName;
+                b.Text = doc.DocName;
                 b.Font = SystemFont;
                 b.Name = doc.DocName;
                 b.Tag = doc.DocPath;
@@ -1245,6 +1245,9 @@ namespace DocMgr
 
             Cursor.Current = Cursors.WaitCursor;
 
+            if (DocName.Text[0] == '*')
+                buttonSaveDoc_Click(null, null);
+
             if (CopySingleDocToFolder(Root.SubDocs, destFolder, DocName.Text))
             {
                 Cursor.Current = Cursors.Default;
@@ -1282,6 +1285,10 @@ namespace DocMgr
                 return;                         // No docs.
 
             Cursor.Current = Cursors.WaitCursor;
+
+            if (DocName.Text[0] == '*')
+                buttonSaveDoc_Click(null, null);
+
             SaveProject(destFolder + '\\' + ProjName + ".json", Root);
 
             if (CopyDocsToFolder(Root.SubDocs, destFolder))

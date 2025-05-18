@@ -133,6 +133,7 @@
             buttonLoadDoc.Size = new Size(175, 31);
             buttonLoadDoc.TabIndex = 7;
             buttonLoadDoc.Text = "&Load Document...";
+            toolTips.SetToolTip(buttonLoadDoc, "Display an existing document and add it to the project.");
             buttonLoadDoc.UseVisualStyleBackColor = false;
             buttonLoadDoc.Click += buttonLoadDoc_Click;
             // 
@@ -146,6 +147,7 @@
             buttonRemoveDoc.Size = new Size(175, 31);
             buttonRemoveDoc.TabIndex = 8;
             buttonRemoveDoc.Text = "&Remove Document";
+            toolTips.SetToolTip(buttonRemoveDoc, "Remove document from project but does NOT delete it.");
             buttonRemoveDoc.UseVisualStyleBackColor = false;
             buttonRemoveDoc.Click += buttonRemoveDoc_Click;
             // 
@@ -183,6 +185,7 @@
             ButtonNewDoc.Size = new Size(175, 31);
             ButtonNewDoc.TabIndex = 11;
             ButtonNewDoc.Text = "&New Document...";
+            toolTips.SetToolTip(ButtonNewDoc, "Add new blank document to the project.");
             ButtonNewDoc.UseVisualStyleBackColor = false;
             ButtonNewDoc.Click += ButtonNewDoc_Click;
             // 
@@ -207,6 +210,7 @@
             ButtonSaveAs.Size = new Size(175, 31);
             ButtonSaveAs.TabIndex = 13;
             ButtonSaveAs.Text = "Save &As...";
+            toolTips.SetToolTip(ButtonSaveAs, "Save a copy of the current document to a file without adding it to the project.");
             ButtonSaveAs.UseVisualStyleBackColor = false;
             ButtonSaveAs.Click += ButtonSaveAs_Click;
             // 
@@ -257,7 +261,7 @@
             buttonProperties.Size = new Size(175, 31);
             buttonProperties.TabIndex = 20;
             buttonProperties.Text = "Prop&erties...";
-            toolTips.SetToolTip(buttonProperties, "Set the Backup/Archive folder or default font.");
+            toolTips.SetToolTip(buttonProperties, "Set the Backup/Archive folder, margins for printing, or default font.");
             buttonProperties.UseVisualStyleBackColor = false;
             buttonProperties.Click += buttonProperties_Click;
             // 
@@ -270,7 +274,7 @@
             buttonPrint.Size = new Size(175, 31);
             buttonPrint.TabIndex = 21;
             buttonPrint.Text = "&Print...";
-            toolTips.SetToolTip(buttonPrint, "Set the Backup/Archive folder or default font.");
+            toolTips.SetToolTip(buttonPrint, "Print document or selection.");
             buttonPrint.UseVisualStyleBackColor = false;
             buttonPrint.Click += buttonPrint_Click;
             // 
@@ -309,7 +313,7 @@
             buttonFind.Size = new Size(175, 31);
             buttonFind.TabIndex = 22;
             buttonFind.Text = "&Find...";
-            toolTips.SetToolTip(buttonFind, "Set the Backup/Archive folder or default font.");
+            toolTips.SetToolTip(buttonFind, "Find a string in the current document, project, or all projects.");
             buttonFind.UseVisualStyleBackColor = false;
             buttonFind.Visible = false;
             buttonFind.Click += buttonFind_Click;
@@ -323,6 +327,7 @@
             buttonOpenFolder.Size = new Size(175, 31);
             buttonOpenFolder.TabIndex = 15;
             buttonOpenFolder.Text = "&Open Folder...";
+            toolTips.SetToolTip(buttonOpenFolder, "Open browser on folder containing the document");
             buttonOpenFolder.UseVisualStyleBackColor = false;
             buttonOpenFolder.Click += buttonOpenFolder_Click;
             // 
