@@ -1194,7 +1194,7 @@ namespace DocMgr
         private void button_MouseHover(object sender, EventArgs e)
         {
             foreach (Doc doc in Root.SubDocs)
-                if ((sender as Button).Text == "&" + doc.DocName)
+                if ((sender as Button).Text == doc.DocName)
                     toolTips.Show(doc.DocPath, sender as Button);
         }
 
