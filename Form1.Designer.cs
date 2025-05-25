@@ -315,7 +315,6 @@
             buttonFind.Text = "&Find...";
             toolTips.SetToolTip(buttonFind, "Find a string in the current document, project, or all projects.");
             buttonFind.UseVisualStyleBackColor = false;
-            buttonFind.Visible = false;
             buttonFind.Click += buttonFind_Click;
             // 
             // buttonOpenFolder
@@ -327,7 +326,7 @@
             buttonOpenFolder.Size = new Size(175, 31);
             buttonOpenFolder.TabIndex = 15;
             buttonOpenFolder.Text = "&Open Folder...";
-            toolTips.SetToolTip(buttonOpenFolder, "Open browser on folder containing the document");
+            toolTips.SetToolTip(buttonOpenFolder, "Open browser on folder containing the document.  Ctrl-O");
             buttonOpenFolder.UseVisualStyleBackColor = false;
             buttonOpenFolder.Click += buttonOpenFolder_Click;
             // 

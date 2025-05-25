@@ -32,6 +32,7 @@ namespace DocMgr
         static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
         int originalLeft;
+        //static string TextCopy = null;
         static readonly int BAD_INT = int.MinValue;
         static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
 
@@ -516,7 +517,7 @@ namespace DocMgr
             Button but = sender as Button;
             ColorButtonBknd(but);
 
-            DocName.Text = but.Name + ':';
+            DocName.Text = "";
 
             if (but.Tag != null)
             {
@@ -535,6 +536,7 @@ namespace DocMgr
                         return;
                     }
 
+                    DocName.Text = but.Name + ':';
                     ScrollToDocPosition(but.Name);
                     buttonSaveDoc.Enabled = false;
                     buttonRemoveDoc.Enabled = ProjectPath != null;
@@ -983,7 +985,7 @@ namespace DocMgr
                         return;
 
                     CurrentFilePath = fileName;
-                    DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                    DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath) + ":";
                 }
 
                 File.WriteAllText(CurrentFilePath, rtfWithMargins);
@@ -1240,7 +1242,7 @@ namespace DocMgr
 
         private void HandleOneFile(string destFolder)
         {
-            if (Root.SubDocs.Count == 0)
+            if (Root.SubDocs.Count == 0  ||  DocName.Text == "")
                 return;                         // No docs.
 
             Cursor.Current = Cursors.WaitCursor;
@@ -1286,7 +1288,7 @@ namespace DocMgr
 
             Cursor.Current = Cursors.WaitCursor;
 
-            if (DocName.Text[0] == '*')
+            if (DocName.Text != ""  &&  DocName.Text[0] == '*')
                 buttonSaveDoc_Click(null, null);
 
             SaveProject(destFolder + '\\' + ProjName + ".json", Root);
@@ -1324,7 +1326,8 @@ namespace DocMgr
             foreach (Doc doc in subDocs)
                 try
                 {
-                    CopyFileToFolder(doc, destFolder);
+                    if (!CopyFileToFolder(doc, destFolder))
+                        MessageBox.Show("Warning, couldn't find document " + doc.DocName + ".");
                 }
                 catch (Exception ex)
                 {
@@ -1759,9 +1762,37 @@ namespace DocMgr
 
         private void buttonFind_Click(object sender, EventArgs e)
         {
-            string newRtfText = /*RtfHighlighter.*/HighlightSearchStringInRtf(richTextBox.Rtf, "ansi");
-            richTextBox.Rtf = newRtfText;
+            //List<int> listOffset = new();
+            //List<int> listWidth = new();
+            string textCopy = new string(richTextBox.Rtf.ToCharArray());
+
+            try
+            {
+                FindForm ff = new(richTextBox);
+
+                if (ff.ShowDialog() == DialogResult.OK)
+                {
+                    string newRtfText = /*RtfHighlighter.*/HighlightSearchStringInRtf(richTextBox.Rtf, "the");
+                    richTextBox.Rtf = newRtfText;
+                }
+            }
+            catch { }
+            finally
+            {
+                richTextBox.Rtf = new string(textCopy.ToCharArray());   // Always restore original text.
+                textCopy = null;
+            }
         }
+
+        //private void RestoreText()
+        //{
+        //    if (TextCopy != null)
+        //    {
+        //        richTextBox.Rtf = TextCopy;
+        //        TextCopy = null;
+        //    }
+        //}
+
 
 
         //public class RtfHighlighter
@@ -1771,99 +1802,99 @@ namespace DocMgr
         //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
         //        return rtf;
 
-        //    // Load RTF into RichTextBox
-        //    RichTextBox rtb = new RichTextBox();
-        //    rtb.Rtf = rtf;
-        //    string plainText = rtb.Text;
+            //    // Load RTF into RichTextBox
+            //    RichTextBox rtb = new RichTextBox();
+            //    rtb.Rtf = rtf;
+            //    string plainText = rtb.Text;
 
-        //    // Build regex pattern
-        //    string pattern = Regex.Escape(searchString);
-        //    if (wholeWord)
-        //        pattern = $@"\b{pattern}\b";
+            //    // Build regex pattern
+            //    string pattern = Regex.Escape(searchString);
+            //    if (wholeWord)
+            //        pattern = $@"\b{pattern}\b";
 
-        //    RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-        //    Regex regex = new Regex(pattern, options);
+            //    RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+            //    Regex regex = new Regex(pattern, options);
 
-        //    // Find matches
-        //    MatchCollection matches = regex.Matches(plainText);
-        //    if (matches.Count == 0)
-        //        return rtf;
+            //    // Find matches
+            //    MatchCollection matches = regex.Matches(plainText);
+            //    if (matches.Count == 0)
+            //        return rtf;
 
-        //    // Apply yellow background highlight to matches
-        //    foreach (Match match in matches)
-        //    {
-        //        rtb.Select(match.Index, match.Length);
-        //        rtb.SelectionBackColor = Color.Yellow;
-        //        RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
-        //    }
+            //    // Apply yellow background highlight to matches
+            //    foreach (Match match in matches)
+            //    {
+            //        rtb.Select(match.Index, match.Length);
+            //        rtb.SelectionBackColor = Color.Yellow;
+            //        RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+            //    }
 
-        //    return rtb.Rtf;
-        //}
-        //public static string HighlightSearchStringInRtf(string rtf, string searchText)
-        //{
-        //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchText))
-        //        return rtf;
+            //    return rtb.Rtf;
+            //}
+            //public static string HighlightSearchStringInRtf(string rtf, string searchText)
+            //{
+            //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchText))
+            //        return rtf;
 
-        //    // Ensure searchText is RTF-escaped
-        //    string escapedSearch = Regex.Escape(searchText);
+            //    // Ensure searchText is RTF-escaped
+            //    string escapedSearch = Regex.Escape(searchText);
 
-        //    // Find or insert the color table
-        //    var colorTableRegex = new Regex(@"(\\colortbl[^;]*;)", RegexOptions.IgnoreCase);
-        //    Match match = colorTableRegex.Match(rtf);
-        //    int yellowIndex;
+            //    // Find or insert the color table
+            //    var colorTableRegex = new Regex(@"(\\colortbl[^;]*;)", RegexOptions.IgnoreCase);
+            //    Match match = colorTableRegex.Match(rtf);
+            //    int yellowIndex;
 
-        //    if (match.Success)
-        //    {
-        //        // Append yellow if not already present
-        //        if (!match.Value.Contains(@"\red255\green255\blue0"))
-        //        {
-        //            string newColorTable = match.Value.Insert(match.Value.Length - 1, @"\red255\green255\blue0;");
-        //            rtf = rtf.Remove(match.Index, match.Length).Insert(match.Index, newColorTable);
-        //            yellowIndex = CountColorEntries(newColorTable);
-        //        }
-        //        else
-        //        {
-        //            yellowIndex = GetColorIndex(match.Value, @"\red255\green255\blue0");
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // No color table found; insert after \rtf1... header
-        //        var headerMatch = Regex.Match(rtf, @"{\\rtf1[^\n]*");
-        //        if (!headerMatch.Success) return rtf; // invalid RTF
+            //    if (match.Success)
+            //    {
+            //        // Append yellow if not already present
+            //        if (!match.Value.Contains(@"\red255\green255\blue0"))
+            //        {
+            //            string newColorTable = match.Value.Insert(match.Value.Length - 1, @"\red255\green255\blue0;");
+            //            rtf = rtf.Remove(match.Index, match.Length).Insert(match.Index, newColorTable);
+            //            yellowIndex = CountColorEntries(newColorTable);
+            //        }
+            //        else
+            //        {
+            //            yellowIndex = GetColorIndex(match.Value, @"\red255\green255\blue0");
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // No color table found; insert after \rtf1... header
+            //        var headerMatch = Regex.Match(rtf, @"{\\rtf1[^\n]*");
+            //        if (!headerMatch.Success) return rtf; // invalid RTF
 
-        //        yellowIndex = 1;
-        //        string colorTable = @"{\colortbl;\red255\green255\blue0;}";
-        //        int insertPos = headerMatch.Index + headerMatch.Length;
-        //        rtf = rtf.Insert(insertPos, colorTable);
-        //    }
+            //        yellowIndex = 1;
+            //        string colorTable = @"{\colortbl;\red255\green255\blue0;}";
+            //        int insertPos = headerMatch.Index + headerMatch.Length;
+            //        rtf = rtf.Insert(insertPos, colorTable);
+            //    }
 
-        //    // Insert highlight tags around the search string
-        //    string highlightStart = $@"\highlight{yellowIndex} ";
-        //    string highlightEnd = @"\highlight0 ";
+            //    // Insert highlight tags around the search string
+            //    string highlightStart = $@"\highlight{yellowIndex} ";
+            //    string highlightEnd = @"\highlight0 ";
 
-        //    string rtfEscapedSearch = Regex.Escape(searchText);
-        //    var contentRegex = new Regex(rtfEscapedSearch, RegexOptions.IgnoreCase);
-        //    rtf = contentRegex.Replace(rtf, $"{highlightStart}{searchText}{highlightEnd}", 1); // first occurrence only
+            //    string rtfEscapedSearch = Regex.Escape(searchText);
+            //    var contentRegex = new Regex(rtfEscapedSearch, RegexOptions.IgnoreCase);
+            //    rtf = contentRegex.Replace(rtf, $"{highlightStart}{searchText}{highlightEnd}", 1); // first occurrence only
 
-        //    return rtf;
-        //}
+            //    return rtf;
+            //}
 
-        //private static int CountColorEntries(string colorTable)
-        //{
-        //    return new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable).Count;
-        //}
+            //private static int CountColorEntries(string colorTable)
+            //{
+            //    return new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable).Count;
+            //}
 
-        //private static int GetColorIndex(string colorTable, string color)
-        //{
-        //    var matches = new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable);
-        //    for (int i = 0; i < matches.Count; i++)
-        //    {
-        //        if (matches[i].Value.Contains(color)) return i + 1; // RTF color index starts at 1
-        //    }
-        //    return 1;
-        //}
-        //}
+            //private static int GetColorIndex(string colorTable, string color)
+            //{
+            //    var matches = new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable);
+            //    for (int i = 0; i < matches.Count; i++)
+            //    {
+            //        if (matches[i].Value.Contains(color)) return i + 1; // RTF color index starts at 1
+            //    }
+            //    return 1;
+            //}
+            //}
 
         public static class RichTextBoxScroller
         {
@@ -1919,57 +1950,12 @@ namespace DocMgr
             public int cpMax;
         }
 
-        //  OLD PRINTING CODE.  MINIMAL PRINTING CAPABILITY.
-        //private string documentText;
-        //private int currentPageIndex;
-        //private PrintDocument printDocument;    
-        //    private void buttonPrint_Click(object sender, EventArgs e)
-        //    {
-        //        PrintDialog printDialog = new PrintDialog();
-        //        printDialog.Document = printDocument;
-
-        //        // Initialize PrintDocument
-        //        printDocument = new PrintDocument();
-        //        printDocument.PrintPage += PrintDocument_PrintPage;
-
-        //        if (printDialog.ShowDialog() == DialogResult.OK)
-        //        {
-        //            documentText = richTextBox.Text; // Store text
-        //            currentPageIndex = 0;
-        //            printDocument.Print();
-        //        }
-        //    }
-
-
-        //    private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
-        //    {
-        //        Font printFont = richTextBox.Font;
-        //        float lineHeight = printFont.GetHeight(e.Graphics);
-        //        float yPosition = e.MarginBounds.Top;
-        //        int charactersOnPage = 0, linesPerPage = 0;
-
-        //        // Measure how much text fits on the page
-        //        e.Graphics.MeasureString(documentText.Substring(currentPageIndex), printFont,
-        //                                 e.MarginBounds.Size, StringFormat.GenericTypographic,
-        //                                 out charactersOnPage, out linesPerPage);
-
-        //        // Print the text that fits
-        //        e.Graphics.DrawString(documentText.Substring(currentPageIndex, charactersOnPage),
-        //                              printFont, Brushes.Black, e.MarginBounds);
-
-        //        // Move index forward
-        //        currentPageIndex += charactersOnPage;
-
-        //        // More pages to print?
-        //        e.HasMorePages = (currentPageIndex < documentText.Length);
-        //    }
-
-
         //    //public static void CenterCursorInButton(this Button but)
         //    //{
         //    //    Cursor.Position = new Point(but.Left + but.Width / 2, but.Top + but.Height / 2);
         //    //}
         //}
+
         public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
         {
             if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
@@ -2010,7 +1996,6 @@ namespace DocMgr
             {
                 // Ctrl + Home is pressed
                 ScrollToBeginning(richTextBox);
-                // MessageBox.Show("Ctrl + Home was pressed.");
                 e.Handled = true; // Optional: Prevent further processing
             }
 
@@ -2018,20 +2003,26 @@ namespace DocMgr
             {
                 // Ctrl + End is pressed
                 ScrollToEnd(richTextBox);
-                // MessageBox.Show("Ctrl + Home was pressed.");
+                e.Handled = true; // Optional: Prevent further processing
+            }
+
+            if (e.Control && e.KeyCode == Keys.O)
+            {
+                // Ctrl + End is pressed
+                buttonOpenFolder_Click(null, null);
                 e.Handled = true; // Optional: Prevent further processing
             }
         }
         private void ScrollToBeginning(RichTextBox richTextBox)
         {
             richTextBox.SelectionStart = 0; // Set selection start to the beginning
-            richTextBox.ScrollToCaret(); // Scroll to the caret
+            richTextBox.ScrollToCaret();    // Scroll to the caret
         }
 
         private void ScrollToEnd(RichTextBox richTextBox)
         {
             richTextBox.SelectionStart = richTextBox.Text.Length; // Set selection start to the end
-            richTextBox.ScrollToCaret(); // Scroll to the caret
+            richTextBox.ScrollToCaret();    // Scroll to the caret
         }
     }
 
