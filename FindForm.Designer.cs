@@ -32,7 +32,7 @@
             textString = new TextBox();
             checkMatchCase = new CheckBox();
             checkMatchWholeWord = new CheckBox();
-            radioButton1 = new RadioButton();
+            radioCurrentDoc = new RadioButton();
             radioCurrentProject = new RadioButton();
             radioAllProjects = new RadioButton();
             groupBox1 = new GroupBox();
@@ -42,7 +42,11 @@
             buttonPrevious = new Button();
             labelInstanceOrder = new Label();
             labelFindResults = new Label();
-            labelDocId = new Label();
+            groupBox2 = new GroupBox();
+            radioBackward = new RadioButton();
+            radioForward = new RadioButton();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -58,7 +62,7 @@
             // 
             textString.Location = new Point(75, 21);
             textString.Name = "textString";
-            textString.Size = new Size(860, 33);
+            textString.Size = new Size(549, 33);
             textString.TabIndex = 1;
             // 
             // checkMatchCase
@@ -81,21 +85,22 @@
             checkMatchWholeWord.Text = "Match Whole Word";
             checkMatchWholeWord.UseVisualStyleBackColor = true;
             // 
-            // radioButton1
+            // radioCurrentDoc
             // 
-            radioButton1.AutoSize = true;
-            radioButton1.Location = new Point(722, 107);
-            radioButton1.Name = "radioButton1";
-            radioButton1.Size = new Size(197, 29);
-            radioButton1.TabIndex = 4;
-            radioButton1.TabStop = true;
-            radioButton1.Text = "Current Document";
-            radioButton1.UseVisualStyleBackColor = true;
+            radioCurrentDoc.AutoSize = true;
+            radioCurrentDoc.Checked = true;
+            radioCurrentDoc.Location = new Point(49, 42);
+            radioCurrentDoc.Name = "radioCurrentDoc";
+            radioCurrentDoc.Size = new Size(197, 29);
+            radioCurrentDoc.TabIndex = 4;
+            radioCurrentDoc.TabStop = true;
+            radioCurrentDoc.Text = "Current Document";
+            radioCurrentDoc.UseVisualStyleBackColor = true;
             // 
             // radioCurrentProject
             // 
             radioCurrentProject.AutoSize = true;
-            radioCurrentProject.Location = new Point(722, 142);
+            radioCurrentProject.Location = new Point(49, 77);
             radioCurrentProject.Name = "radioCurrentProject";
             radioCurrentProject.Size = new Size(167, 29);
             radioCurrentProject.TabIndex = 5;
@@ -106,7 +111,7 @@
             // radioAllProjects
             // 
             radioAllProjects.AutoSize = true;
-            radioAllProjects.Location = new Point(722, 177);
+            radioAllProjects.Location = new Point(49, 112);
             radioAllProjects.Name = "radioAllProjects";
             radioAllProjects.Size = new Size(129, 29);
             radioAllProjects.TabIndex = 6;
@@ -116,7 +121,10 @@
             // 
             // groupBox1
             // 
-            groupBox1.Location = new Point(651, 76);
+            groupBox1.Controls.Add(radioCurrentDoc);
+            groupBox1.Controls.Add(radioCurrentProject);
+            groupBox1.Controls.Add(radioAllProjects);
+            groupBox1.Location = new Point(340, 133);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(284, 148);
             groupBox1.TabIndex = 7;
@@ -125,7 +133,7 @@
             // 
             // buttonFind
             // 
-            buttonFind.Location = new Point(966, 19);
+            buttonFind.Location = new Point(650, 19);
             buttonFind.Name = "buttonFind";
             buttonFind.Size = new Size(135, 65);
             buttonFind.TabIndex = 8;
@@ -135,18 +143,18 @@
             // 
             // buttonClose
             // 
-            buttonClose.Location = new Point(964, 161);
+            buttonClose.DialogResult = DialogResult.Cancel;
+            buttonClose.Location = new Point(650, 145);
             buttonClose.Name = "buttonClose";
             buttonClose.Size = new Size(135, 65);
             buttonClose.TabIndex = 9;
             buttonClose.Text = "&Close";
             buttonClose.UseVisualStyleBackColor = true;
-            buttonClose.Click += buttonClose_Click;
             // 
             // buttonNext
             // 
             buttonNext.Enabled = false;
-            buttonNext.Location = new Point(26, 225);
+            buttonNext.Location = new Point(26, 395);
             buttonNext.Name = "buttonNext";
             buttonNext.Size = new Size(135, 65);
             buttonNext.TabIndex = 10;
@@ -157,7 +165,7 @@
             // buttonPrevious
             // 
             buttonPrevious.Enabled = false;
-            buttonPrevious.Location = new Point(190, 225);
+            buttonPrevious.Location = new Point(190, 395);
             buttonPrevious.Name = "buttonPrevious";
             buttonPrevious.Size = new Size(135, 65);
             buttonPrevious.TabIndex = 11;
@@ -168,7 +176,7 @@
             // labelInstanceOrder
             // 
             labelInstanceOrder.AutoSize = true;
-            labelInstanceOrder.Location = new Point(22, 179);
+            labelInstanceOrder.Location = new Point(22, 340);
             labelInstanceOrder.Name = "labelInstanceOrder";
             labelInstanceOrder.Size = new Size(172, 25);
             labelInstanceOrder.TabIndex = 12;
@@ -177,36 +185,60 @@
             // labelFindResults
             // 
             labelFindResults.AutoSize = true;
-            labelFindResults.Location = new Point(22, 143);
+            labelFindResults.Location = new Point(22, 304);
             labelFindResults.Name = "labelFindResults";
             labelFindResults.Size = new Size(434, 25);
             labelFindResults.TabIndex = 13;
             labelFindResults.Text = "Found X instances in x documents in x projects.";
             // 
-            // labelDocId
+            // groupBox2
             // 
-            labelDocId.AutoSize = true;
-            labelDocId.Location = new Point(200, 179);
-            labelDocId.Name = "labelDocId";
-            labelDocId.Size = new Size(456, 25);
-            labelDocId.TabIndex = 14;
-            labelDocId.Text = "Project: wowie zowie, Document: Death Star Plans";
+            groupBox2.Controls.Add(radioBackward);
+            groupBox2.Controls.Add(radioForward);
+            groupBox2.Location = new Point(22, 133);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(284, 148);
+            groupBox2.TabIndex = 15;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Direction";
+            // 
+            // radioBackward
+            // 
+            radioBackward.AutoSize = true;
+            radioBackward.Location = new Point(44, 89);
+            radioBackward.Name = "radioBackward";
+            radioBackward.Size = new Size(117, 29);
+            radioBackward.TabIndex = 17;
+            radioBackward.TabStop = true;
+            radioBackward.Text = "Backward";
+            radioBackward.UseVisualStyleBackColor = true;
+            // 
+            // radioForward
+            // 
+            radioForward.AutoSize = true;
+            radioForward.Checked = true;
+            radioForward.Location = new Point(44, 46);
+            radioForward.Name = "radioForward";
+            radioForward.Size = new Size(106, 29);
+            radioForward.TabIndex = 16;
+            radioForward.TabStop = true;
+            radioForward.Text = "Forward";
+            radioForward.UseVisualStyleBackColor = true;
             // 
             // FindForm
             // 
+            AcceptButton = buttonFind;
             AutoScaleDimensions = new SizeF(11F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1126, 323);
-            Controls.Add(labelDocId);
+            CancelButton = buttonClose;
+            ClientSize = new Size(814, 478);
+            Controls.Add(groupBox2);
             Controls.Add(labelFindResults);
             Controls.Add(labelInstanceOrder);
             Controls.Add(buttonPrevious);
             Controls.Add(buttonNext);
             Controls.Add(buttonClose);
             Controls.Add(buttonFind);
-            Controls.Add(radioAllProjects);
-            Controls.Add(radioCurrentProject);
-            Controls.Add(radioButton1);
             Controls.Add(checkMatchWholeWord);
             Controls.Add(checkMatchCase);
             Controls.Add(textString);
@@ -217,6 +249,10 @@
             Name = "FindForm";
             Text = "Find";
             TopMost = true;
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -227,7 +263,7 @@
         private TextBox textString;
         private CheckBox checkMatchCase;
         private CheckBox checkMatchWholeWord;
-        private RadioButton radioButton1;
+        private RadioButton radioCurrentDoc;
         private RadioButton radioCurrentProject;
         private RadioButton radioAllProjects;
         private GroupBox groupBox1;
@@ -237,6 +273,8 @@
         private Button buttonPrevious;
         private Label labelInstanceOrder;
         private Label labelFindResults;
-        private Label labelDocId;
+        private GroupBox groupBox2;
+        private RadioButton radioBackward;
+        private RadioButton radioForward;
     }
 }

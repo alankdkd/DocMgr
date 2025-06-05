@@ -4,15 +4,17 @@ namespace DocMgr
 {
     public partial class LoadProjectDlg : Form
     {
-        private Dictionary<string, string> projMap = new Dictionary<string, string>();
+        public static Dictionary<string, string> projMap;
         public string selectedPath = "";
-        int numProjects;
+        static int numProjects;
 
-        public int NumProjects { get => numProjects; set => numProjects = value; }
+        public static int NumProjects { get => numProjects; set => numProjects = value; }
+        public static Dictionary<string, string> GetProjMap() => projMap;
 
         public LoadProjectDlg()
         {
             InitializeComponent();
+            projMap = new Dictionary<string, string>();
 
             ReadPreviousProjects();
             AddProjectsToListBox();
@@ -26,7 +28,7 @@ namespace DocMgr
                 listBox1.Items.Add(projName);
         }
 
-        private void ReadPreviousProjects()
+        private static void ReadPreviousProjects()
         {
             NumProjects = GetNumProjects();
 
@@ -34,7 +36,7 @@ namespace DocMgr
                 ReadNextProject(i);
         }
 
-        private void ReadNextProject(int i)
+        private static void ReadNextProject(int i)
         {
             RegistryKey? key;
             string projIndex = "Project" + i;
@@ -107,7 +109,7 @@ namespace DocMgr
             return false;
         }
 
-        private static string GetProjectName(int i)
+        private static string? GetProjectName(int i)
         {
             string projIndex = "Project" + i;
 
@@ -118,7 +120,7 @@ namespace DocMgr
             if (key == null)
                 return "";
 
-            object obj = key.GetValue("Name");
+            object? obj = key.GetValue("Name");
 
             if (obj == null || !(obj is string))
                 return null;

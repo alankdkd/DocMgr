@@ -80,7 +80,6 @@ namespace DocMgr
             ArrangeLayout();
 
             string version = GetSubstringUpToSecondPeriod(Application.ProductVersion);
-            //MessageBox.Show("Version: " + version);
             Text = "DocMgr v" + version;
             this.KeyPreview = true; // Enable KeyPreview programmatically
         }
@@ -725,7 +724,7 @@ namespace DocMgr
             dlg.Left = buttonLoadProj.Left - 7;
             dlg.Top = buttonLoadProj.Bottom + 32;
 
-            if (dlg.NumProjects > 0)
+            if (LoadProjectDlg.NumProjects > 0)
                 Cursor.Position = new Point(dlg.Left + 200, dlg.Top + 162);
             // else put cursor in Browse button.
 
@@ -1569,7 +1568,7 @@ namespace DocMgr
                 {
                     string newFolderPath = createDialog.NewFolderPath;
                     string projFilePath = newFolderPath + '\\' + createDialog.textProjName.Text + ".json";
-                    Root = new Doc("Root");
+                    Root = new Doc(createDialog.textProjName.Text);
                     SaveProject(projFilePath, Root);
                     SetProjectPath(projFilePath);
                     richTextBox.Clear();
@@ -1764,19 +1763,26 @@ namespace DocMgr
         {
             //List<int> listOffset = new();
             //List<int> listWidth = new();
-            string textCopy = new string(richTextBox.Rtf.ToCharArray());
+            string textCopy = new string(richTextBox.Rtf.ToCharArray());    // Back up original text.
+            string justDocName = DocName.Text;
+            if (justDocName[justDocName.Length - 1] == ':')
+                justDocName = justDocName.Remove(justDocName.Length - 1);   // Remove trailing colon.
 
             try
             {
-                FindForm ff = new(richTextBox);
+                FindForm ff = new(richTextBox, Root, justDocName);
+                ff.ShowDialog();
 
-                if (ff.ShowDialog() == DialogResult.OK)
-                {
-                    string newRtfText = /*RtfHighlighter.*/HighlightSearchStringInRtf(richTextBox.Rtf, "the");
-                    richTextBox.Rtf = newRtfText;
-                }
+                //if (ff.ShowDialog() == DialogResult.OK)
+                //{
+                //    string newRtfText = /*RtfHighlighter.*/HighlightSearchStringInRtf(richTextBox.Rtf, "the");
+                //    richTextBox.Rtf = newRtfText;
+                //}
             }
-            catch { }
+            catch (Exception exception)
+            {
+                MessageBox.Show($"Problem finding: {exception.Message}");
+            }
             finally
             {
                 richTextBox.Rtf = new string(textCopy.ToCharArray());   // Always restore original text.
@@ -1896,36 +1902,37 @@ namespace DocMgr
             //}
             //}
 
-        public static class RichTextBoxScroller
-        {
-            [DllImport("user32.dll")]
-            private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        // MOVED TO FindForm.cs.
+        //public static class RichTextBoxScroller
+        //{
+        //    [DllImport("user32.dll")]
+        //    private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
-            private const int EM_GETFIRSTVISIBLELINE = 0x00CE;
-            private const int EM_LINESCROLL = 0x00B6;
+        //    private const int EM_GETFIRSTVISIBLELINE = 0x00CE;
+        //    private const int EM_LINESCROLL = 0x00B6;
 
-            public static void ScrollToOffsetCenter(RichTextBox rtb, int offset)
-            {
-                if (offset < 0 || offset > rtb.TextLength)
-                    return;
+        //    public static void ScrollToOffsetCenter(RichTextBox rtb, int offset)
+        //    {
+        //        if (offset < 0 || offset > rtb.TextLength)
+        //            return;
 
-                int lineIndex = rtb.GetLineFromCharIndex(offset);
+        //        int lineIndex = rtb.GetLineFromCharIndex(offset);
 
-                // Get the number of visible lines in the RichTextBox
-                int charIndexTopLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, 1));
-                int firstVisibleLine = rtb.GetLineFromCharIndex(charIndexTopLeft);
-                int charIndexBottomLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, rtb.ClientSize.Height - 1));
-                int lastVisibleLine = rtb.GetLineFromCharIndex(charIndexBottomLeft);
+        //        // Get the number of visible lines in the RichTextBox
+        //        int charIndexTopLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, 1));
+        //        int firstVisibleLine = rtb.GetLineFromCharIndex(charIndexTopLeft);
+        //        int charIndexBottomLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, rtb.ClientSize.Height - 1));
+        //        int lastVisibleLine = rtb.GetLineFromCharIndex(charIndexBottomLeft);
 
-                int visibleLines = lastVisibleLine - firstVisibleLine;
-                int targetTopLine = Math.Max(0, lineIndex - visibleLines / 2);
+        //        int visibleLines = lastVisibleLine - firstVisibleLine;
+        //        int targetTopLine = Math.Max(0, lineIndex - visibleLines / 2);
 
-                int currentTopLine = SendMessage(rtb.Handle, EM_GETFIRSTVISIBLELINE, IntPtr.Zero, IntPtr.Zero);
-                int delta = targetTopLine - currentTopLine;
+        //        int currentTopLine = SendMessage(rtb.Handle, EM_GETFIRSTVISIBLELINE, IntPtr.Zero, IntPtr.Zero);
+        //        int delta = targetTopLine - currentTopLine;
 
-                SendMessage(rtb.Handle, EM_LINESCROLL, IntPtr.Zero, (IntPtr)delta);
-            }
-        }
+        //        SendMessage(rtb.Handle, EM_LINESCROLL, IntPtr.Zero, (IntPtr)delta);
+        //    }
+        //}
 
         [StructLayout(LayoutKind.Sequential)]
         private struct FORMATRANGE
@@ -1956,39 +1963,40 @@ namespace DocMgr
         //    //}
         //}
 
-        public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
-        {
-            if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
-                return rtf;
+        // The latest version.  It seems to work.  Moved to FindForm.cs.
+ //       public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
+ //       {
+ //           if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
+ //               return rtf;
 
-            // Load RTF into RichTextBox
-            RichTextBox rtb = new RichTextBox();
-            rtb.Rtf = rtf;
-            string plainText = rtb.Text;
+ //           // Load RTF into RichTextBox
+ //           RichTextBox rtb = new RichTextBox();
+ //           rtb.Rtf = rtf;
+ //           string plainText = rtb.Text;
 
-            // Build regex pattern
-            string pattern = Regex.Escape(searchString);
-            if (wholeWord)
-                pattern = $@"\b{pattern}\b";
+ //           // Build regex pattern
+ //           string pattern = Regex.Escape(searchString);
+ //           if (wholeWord)
+ //               pattern = $@"\b{pattern}\b";
 
-            RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-            Regex regex = new Regex(pattern, options);
+ //           RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+ //           Regex regex = new Regex(pattern, options);
 
-            // Find matches
-            MatchCollection matches = regex.Matches(plainText);
-            if (matches.Count == 0)
-                return rtf;
+ //           // Find matches
+ //           MatchCollection matches = regex.Matches(plainText);
+ //           if (matches.Count == 0)
+ //               return rtf;
 
-            // Apply yellow background highlight to matches
-            foreach (Match match in matches)
-            {
-                rtb.Select(match.Index, match.Length);
-                rtb.SelectionBackColor = Color.Yellow;
- // COMMENTED OUT TO COMPILE:               RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
-            }
+ //           // Apply yellow background highlight to matches
+ //           foreach (Match match in matches)
+ //           {
+ //               rtb.Select(match.Index, match.Length);
+ //               rtb.SelectionBackColor = Color.Yellow;
+ //// COMMENTED OUT TO COMPILE:               RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+ //           }
 
-            return rtb.Rtf;
-        }
+ //           return rtb.Rtf;
+ //       }
 
         private void DocMgr_KeyDown(object sender, KeyEventArgs e)
         {
@@ -2010,6 +2018,13 @@ namespace DocMgr
             {
                 // Ctrl + End is pressed
                 buttonOpenFolder_Click(null, null);
+                e.Handled = true; // Optional: Prevent further processing
+            }
+
+            if (e.Control && e.KeyCode == Keys.F)
+            {
+                // Ctrl + End is pressed
+                buttonFind_Click(null, null);
                 e.Handled = true; // Optional: Prevent further processing
             }
         }
