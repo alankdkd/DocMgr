@@ -19,7 +19,7 @@ namespace DocMgr
         //List<int> listOffset;
         //List<int> listWidth;
         MatchCollection Matches;
-        List<(string docName, string projectPath)> DocList = new();
+        List<(string docName, string projectPath)> DocList;
         (string docName, string projectPath)? CurrentDoc = null;
         int CurrentDocNum = 0;
         string? CurrentProjectName;
@@ -41,11 +41,13 @@ namespace DocMgr
             // Set specific screen coordinates (e.g., X = 200, Y = 150)
             this.Location = new Point(box.Right + 20, box.Bottom - Height);
             Cursor.Position = new Point(textString.Left + 10, textString.Top + 8);
+            buttonFind.CenterCursorInButton();
             this.textString.Focus();
         }
 
         private void buttonFind_Click(object sender, EventArgs e)
         {
+            Cursor.Current = Cursors.WaitCursor;
             GetDocsInScope(DocList);
             DocList = GetDocsWithInstances(DocList);
             buttonNext.Enabled = DocList.Count > 0;
@@ -53,12 +55,15 @@ namespace DocMgr
             DirectionForward = radioForward.Checked;
             CurrentDocNum = (DirectionForward)  ?  0  :  DocList.Count - 1;
             CurrentProjectName = null;
+            Cursor.Current = Cursors.Default;
 
             //buttonNext_Click(null, null);
         }
 
         private void GetDocsInScope(object doclist)     // Get the doc/project pairs to process.
         {
+            DocList = new();
+
             if (radioCurrentDoc.Checked)
             {
                 if (DocName != ""  &&  ProjName != "")

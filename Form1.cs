@@ -667,13 +667,22 @@ namespace DocMgr
             //    buttonClose_Click(sender, e);           // User wants to exit.
 
             if (e.KeyChar == 19 && buttonSaveDoc.Enabled) // Ctrl-S.  Civilized way to do this not apparent.
+            {
+                e.Handled = true;
                 buttonSaveDoc_Click(sender, e);         // Save document.
+            }
 
             if (e.KeyChar == 16)                        // Ctrl-P.  Print.
+            {
+                e.Handled = true;
                 buttonPrint_Click(sender, e);           // Invoke print.
+            }
 
             if (e.KeyChar == 6)                        // Ctrl-F.  Find.
+            {
+                e.Handled = true;
                 buttonFind_Click(sender, e);           // Invoke find.
+            }
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -1764,9 +1773,14 @@ namespace DocMgr
             //List<int> listOffset = new();
             //List<int> listWidth = new();
             string textCopy = new string(richTextBox.Rtf.ToCharArray());    // Back up original text.
+            int docNameLength = DocName.Text.Length;
+
+            if (docNameLength == 0)
+                return;                                                     // No doc selected.
+
             string justDocName = DocName.Text;
-            if (justDocName[justDocName.Length - 1] == ':')
-                justDocName = justDocName.Remove(justDocName.Length - 1);   // Remove trailing colon.
+            if (justDocName[docNameLength - 1] == ':')
+                justDocName = justDocName.Remove(docNameLength - 1);   // Remove trailing colon.
 
             try
             {
@@ -2018,13 +2032,6 @@ namespace DocMgr
             {
                 // Ctrl + End is pressed
                 buttonOpenFolder_Click(null, null);
-                e.Handled = true; // Optional: Prevent further processing
-            }
-
-            if (e.Control && e.KeyCode == Keys.F)
-            {
-                // Ctrl + End is pressed
-                buttonFind_Click(null, null);
                 e.Handled = true; // Optional: Prevent further processing
             }
         }
