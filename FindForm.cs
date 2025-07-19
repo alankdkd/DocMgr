@@ -62,6 +62,13 @@ namespace DocMgr
             DocList = GetDocsWithInstances(DocList);
             buttonNext.Enabled = DocList.Count > 0;
             buttonPrevious.Enabled = DocList.Count > 0;
+
+            if (DocList.Count == 0)
+            {
+                labelFindResults.Text = "Not found.";
+                return;
+            }
+
             DirectionForward = radioForward.Checked;
             CurrentDocNum = GetNumberOfDoc(DocName, DocList);
             CurrentProjectName = null;
@@ -271,6 +278,17 @@ namespace DocMgr
                 return;
             }
 
+            if (MatchOrderInDoc == NumMatches)
+            {
+                ++CurrentDocNum;
+
+                if (CurrentDocNum == DocList.Count)
+                    CurrentDocNum = 0;
+
+                ShowDoc(DocList[CurrentDocNum]);
+                return;
+            }
+
             Match match = Matches[MatchOrderInDoc];
 
             tempRTBox.Select(match.Index, match.Length);
@@ -280,7 +298,22 @@ namespace DocMgr
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
-           // int tmp = richTextBox.caret;
+            int firstVisibleCharIndex = richTextBox.GetCharIndexFromPosition(new Point(0, 0));
+            int lastVisibleCharIndex = richTextBox.GetCharIndexFromPosition(new Point(0, richTextBox.ClientSize.Height));
+
+            if (match.Index < firstVisibleCharIndex || match.Index > lastVisibleCharIndex)
+            {
+                // It's off-screen — move caret and scroll
+                richTextBox.SelectionStart = match.Index;
+                richTextBox.SelectionLength = match.Length;
+                richTextBox.ScrollToCaret();
+            }
+            else
+            {
+                // It's already visible — just update the selection
+                richTextBox.SelectionStart = match.Index;
+                richTextBox.SelectionLength = match.Length;
+            }
         }
 
         private void ShowDoc((string docName, string projectPath)? currentDoc)
@@ -320,6 +353,10 @@ namespace DocMgr
             string highlightedRtf = HighlightSearchStringInRtf(tempRTBox);
 
             NumMatches = Matches.Count();
+
+            if (NumMatches == 0)
+                return;
+
             MatchOrderInDoc = DirectionForward ? 0 : NumMatches - 1;
 
             Match match = Matches[MatchOrderInDoc];
