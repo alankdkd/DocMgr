@@ -24,7 +24,6 @@ namespace DocMgr
         {
             InitializeComponent();
             buttonClose.Enabled = true;
-            buttonSelect.CenterCursorInButton();
             FolderForDoc = initialFolder;
             labelPath.Text = FolderForDoc;
             CenterToScreen();
@@ -81,6 +80,11 @@ namespace DocMgr
         private void textBoxDocName_TextChanged(object sender, EventArgs e)
         {
             buttonCreate.Enabled = textBoxDocName.Text.Length > 0;
+        }
+
+        private void FormCreateDoc_Shown(object sender, EventArgs e)
+        {
+            buttonCreate.CenterCursorInButton(0, 5);          // This has to be done after the ctor.
         }
     }
 

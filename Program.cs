@@ -16,8 +16,10 @@ namespace DocMgr
 
         public static void CenterCursorInButton(this Button but, int dx = 0, int dy = 0)
         {
-            Point loc = but.PointToScreen(Point.Empty);
-            Cursor.Position = new Point(loc.X + but.Left + but.Width / 2 + dx, loc.Y + but.Top + but.Height / 2 + dy);
+            Point screenTopLeft = but.PointToScreen(Point.Empty);
+            int centerX = screenTopLeft.X + but.Width / 2 + dx;
+            int centerY = screenTopLeft.Y + but.Height / 2 + dy;
+            Cursor.Position = new Point(centerX, centerY);
         }
     }
 }

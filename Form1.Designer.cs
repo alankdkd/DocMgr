@@ -161,7 +161,7 @@
             buttonSaveDoc.Size = new Size(175, 31);
             buttonSaveDoc.TabIndex = 9;
             buttonSaveDoc.Text = "&Save Document";
-            toolTips.SetToolTip(buttonSaveDoc, "Ctrl-S");
+            toolTips.SetToolTip(buttonSaveDoc, "Save the currently displayed document.  Ctrl-S");
             buttonSaveDoc.UseVisualStyleBackColor = false;
             buttonSaveDoc.Click += buttonSaveDoc_Click;
             // 
@@ -274,7 +274,7 @@
             buttonPrint.Size = new Size(175, 31);
             buttonPrint.TabIndex = 21;
             buttonPrint.Text = "&Print...";
-            toolTips.SetToolTip(buttonPrint, "Print document or selection.");
+            toolTips.SetToolTip(buttonPrint, "Print document or selection.  Ctrl-P");
             buttonPrint.UseVisualStyleBackColor = false;
             buttonPrint.Click += buttonPrint_Click;
             // 
@@ -313,7 +313,7 @@
             buttonFind.Size = new Size(175, 31);
             buttonFind.TabIndex = 22;
             buttonFind.Text = "&Find...";
-            toolTips.SetToolTip(buttonFind, "Find a string in the current document, project, or all projects.");
+            toolTips.SetToolTip(buttonFind, "Find a string in the current document, project, or all projects.  Ctrl-F");
             buttonFind.UseVisualStyleBackColor = false;
             buttonFind.Click += buttonFind_Click;
             // 

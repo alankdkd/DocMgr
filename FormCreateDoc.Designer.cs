@@ -125,6 +125,7 @@
             Margin = new Padding(4, 5, 4, 5);
             Name = "FormCreateDoc";
             Text = "Create New Document";
+            Shown += FormCreateDoc_Shown;
             KeyPress += FormCreateDoc_KeyPress;
             ResumeLayout(false);
             PerformLayout();

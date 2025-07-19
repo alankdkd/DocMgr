@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,7 +15,7 @@ namespace DocMgr
 {
     public partial class FindForm : Form
     {
-        RichTextBox richTextBox;
+        RichTextBox richTextBox, tempRTBox = new();
         string DocName, ProjName;
         //List<int> listOffset;
         //List<int> listWidth;
@@ -23,8 +24,16 @@ namespace DocMgr
         (string docName, string projectPath)? CurrentDoc = null;
         int CurrentDocNum = 0;
         string? CurrentProjectName;
+        string DisplayedDoc;
+        string SearchString;
         Doc CurrentProjectInfo;
         bool DirectionForward;
+        int TotalMatches, NumMatches;
+        int MatchOrderInDoc;
+        int OrangeStart, OrangeLength;
+        bool MatchCase;
+        bool MatchWholeWord;
+
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
 
@@ -41,23 +50,39 @@ namespace DocMgr
             // Set specific screen coordinates (e.g., X = 200, Y = 150)
             this.Location = new Point(box.Right + 20, box.Bottom - Height);
             Cursor.Position = new Point(textString.Left + 10, textString.Top + 8);
-            buttonFind.CenterCursorInButton();
             this.textString.Focus();
         }
 
         private void buttonFind_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
+            labelFindResults.Text = "";
+            labelInstanceOrder.Text = "";
             GetDocsInScope(DocList);
             DocList = GetDocsWithInstances(DocList);
             buttonNext.Enabled = DocList.Count > 0;
             buttonPrevious.Enabled = DocList.Count > 0;
             DirectionForward = radioForward.Checked;
-            CurrentDocNum = (DirectionForward)  ?  0  :  DocList.Count - 1;
+            CurrentDocNum = GetNumberOfDoc(DocName, DocList);
             CurrentProjectName = null;
+            DisplayedDoc = "";
+
+            ShowDoc(DocList[CurrentDocNum]);
             Cursor.Current = Cursors.Default;
 
             //buttonNext_Click(null, null);
+        }
+
+        private int GetNumberOfDoc(string docName, List<(string docName, string projectPath)> docList)
+        {
+            int docNum = 0;
+            foreach (var doc in docList)
+                if (doc.docName == docName)
+                    return docNum;
+                else
+                    ++docNum;
+
+            return 0;           // Shouldn't happen.
         }
 
         private void GetDocsInScope(object doclist)     // Get the doc/project pairs to process.
@@ -66,39 +91,42 @@ namespace DocMgr
 
             if (radioCurrentDoc.Checked)
             {
-                if (DocName != ""  &&  ProjName != "")
+                if (DocName != "" && ProjName != "")
                     DocList.Add(new(DocName, Root.DocPath));                // The only doc.
             }
             else
                 if (radioCurrentProject.Checked)
-                {
-                    if (ProjName != "")
-                        AddProjectsDocsToList(DocList, Root);       // All docs in project.
-                }
-                else
+            {
+                if (ProjName != "")
+                    AddProjectsDocsToList(DocList, Root);       // All docs in project.
+            }
+            else
                     if (radioAllProjects.Checked)
-                        AddAllProjectsDocsToList(DocList);        // All projects.
+                AddAllProjectsDocsToList(DocList);        // All projects.
         }
 
         private List<(string docName, string projectPath)> GetDocsWithInstances(List<(string docName, string projectPath)> docList)
         {
             List<(string docName, string projectPath)> docsWithList = new();    // With instances.
             HashSet<string> projectNames = new();                               // Proj-name set for summary.
-            bool matchCase = checkMatchCase.Checked;
-            bool matchWholeWord = checkMatchWholeWord.Checked;
-            int numMatches, totalMatches = 0;
-            string summary;
+            MatchCase = checkMatchCase.Checked;
+            MatchWholeWord = checkMatchWholeWord.Checked;
+            string summary, position;
+            TotalMatches = 0;
+
+            SearchString = textString.Text;
 
             foreach (var doc in docList)
-                if (DocContainsString(doc, textString.Text, matchCase, matchWholeWord, out numMatches))
+                if (DocContainsString(doc, SearchString, MatchCase, MatchWholeWord, out NumMatches))
                 {
                     docsWithList.Add(doc);
-                    totalMatches += numMatches;
+                    TotalMatches += NumMatches;
                     AddProjectToSet(projectNames, doc);
                 }
 
-            summary = FormatFindResults(totalMatches, projectNames, docsWithList);
+            summary = FormatFindResults(TotalMatches, projectNames, docsWithList);
             labelFindResults.Text = summary;
+
             return docsWithList;
         }
 
@@ -118,7 +146,7 @@ namespace DocMgr
 
             string pathToDoc = GetPathToDoc(doc.docName, newDocRoot);
 
-            if (pathToDoc.Length == 0  ||  !File.Exists(pathToDoc))
+            if (pathToDoc.Length == 0 || !File.Exists(pathToDoc))
             {
                 if (pathToDoc.Length == 0)
                     MessageBox.Show($"Warning: Document {doc.docName} not found in project.");
@@ -129,11 +157,13 @@ namespace DocMgr
                 return false;
             }
 
-            richTextBox.LoadFile(pathToDoc);
-            string rtf = richTextBox.Rtf;
+            tempRTBox.LoadFile(pathToDoc);
+            string rtf = tempRTBox.Rtf;
 
-            string highlightRtf = HighlightSearchStringInRtf(rtf, searchString, matchCase, matchWholeWord);
-            richTextBox.Rtf = highlightRtf;
+            // FOLLOWING IS PREMATURE HERE:
+            //string highlightRtf = HighlightSearchStringInRtf(rtf, searchString, matchCase, matchWholeWord);
+            //richTextBox.Rtf = highlightRtf;
+            FindMatchesInString(rtf, searchString, matchCase, matchWholeWord);
 
             if (Matches == null)
                 numMatches = 0;
@@ -193,7 +223,7 @@ namespace DocMgr
             }
 
             foreach (Doc doc in project.SubDocs)               // Add all of this project's docs to Doc List:
-                DocList.Add(new (doc.DocName, project.DocPath));
+                DocList.Add(new(doc.DocName, project.DocPath));
         }
 
         private void AddAllProjectsDocsToList(List<(string docName, string projectPath)> docList)
@@ -210,39 +240,50 @@ namespace DocMgr
             }
         }
 
-        //private void buttonClose_Click(object sender, EventArgs e)
-        //{
-        //    //Close();
-        //}
-
         private void buttonNext_Click(object sender, EventArgs e)
         {
-            if (DocList.Count == 0)
-                return;
-
-            CurrentDoc = DocList[CurrentDocNum];
-
-            if (++CurrentDocNum == DocList.Count)
-                CurrentDocNum = 0;
-
-            buttonNext.Enabled = buttonPrevious.Enabled = (DocList.Count > 1);
-            DisplayCurrentDoc(CurrentDoc);
+            MoveHighlightedWord(DirectionForward);
         }
 
         private void buttonPrevious_Click(object sender, EventArgs e)
         {
-            if (DocList.Count == 0)
-                return;
-
-            CurrentDoc = DocList[CurrentDocNum];
-
-            if (--CurrentDocNum == -1)
-                CurrentDocNum = DocList.Count - 1;
-
-            DisplayCurrentDoc(CurrentDoc);
+            MoveHighlightedWord(!DirectionForward);
         }
 
-        private void DisplayCurrentDoc((string docName, string projectPath)? currentDoc)
+        private void MoveHighlightedWord(bool moveMatchUp)
+        {
+            tempRTBox.Select(OrangeStart, OrangeLength);
+            tempRTBox.SelectionBackColor = Color.Yellow;
+
+            if (moveMatchUp)
+                ++MatchOrderInDoc;
+            else
+                --MatchOrderInDoc;
+
+            if (MatchOrderInDoc == -1)
+            {
+                --CurrentDocNum;
+
+                if (CurrentDocNum == -1)
+                    CurrentDocNum = DocList.Count() - 1;
+
+                ShowDoc(DocList[CurrentDocNum]);
+                return;
+            }
+
+            Match match = Matches[MatchOrderInDoc];
+
+            tempRTBox.Select(match.Index, match.Length);
+            tempRTBox.SelectionBackColor = Color.Orange;
+            OrangeStart = match.Index;
+            OrangeLength = match.Length;
+
+            richTextBox.Rtf = tempRTBox.Rtf;
+
+           // int tmp = richTextBox.caret;
+        }
+
+        private void ShowDoc((string docName, string projectPath)? currentDoc)
         {
             if (currentDoc == null)
             {
@@ -250,16 +291,45 @@ namespace DocMgr
                 return;
             }
 
-            if (currentDoc.Value.projectPath  !=  CurrentProjectName)
-                if (!LoadCurrentProject(currentDoc))            // Project out of date.  Load project.
+            bool loadDoc = false;
+            string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
+            labelInstanceOrder.Text = position;
+
+            if (currentDoc.Value.projectPath != CurrentProjectName)
+            {
+                loadDoc = true;                             // If loading project, need to load doc.
+
+                if (!LoadCurrentProject(currentDoc))        // Project out of date.  Load project.
+                    return;
+            }
+
+            if (currentDoc.Value.docName != DisplayedDoc)
+                loadDoc = true;                             // If displayed doc different, load current.
+
+            if (loadDoc)
+            {
+                string CurrentDocPath = GetPathToDoc(currentDoc.Value.docName, CurrentProjectInfo);
+
+                if (CurrentDocPath.Length == 0)
                     return;
 
-            string CurrentDocPath = GetPathToDoc(currentDoc.Value.docName, CurrentProjectInfo);
+                tempRTBox.LoadFile(CurrentDocPath);
+                DisplayedDoc = currentDoc.Value.docName;
+            }
 
-            if (CurrentDocPath.Length == 0)
-                return;
+            string highlightedRtf = HighlightSearchStringInRtf(tempRTBox);
 
-            richTextBox.LoadFile(CurrentDocPath);
+            NumMatches = Matches.Count();
+            MatchOrderInDoc = DirectionForward ? 0 : NumMatches - 1;
+
+            Match match = Matches[MatchOrderInDoc];
+            OrangeStart = match.Index;
+            OrangeLength = match.Length;
+            tempRTBox.Select(OrangeStart, OrangeLength);
+            tempRTBox.SelectionBackColor = Color.Orange;
+
+            richTextBox.Rtf = tempRTBox.Rtf;
+            RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
         }
 
         private string GetPathToProject(string projName)
@@ -303,7 +373,7 @@ namespace DocMgr
             if (File.Exists(projectPath))
             {                               // Load project file:
                 string? docList = File.ReadAllText(projectPath);
-// CONNECT THIS TO CONTROL IN Form1:        ProjectName.Text = Path.GetFileNameWithoutExtension(projectPath);
+                // CONNECT THIS TO CONTROL IN Form1:        ProjectName.Text = Path.GetFileNameWithoutExtension(projectPath);
 
                 if (docList != null)
                     try
@@ -322,15 +392,23 @@ namespace DocMgr
                 MessageBox.Show($"Warning: Project not found at {projectPath} in LoadProject().");
         }
 
-        public string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
+        /// <summary>
+        /// Locates the offset and length of each match in the text and sets Matches collection.
+        /// </summary>
+        /// <returns></returns>
+        public void FindMatchesInString(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
         {
             if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
-                return rtf;
+                return;
+
+            string plainText;
 
             // Load RTF into RichTextBox
-            RichTextBox rtb = new RichTextBox();
-            rtb.Rtf = rtf;
-            string plainText = rtb.Text;
+            using (RichTextBox rtb = new RichTextBox())
+            {
+                rtb.Rtf = rtf;
+                plainText = rtb.Text;
+            }
 
             // Build regex pattern
             string pattern = Regex.Escape(searchString);
@@ -340,10 +418,27 @@ namespace DocMgr
             RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
             Regex regex = new Regex(pattern, options);
 
-            // Find matches
+            // Find matches:
             Matches = regex.Matches(plainText);
-            if (Matches.Count == 0)
-                return rtf;
+
+            //// Apply yellow background highlight to matches
+            //foreach (Match match in Matches)
+            //{
+            //    rtb.Select(match.Index, match.Length);
+            //    rtb.SelectionBackColor = Color.Yellow;
+            //    RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+            //}
+
+            //return rtb.Rtf;
+        }
+
+        // BREAK OUT SEPARATE MATCH-FINDING AND YELLOW HIGHLIGHTING.
+        /// <summary>
+        /// Highlights match instances found in yellow.
+        /// </summary>
+        /// <returns></returns>
+        public string HighlightSearchStringInRtf(RichTextBox rtb)
+        {
 
             // Apply yellow background highlight to matches
             foreach (Match match in Matches)
@@ -355,6 +450,7 @@ namespace DocMgr
 
             return rtb.Rtf;
         }
+
         public static class RichTextBoxScroller
         {
             [DllImport("user32.dll")]
@@ -384,6 +480,11 @@ namespace DocMgr
 
                 SendMessage(rtb.Handle, EM_LINESCROLL, IntPtr.Zero, (IntPtr)delta);
             }
+        }
+
+        private void FindForm_Shown(object sender, EventArgs e)
+        {
+            buttonFind.CenterCursorInButton(0, 6);          // This has to be done after the ctor.
         }
     }
 }

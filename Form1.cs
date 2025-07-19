@@ -31,6 +31,7 @@ namespace DocMgr
         string? CurrentFilePath;
         static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
+        bool finding = false;
         int originalLeft;
         //static string TextCopy = null;
         static readonly int BAD_INT = int.MinValue;
@@ -1061,7 +1062,7 @@ namespace DocMgr
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (!loadingDoc)
+            if (!loadingDoc  &&  !finding)
             {
                 buttonSaveDoc.Enabled = true;
                 // Indicate document modified:
@@ -1784,6 +1785,7 @@ namespace DocMgr
 
             try
             {
+                finding = true;
                 FindForm ff = new(richTextBox, Root, justDocName);
                 ff.ShowDialog();
 
@@ -1801,6 +1803,7 @@ namespace DocMgr
             {
                 richTextBox.Rtf = new string(textCopy.ToCharArray());   // Always restore original text.
                 textCopy = null;
+                finding = false;
             }
         }
 

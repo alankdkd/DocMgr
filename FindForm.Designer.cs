@@ -249,6 +249,7 @@
             Name = "FindForm";
             Text = "Find";
             TopMost = true;
+            Shown += FindForm_Shown;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
