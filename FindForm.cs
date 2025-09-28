@@ -27,7 +27,7 @@ namespace DocMgr
         string DisplayedDoc;
         string SearchString;
         Doc CurrentProjectInfo;
-        bool DirectionForward;
+        bool DirectionForward = true;
         int TotalMatches, NumMatches;
         int MatchOrderInDoc;
         int OrangeStart, OrangeLength;
@@ -69,12 +69,12 @@ namespace DocMgr
                 return;
             }
 
-            DirectionForward = radioForward.Checked;
             CurrentDocNum = GetNumberOfDoc(DocName, DocList);
             CurrentProjectName = null;
             DisplayedDoc = "";
 
             ShowDoc(DocList[CurrentDocNum]);
+            buttonNext.Focus();
             Cursor.Current = Cursors.Default;
 
             //buttonNext_Click(null, null);
@@ -249,12 +249,14 @@ namespace DocMgr
 
         private void buttonNext_Click(object sender, EventArgs e)
         {
+            DirectionForward = true;
             MoveHighlightedWord(DirectionForward);
         }
 
         private void buttonPrevious_Click(object sender, EventArgs e)
         {
-            MoveHighlightedWord(!DirectionForward);
+            DirectionForward = false;
+            MoveHighlightedWord(DirectionForward);
         }
 
         private void MoveHighlightedWord(bool moveMatchUp)
@@ -430,7 +432,7 @@ namespace DocMgr
         }
 
         /// <summary>
-        /// Locates the offset and length of each match in the text and sets Matches collection.
+        /// Locate the offset and length of each match in the text and set Matches collection.
         /// </summary>
         /// <returns></returns>
         public void FindMatchesInString(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)

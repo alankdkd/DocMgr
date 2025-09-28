@@ -42,11 +42,7 @@
             buttonPrevious = new Button();
             labelInstanceOrder = new Label();
             labelFindResults = new Label();
-            groupBox2 = new GroupBox();
-            radioBackward = new RadioButton();
-            radioForward = new RadioButton();
             groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // label1
@@ -191,40 +187,6 @@
             labelFindResults.TabIndex = 13;
             labelFindResults.Text = "Found X instances in x documents in x projects.";
             // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(radioBackward);
-            groupBox2.Controls.Add(radioForward);
-            groupBox2.Location = new Point(22, 133);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(284, 148);
-            groupBox2.TabIndex = 15;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Direction";
-            // 
-            // radioBackward
-            // 
-            radioBackward.AutoSize = true;
-            radioBackward.Location = new Point(44, 89);
-            radioBackward.Name = "radioBackward";
-            radioBackward.Size = new Size(117, 29);
-            radioBackward.TabIndex = 17;
-            radioBackward.TabStop = true;
-            radioBackward.Text = "Backward";
-            radioBackward.UseVisualStyleBackColor = true;
-            // 
-            // radioForward
-            // 
-            radioForward.AutoSize = true;
-            radioForward.Checked = true;
-            radioForward.Location = new Point(44, 46);
-            radioForward.Name = "radioForward";
-            radioForward.Size = new Size(106, 29);
-            radioForward.TabIndex = 16;
-            radioForward.TabStop = true;
-            radioForward.Text = "Forward";
-            radioForward.UseVisualStyleBackColor = true;
-            // 
             // FindForm
             // 
             AcceptButton = buttonFind;
@@ -232,7 +194,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = buttonClose;
             ClientSize = new Size(814, 478);
-            Controls.Add(groupBox2);
             Controls.Add(labelFindResults);
             Controls.Add(labelInstanceOrder);
             Controls.Add(buttonPrevious);
@@ -252,8 +213,6 @@
             Shown += FindForm_Shown;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
-            groupBox2.ResumeLayout(false);
-            groupBox2.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -274,8 +233,5 @@
         private Button buttonPrevious;
         private Label labelInstanceOrder;
         private Label labelFindResults;
-        private GroupBox groupBox2;
-        private RadioButton radioBackward;
-        private RadioButton radioForward;
     }
 }

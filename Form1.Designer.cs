@@ -147,7 +147,7 @@
             buttonRemoveDoc.Size = new Size(175, 31);
             buttonRemoveDoc.TabIndex = 8;
             buttonRemoveDoc.Text = "&Remove Document";
-            toolTips.SetToolTip(buttonRemoveDoc, "Remove document from project but does NOT delete it.");
+            toolTips.SetToolTip(buttonRemoveDoc, "Remove document from project but do NOT delete it.");
             buttonRemoveDoc.UseVisualStyleBackColor = false;
             buttonRemoveDoc.Click += buttonRemoveDoc_Click;
             // 
@@ -223,6 +223,7 @@
             buttonNumberLines.Size = new Size(175, 31);
             buttonNumberLines.TabIndex = 14;
             buttonNumberLines.Text = "N&umber Lines";
+            toolTips.SetToolTip(buttonNumberLines, "Add auto-numbering to the selected text.");
             buttonNumberLines.UseVisualStyleBackColor = false;
             buttonNumberLines.Click += buttonNumberLines_Click;
             // 

@@ -1278,7 +1278,7 @@ namespace DocMgr
             if ((BackupFolder = GetMakeBackupFolder(ProjName)) == "")
                 return;                         // Problems.
 
-            HandleProject(BackupFolder);
+            SaveProjectToFolder(BackupFolder);
         }
 
         private void buttonArchiveProject_Click(object sender, EventArgs e)
@@ -1286,11 +1286,11 @@ namespace DocMgr
             if ((ArchiveFolder = GetMakeArchiveFolder(ProjName)) == "")
                 return;                         // Problems.
 
-            HandleProject(ArchiveFolder);
+            SaveProjectToFolder(ArchiveFolder);
             SetReadOnlyAttributes(ArchiveFolder);
         }
 
-        private void HandleProject(string destFolder)
+        private void SaveProjectToFolder(string destFolder)
         {
             if (Root.SubDocs.Count == 0)
                 return;                         // No docs.
@@ -1336,7 +1336,7 @@ namespace DocMgr
                 try
                 {
                     if (!CopyFileToFolder(doc, destFolder))
-                        MessageBox.Show("Warning, couldn't find document " + doc.DocName + ".");
+                        MessageBox.Show("Warning, couldn't find project document '" + doc.DocName + "'.");
                 }
                 catch (Exception ex)
                 {
