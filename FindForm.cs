@@ -111,8 +111,8 @@ namespace DocMgr
                     AddProjectsDocsToList(DocList, Root);       // All docs in project.
             }
             else
-                    if (radioAllProjects.Checked)
-                AddAllProjectsDocsToList(DocList);        // All projects.
+                if (radioAllProjects.Checked)
+                    AddAllProjectsDocsToList(DocList);        // All projects.
         }
 
         private List<(string docName, string projectPath)> GetDocsWithInstances(List<(string docName, string projectPath)> docList)
@@ -245,7 +245,10 @@ namespace DocMgr
             {
                 string docName = pair.Key;
                 Doc project;
-                LoadProject(pair.Value, out project);
+
+                if (!LoadProject(pair.Value, out project))
+                    continue;
+
                 AddProjectsDocsToList(docList, project);
             }
         }
@@ -420,11 +423,10 @@ namespace DocMgr
             }
 
             //WRONG  CurrentProjectInfo = new Doc(projPath, CurrentProjectName);
-            LoadProject(projPath, out CurrentProjectInfo);
-            return true;
+            return LoadProject(projPath, out CurrentProjectInfo);
         }
 
-        private void LoadProject(string projectPath, out Doc? Root)     // This duplicates functionality in Form1.cs.  Ugh.  Need Project class.
+        private bool LoadProject(string projectPath, out Doc? Root)     // This duplicates functionality in Form1.cs.  Ugh.  Need Project class.
         {
             Root = null;
 
@@ -438,16 +440,18 @@ namespace DocMgr
                     {
                         Root = System.Text.Json.JsonSerializer.Deserialize<Doc>(docList);
                         Root.DocPath = projectPath;
+                        return true;
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show("Problem loading project at {projectPath}: " + ex.Message);
                         //Root = new Doc("Root");
-                        return;
+                        return false;
                     }
             }
-            else
-                MessageBox.Show($"Warning: Project not found at {projectPath} in LoadProject().");
+
+            MessageBox.Show($"Warning: Project not found at {projectPath} in LoadProject().");
+            return false;
         }
 
         /// <summary>
