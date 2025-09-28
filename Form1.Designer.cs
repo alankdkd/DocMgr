@@ -257,7 +257,7 @@
             // 
             buttonProperties.BackColor = SystemColors.Control;
             buttonProperties.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonProperties.Location = new Point(1090, 687);
+            buttonProperties.Location = new Point(1090, 755);
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(175, 31);
             buttonProperties.TabIndex = 20;
@@ -309,7 +309,7 @@
             // 
             buttonFind.BackColor = SystemColors.Control;
             buttonFind.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonFind.Location = new Point(1090, 755);
+            buttonFind.Location = new Point(1090, 687);
             buttonFind.Name = "buttonFind";
             buttonFind.Size = new Size(175, 31);
             buttonFind.TabIndex = 22;

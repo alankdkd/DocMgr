@@ -396,7 +396,7 @@ namespace DocMgr
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
                 ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
                 buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
-                buttonArchiveProject, buttonProperties, buttonPrint};
+                buttonArchiveProject, buttonProperties, buttonPrint, buttonFind};
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -1773,6 +1773,10 @@ namespace DocMgr
         {
             //List<int> listOffset = new();
             //List<int> listWidth = new();
+
+            if (DocName.Text.StartsWith('*'))
+                buttonSaveDoc_Click(null, null);        // Save changes.
+
             string textCopy = new string(richTextBox.Rtf.ToCharArray());    // Back up original text.
             int docNameLength = DocName.Text.Length;
 
