@@ -373,9 +373,9 @@
         #endregion
 
         private RichTextBox richTextBox;
-        private Label DocName;
+        public Label DocName;
+        public Label ProjectName;
         private Button buttonClose;
-        private Label ProjectName;
         private Label label1;
         private Button buttonLoadProj;
         private Button buttonLoadDoc;

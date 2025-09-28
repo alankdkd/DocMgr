@@ -36,14 +36,17 @@ namespace DocMgr
 
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
+        DocMgr mainForm;
 
-        public FindForm(RichTextBox box, Doc projectRoot, string docName)
+
+        public FindForm(RichTextBox box, Doc projectRoot, string docName, DocMgr callingForm)
         {
             InitializeComponent();
             richTextBox = box;
             Root = projectRoot;
             DocName = docName;
             ProjName = projectRoot.DocName;
+            mainForm = callingForm;
             CurrentProjectName = "";
             this.StartPosition = FormStartPosition.Manual;
 
@@ -361,7 +364,6 @@ namespace DocMgr
             MatchWholeWord = checkMatchWholeWord.Checked;
             FindMatchesInString(tempRTBox.Rtf, SearchString, MatchCase, MatchWholeWord);
 
-
             string highlightedRtf = HighlightSearchStringInRtf(tempRTBox);
 
             NumMatches = Matches.Count();
@@ -378,6 +380,13 @@ namespace DocMgr
             tempRTBox.SelectionBackColor = Color.Orange;
 
             richTextBox.Rtf = tempRTBox.Rtf;
+
+            if (mainForm != null)
+            {
+                mainForm.DocName.Text = currentDoc.Value.docName + ':';
+                mainForm.ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentProjectInfo.DocPath);
+            }
+
             RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
         }
 

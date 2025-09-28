@@ -1786,7 +1786,7 @@ namespace DocMgr
             try
             {
                 finding = true;
-                FindForm ff = new(richTextBox, Root, justDocName);
+                FindForm ff = new(richTextBox, Root, justDocName, this);
                 ff.ShowDialog();
 
                 //if (ff.ShowDialog() == DialogResult.OK)
