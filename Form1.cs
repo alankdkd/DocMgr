@@ -401,7 +401,7 @@ namespace DocMgr
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
                 ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
                 buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
-                buttonArchiveProject, buttonProperties, buttonPrint, buttonFind};
+                buttonArchiveProject, buttonProperties, buttonPrint, buttonFind, buttonFont};
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -1067,7 +1067,7 @@ namespace DocMgr
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (!loadingDoc  &&  !finding)
+            if (!loadingDoc && !finding)
             {
                 buttonSaveDoc.Enabled = true;
                 // Indicate document modified:
@@ -1256,7 +1256,7 @@ namespace DocMgr
 
         private void HandleOneFile(string destFolder)
         {
-            if (Root.SubDocs.Count == 0  ||  DocName.Text == "")
+            if (Root.SubDocs.Count == 0 || DocName.Text == "")
                 return;                         // No docs.
 
             Cursor.Current = Cursors.WaitCursor;
@@ -1302,7 +1302,7 @@ namespace DocMgr
 
             Cursor.Current = Cursors.WaitCursor;
 
-            if (DocName.Text != ""  &&  DocName.Text[0] == '*')
+            if (DocName.Text != "" && DocName.Text[0] == '*')
                 buttonSaveDoc_Click(null, null);
 
             SaveProject(destFolder + '\\' + ProjName + ".json", Root);
@@ -1822,99 +1822,99 @@ namespace DocMgr
         //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
         //        return rtf;
 
-            //    // Load RTF into RichTextBox
-            //    RichTextBox rtb = new RichTextBox();
-            //    rtb.Rtf = rtf;
-            //    string plainText = rtb.Text;
+        //    // Load RTF into RichTextBox
+        //    RichTextBox rtb = new RichTextBox();
+        //    rtb.Rtf = rtf;
+        //    string plainText = rtb.Text;
 
-            //    // Build regex pattern
-            //    string pattern = Regex.Escape(searchString);
-            //    if (wholeWord)
-            //        pattern = $@"\b{pattern}\b";
+        //    // Build regex pattern
+        //    string pattern = Regex.Escape(searchString);
+        //    if (wholeWord)
+        //        pattern = $@"\b{pattern}\b";
 
-            //    RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
-            //    Regex regex = new Regex(pattern, options);
+        //    RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+        //    Regex regex = new Regex(pattern, options);
 
-            //    // Find matches
-            //    MatchCollection matches = regex.Matches(plainText);
-            //    if (matches.Count == 0)
-            //        return rtf;
+        //    // Find matches
+        //    MatchCollection matches = regex.Matches(plainText);
+        //    if (matches.Count == 0)
+        //        return rtf;
 
-            //    // Apply yellow background highlight to matches
-            //    foreach (Match match in matches)
-            //    {
-            //        rtb.Select(match.Index, match.Length);
-            //        rtb.SelectionBackColor = Color.Yellow;
-            //        RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
-            //    }
+        //    // Apply yellow background highlight to matches
+        //    foreach (Match match in matches)
+        //    {
+        //        rtb.Select(match.Index, match.Length);
+        //        rtb.SelectionBackColor = Color.Yellow;
+        //        RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+        //    }
 
-            //    return rtb.Rtf;
-            //}
-            //public static string HighlightSearchStringInRtf(string rtf, string searchText)
-            //{
-            //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchText))
-            //        return rtf;
+        //    return rtb.Rtf;
+        //}
+        //public static string HighlightSearchStringInRtf(string rtf, string searchText)
+        //{
+        //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchText))
+        //        return rtf;
 
-            //    // Ensure searchText is RTF-escaped
-            //    string escapedSearch = Regex.Escape(searchText);
+        //    // Ensure searchText is RTF-escaped
+        //    string escapedSearch = Regex.Escape(searchText);
 
-            //    // Find or insert the color table
-            //    var colorTableRegex = new Regex(@"(\\colortbl[^;]*;)", RegexOptions.IgnoreCase);
-            //    Match match = colorTableRegex.Match(rtf);
-            //    int yellowIndex;
+        //    // Find or insert the color table
+        //    var colorTableRegex = new Regex(@"(\\colortbl[^;]*;)", RegexOptions.IgnoreCase);
+        //    Match match = colorTableRegex.Match(rtf);
+        //    int yellowIndex;
 
-            //    if (match.Success)
-            //    {
-            //        // Append yellow if not already present
-            //        if (!match.Value.Contains(@"\red255\green255\blue0"))
-            //        {
-            //            string newColorTable = match.Value.Insert(match.Value.Length - 1, @"\red255\green255\blue0;");
-            //            rtf = rtf.Remove(match.Index, match.Length).Insert(match.Index, newColorTable);
-            //            yellowIndex = CountColorEntries(newColorTable);
-            //        }
-            //        else
-            //        {
-            //            yellowIndex = GetColorIndex(match.Value, @"\red255\green255\blue0");
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // No color table found; insert after \rtf1... header
-            //        var headerMatch = Regex.Match(rtf, @"{\\rtf1[^\n]*");
-            //        if (!headerMatch.Success) return rtf; // invalid RTF
+        //    if (match.Success)
+        //    {
+        //        // Append yellow if not already present
+        //        if (!match.Value.Contains(@"\red255\green255\blue0"))
+        //        {
+        //            string newColorTable = match.Value.Insert(match.Value.Length - 1, @"\red255\green255\blue0;");
+        //            rtf = rtf.Remove(match.Index, match.Length).Insert(match.Index, newColorTable);
+        //            yellowIndex = CountColorEntries(newColorTable);
+        //        }
+        //        else
+        //        {
+        //            yellowIndex = GetColorIndex(match.Value, @"\red255\green255\blue0");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // No color table found; insert after \rtf1... header
+        //        var headerMatch = Regex.Match(rtf, @"{\\rtf1[^\n]*");
+        //        if (!headerMatch.Success) return rtf; // invalid RTF
 
-            //        yellowIndex = 1;
-            //        string colorTable = @"{\colortbl;\red255\green255\blue0;}";
-            //        int insertPos = headerMatch.Index + headerMatch.Length;
-            //        rtf = rtf.Insert(insertPos, colorTable);
-            //    }
+        //        yellowIndex = 1;
+        //        string colorTable = @"{\colortbl;\red255\green255\blue0;}";
+        //        int insertPos = headerMatch.Index + headerMatch.Length;
+        //        rtf = rtf.Insert(insertPos, colorTable);
+        //    }
 
-            //    // Insert highlight tags around the search string
-            //    string highlightStart = $@"\highlight{yellowIndex} ";
-            //    string highlightEnd = @"\highlight0 ";
+        //    // Insert highlight tags around the search string
+        //    string highlightStart = $@"\highlight{yellowIndex} ";
+        //    string highlightEnd = @"\highlight0 ";
 
-            //    string rtfEscapedSearch = Regex.Escape(searchText);
-            //    var contentRegex = new Regex(rtfEscapedSearch, RegexOptions.IgnoreCase);
-            //    rtf = contentRegex.Replace(rtf, $"{highlightStart}{searchText}{highlightEnd}", 1); // first occurrence only
+        //    string rtfEscapedSearch = Regex.Escape(searchText);
+        //    var contentRegex = new Regex(rtfEscapedSearch, RegexOptions.IgnoreCase);
+        //    rtf = contentRegex.Replace(rtf, $"{highlightStart}{searchText}{highlightEnd}", 1); // first occurrence only
 
-            //    return rtf;
-            //}
+        //    return rtf;
+        //}
 
-            //private static int CountColorEntries(string colorTable)
-            //{
-            //    return new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable).Count;
-            //}
+        //private static int CountColorEntries(string colorTable)
+        //{
+        //    return new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable).Count;
+        //}
 
-            //private static int GetColorIndex(string colorTable, string color)
-            //{
-            //    var matches = new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable);
-            //    for (int i = 0; i < matches.Count; i++)
-            //    {
-            //        if (matches[i].Value.Contains(color)) return i + 1; // RTF color index starts at 1
-            //    }
-            //    return 1;
-            //}
-            //}
+        //private static int GetColorIndex(string colorTable, string color)
+        //{
+        //    var matches = new Regex(@"\\red\d+\\green\d+\\blue\d+;").Matches(colorTable);
+        //    for (int i = 0; i < matches.Count; i++)
+        //    {
+        //        if (matches[i].Value.Contains(color)) return i + 1; // RTF color index starts at 1
+        //    }
+        //    return 1;
+        //}
+        //}
 
         // MOVED TO FindForm.cs.
         //public static class RichTextBoxScroller
@@ -1978,39 +1978,39 @@ namespace DocMgr
         //}
 
         // The latest version.  It seems to work.  Moved to FindForm.cs.
- //       public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
- //       {
- //           if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
- //               return rtf;
+        //       public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
+        //       {
+        //           if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
+        //               return rtf;
 
- //           // Load RTF into RichTextBox
- //           RichTextBox rtb = new RichTextBox();
- //           rtb.Rtf = rtf;
- //           string plainText = rtb.Text;
+        //           // Load RTF into RichTextBox
+        //           RichTextBox rtb = new RichTextBox();
+        //           rtb.Rtf = rtf;
+        //           string plainText = rtb.Text;
 
- //           // Build regex pattern
- //           string pattern = Regex.Escape(searchString);
- //           if (wholeWord)
- //               pattern = $@"\b{pattern}\b";
+        //           // Build regex pattern
+        //           string pattern = Regex.Escape(searchString);
+        //           if (wholeWord)
+        //               pattern = $@"\b{pattern}\b";
 
- //           RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
- //           Regex regex = new Regex(pattern, options);
+        //           RegexOptions options = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+        //           Regex regex = new Regex(pattern, options);
 
- //           // Find matches
- //           MatchCollection matches = regex.Matches(plainText);
- //           if (matches.Count == 0)
- //               return rtf;
+        //           // Find matches
+        //           MatchCollection matches = regex.Matches(plainText);
+        //           if (matches.Count == 0)
+        //               return rtf;
 
- //           // Apply yellow background highlight to matches
- //           foreach (Match match in matches)
- //           {
- //               rtb.Select(match.Index, match.Length);
- //               rtb.SelectionBackColor = Color.Yellow;
- //// COMMENTED OUT TO COMPILE:               RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
- //           }
+        //           // Apply yellow background highlight to matches
+        //           foreach (Match match in matches)
+        //           {
+        //               rtb.Select(match.Index, match.Length);
+        //               rtb.SelectionBackColor = Color.Yellow;
+        //// COMMENTED OUT TO COMPILE:               RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+        //           }
 
- //           return rtb.Rtf;
- //       }
+        //           return rtb.Rtf;
+        //       }
 
         private void DocMgr_KeyDown(object sender, KeyEventArgs e)
         {
@@ -2045,6 +2045,39 @@ namespace DocMgr
         {
             richTextBox.SelectionStart = richTextBox.Text.Length; // Set selection start to the end
             richTextBox.ScrollToCaret();    // Scroll to the caret
+        }
+
+        private void buttonFont_Click(object sender, EventArgs e)
+        {
+            // Check if there is any text selected
+            if (richTextBox.SelectionLength > 0)
+            {
+                // Get the current font of the selection
+                System.Drawing.Font currentFont = richTextBox.SelectionFont;
+                System.Drawing.Font? newFont = GetFontSelection(currentFont);
+
+
+                if (newFont != null)
+                    richTextBox.SelectionFont = newFont;    // Apply the new font to the selected text.
+            }
+            else
+            {
+                CenterCursor(88, 72);
+                MessageBox.Show("Please select some text to change its font.");
+            }
+        }
+
+        private Font? GetFontSelection(Font currentFont)
+        {
+            using (FontDialog fd = new())
+            {
+                fd.Font = currentFont;
+
+                if (fd.ShowDialog() == DialogResult.OK)
+                    return fd.Font;
+            }
+
+            return null;
         }
     }
 

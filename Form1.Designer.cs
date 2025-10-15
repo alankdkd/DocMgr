@@ -52,6 +52,7 @@
             buttonArchiveProject = new Button();
             buttonFind = new Button();
             buttonOpenFolder = new Button();
+            buttonFont = new Button();
             SuspendLayout();
             // 
             // richTextBox
@@ -257,7 +258,7 @@
             // 
             buttonProperties.BackColor = SystemColors.Control;
             buttonProperties.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonProperties.Location = new Point(1090, 755);
+            buttonProperties.Location = new Point(1090, 823);
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(175, 31);
             buttonProperties.TabIndex = 20;
@@ -331,12 +332,26 @@
             buttonOpenFolder.UseVisualStyleBackColor = false;
             buttonOpenFolder.Click += buttonOpenFolder_Click;
             // 
+            // buttonFont
+            // 
+            buttonFont.BackColor = SystemColors.Control;
+            buttonFont.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonFont.Location = new Point(1090, 755);
+            buttonFont.Name = "buttonFont";
+            buttonFont.Size = new Size(175, 31);
+            buttonFont.TabIndex = 23;
+            buttonFont.Text = "Font...";
+            toolTips.SetToolTip(buttonFont, "Set the font for selected text.");
+            buttonFont.UseVisualStyleBackColor = false;
+            buttonFont.Click += buttonFont_Click;
+            // 
             // DocMgr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlDarkDark;
             ClientSize = new Size(1296, 985);
+            Controls.Add(buttonFont);
             Controls.Add(buttonFind);
             Controls.Add(buttonPrint);
             Controls.Add(buttonProperties);
@@ -395,5 +410,6 @@
         private Button buttonProperties;
         private Button buttonPrint;
         private Button buttonFind;
+        private Button buttonFont;
     }
 }

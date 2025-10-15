@@ -356,10 +356,6 @@ namespace DocMgr
                 DisplayedDoc = currentDoc.Value.docName;
             }
 
-
-
-            // WE NEED TO SET THE Matches ARRAY HERE!
-            // DO IT IN Public void FindMatchesInString(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false).
             SearchString = textString.Text;
             MatchCase = checkMatchCase.Checked;
             MatchWholeWord = checkMatchWholeWord.Checked;
