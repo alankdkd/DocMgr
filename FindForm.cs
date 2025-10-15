@@ -24,7 +24,7 @@ namespace DocMgr
         (string docName, string projectPath)? CurrentDoc = null;
         int CurrentDocNum = 0;
         string? CurrentProjectName;
-        string CurrentDocPath;
+        string? CurrentDocPath = null;
         string SearchString;
         Doc CurrentProjectInfo;
         bool DirectionForward = true;
@@ -552,7 +552,9 @@ namespace DocMgr
             richTextBox.SelectAll();
             richTextBox.SelectionBackColor = Color.White;
             richTextBox.DeselectAll();
-            mainForm.CurrentFilePath = CurrentDocPath;
+
+            if (CurrentDocPath != null)
+                mainForm.CurrentFilePath = CurrentDocPath;
 
             if (!radioCurrentProject.Checked)
                 DisplayedDoc = "";
