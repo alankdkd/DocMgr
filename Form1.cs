@@ -28,7 +28,7 @@ namespace DocMgr
         static MarginSt MyMargins;    // In twips; 1/1440 inch.  Twentieth of a point.
         static bool HaveMargins = false;
 
-        string? CurrentFilePath;
+        public string? CurrentFilePath;
         static string? ProjectPath, lastDocName;
         bool loadingDoc = false;
         bool finding = false;
@@ -189,7 +189,12 @@ namespace DocMgr
 
         private void SaveScrollPosition()
         {
-            Doc? doc = FindDocByName(DocName.Text.TrimEnd(':'));
+            string name = DocName.Text;
+
+            if (name.StartsWith("* "))
+                name = name.Remove(0, 2);
+
+            Doc? doc = FindDocByName(name.TrimEnd(':'));
 
             if (doc != null && ProjectPath != null)
             {                                   // Save new scroll position in project:
@@ -1774,7 +1779,7 @@ namespace DocMgr
             //List<int> listOffset = new();
             //List<int> listWidth = new();
 
-            if (DocName.Text.StartsWith('*'))
+            if (DocName.Text.StartsWith("* "))
                 buttonSaveDoc_Click(null, null);        // Save changes.
 
             string textCopy = new string(richTextBox.Rtf.ToCharArray());    // Back up original text.
@@ -1793,11 +1798,11 @@ namespace DocMgr
                 FindForm ff = new(richTextBox, Root, justDocName, this);
                 ff.ShowDialog();
 
-                //if (ff.ShowDialog() == DialogResult.OK)
-                //{
-                //    string newRtfText = /*RtfHighlighter.*/HighlightSearchStringInRtf(richTextBox.Rtf, "the");
-                //    richTextBox.Rtf = newRtfText;
-                //}
+                if (ff.DisplayedDoc != null && ff.DisplayedDoc.Length > 0)
+                {
+                    HighlightThisButton(ff.DisplayedDoc);
+                    SetProjectsLastDoc(CurrentFilePath);
+                }
             }
             catch (Exception exception)
             {
@@ -1805,21 +1810,9 @@ namespace DocMgr
             }
             finally
             {
-                richTextBox.Rtf = new string(textCopy.ToCharArray());   // Always restore original text.
-                textCopy = null;
                 finding = false;
             }
         }
-
-        //private void RestoreText()
-        //{
-        //    if (TextCopy != null)
-        //    {
-        //        richTextBox.Rtf = TextCopy;
-        //        TextCopy = null;
-        //    }
-        //}
-
 
 
         //public class RtfHighlighter

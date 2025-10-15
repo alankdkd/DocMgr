@@ -24,7 +24,7 @@ namespace DocMgr
         (string docName, string projectPath)? CurrentDoc = null;
         int CurrentDocNum = 0;
         string? CurrentProjectName;
-        string DisplayedDoc;
+        string CurrentDocPath;
         string SearchString;
         Doc CurrentProjectInfo;
         bool DirectionForward = true;
@@ -37,6 +37,7 @@ namespace DocMgr
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
         DocMgr mainForm;
+        public string? DisplayedDoc = null;
 
 
         public FindForm(RichTextBox box, Doc projectRoot, string docName, DocMgr callingForm)
@@ -102,17 +103,17 @@ namespace DocMgr
             if (radioCurrentDoc.Checked)
             {
                 if (DocName != "" && ProjName != "")
-                    DocList.Add(new(DocName, Root.DocPath));                // The only doc.
+                    DocList.Add(new(DocName, Root.DocPath));      // The only doc.
             }
             else
                 if (radioCurrentProject.Checked)
             {
                 if (ProjName != "")
-                    AddProjectsDocsToList(DocList, Root);       // All docs in project.
+                    AddProjectsDocsToList(DocList, Root);     // All docs in project.
             }
             else
-                if (radioAllProjects.Checked)
-                    AddAllProjectsDocsToList(DocList);        // All projects.
+                    if (radioAllProjects.Checked)
+                AddAllProjectsDocsToList(DocList);        // All projects.
         }
 
         private List<(string docName, string projectPath)> GetDocsWithInstances(List<(string docName, string projectPath)> docList)
@@ -170,9 +171,6 @@ namespace DocMgr
             tempRTBox.LoadFile(pathToDoc);
             string rtf = tempRTBox.Rtf;
 
-            // FOLLOWING IS PREMATURE HERE:
-            //string highlightRtf = HighlightSearchStringInRtf(rtf, searchString, matchCase, matchWholeWord);
-            //richTextBox.Rtf = highlightRtf;
             FindMatchesInString(rtf, searchString, matchCase, matchWholeWord);
 
             if (Matches == null)
@@ -349,7 +347,7 @@ namespace DocMgr
 
             if (loadDoc)
             {
-                string CurrentDocPath = GetPathToDoc(currentDoc.Value.docName, CurrentProjectInfo);
+                CurrentDocPath = GetPathToDoc(currentDoc.Value.docName, CurrentProjectInfo);
 
                 if (CurrentDocPath.Length == 0)
                     return;
@@ -547,6 +545,18 @@ namespace DocMgr
         private void FindForm_Shown(object sender, EventArgs e)
         {
             buttonFind.CenterCursorInButton(0, 6);          // This has to be done after the ctor.
+        }
+
+        private void buttonClose_Click(object sender, EventArgs e)
+        {
+            richTextBox.SelectAll();
+            richTextBox.SelectionBackColor = Color.White;
+            richTextBox.DeselectAll();
+            mainForm.CurrentFilePath = CurrentDocPath;
+
+            if (!radioCurrentProject.Checked)
+                DisplayedDoc = "";
+
         }
     }
 }

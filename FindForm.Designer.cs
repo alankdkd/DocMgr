@@ -146,6 +146,7 @@
             buttonClose.TabIndex = 9;
             buttonClose.Text = "&Close";
             buttonClose.UseVisualStyleBackColor = true;
+            buttonClose.Click += buttonClose_Click;
             // 
             // buttonNext
             // 
