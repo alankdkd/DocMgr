@@ -543,12 +543,12 @@ namespace DocMgr
             buttonFind.CenterCursorInButton(0, 6);          // This has to be done after the ctor.
         }
 
-        private void buttonClose_Click(object sender, EventArgs e)
+        private void FindForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            int scrollPos = richTextBox.SelectionStart;
+            int ScrollPos = richTextBox.SelectionStart;
 
-            if (DocList.Count > 0)
-                scrollPos = tempRTBox.SelectionStart;
+            if (DocList != null && DocList.Count > 0)
+                ScrollPos = tempRTBox.SelectionStart;
 
             richTextBox.SelectAll();
             richTextBox.SelectionBackColor = Color.White;
@@ -560,7 +560,8 @@ namespace DocMgr
             if (!radioCurrentProject.Checked)
                 DisplayedDoc = "";
 
-            richTextBox.SelectionStart = scrollPos;
+            richTextBox.SelectionStart = ScrollPos;
+            Close();
         }
     }
 }

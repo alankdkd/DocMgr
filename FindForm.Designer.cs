@@ -146,7 +146,6 @@
             buttonClose.TabIndex = 9;
             buttonClose.Text = "&Close";
             buttonClose.UseVisualStyleBackColor = true;
-            buttonClose.Click += buttonClose_Click;
             // 
             // buttonNext
             // 
@@ -206,11 +205,12 @@
             Controls.Add(textString);
             Controls.Add(label1);
             Controls.Add(groupBox1);
-            Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
             Margin = new Padding(5);
             Name = "FindForm";
             Text = "Find";
             TopMost = true;
+            FormClosed += FindForm_FormClosed;
             Shown += FindForm_Shown;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
