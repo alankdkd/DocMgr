@@ -545,6 +545,11 @@ namespace DocMgr
 
         private void buttonClose_Click(object sender, EventArgs e)
         {
+            int scrollPos = richTextBox.SelectionStart;
+
+            if (DocList.Count > 0)
+                scrollPos = tempRTBox.SelectionStart;
+
             richTextBox.SelectAll();
             richTextBox.SelectionBackColor = Color.White;
             richTextBox.DeselectAll();
@@ -555,6 +560,7 @@ namespace DocMgr
             if (!radioCurrentProject.Checked)
                 DisplayedDoc = "";
 
+            richTextBox.SelectionStart = scrollPos;
         }
     }
 }
