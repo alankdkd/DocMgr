@@ -10,6 +10,8 @@ using System.Drawing.Design;
 using System.ComponentModel;
 using System.Drawing.Printing;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DocMgr
 {
@@ -371,6 +373,7 @@ namespace DocMgr
                 buttons.Add(b);
             }
 
+            buttons = ButtonSorter.SortButtonsByNameCaseInsensitive(buttons);
             ResizeAndAddButtons(buttons);
             ArrangeControls();
             CenterWindowIfOverEdge();
@@ -1128,6 +1131,7 @@ namespace DocMgr
 
         private void buttonNumberLines_Click(object sender, EventArgs e)
         {
+            //NumberSelectedLines(richTextBox);
             string text = richTextBox.SelectedText.Trim();            // Get selected lines to number.
 
             if (text.Length == 0)
@@ -1165,6 +1169,116 @@ namespace DocMgr
             //File.WriteAllText("out.txt", replacementText);
             richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, replacementText);
         }
+
+        private void NumberSelectedLines(RichTextBox richTextBox)       // WORKS BUT DOESN'T APPLY AUTO-NUMBERING PROPERTY.
+        {
+            int selStart = richTextBox.SelectionStart;
+            int selLength = richTextBox.SelectionLength;
+
+            string selectedText = richTextBox.SelectedText;
+
+            if (string.IsNullOrWhiteSpace(selectedText))
+                return;
+
+            // Split selected text into lines
+            string[] lines = selectedText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+            StringBuilder numberedText = new StringBuilder();
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+
+                // Skip last empty line (optional)
+                if (i == lines.Length - 1 && string.IsNullOrEmpty(line))
+                    break;
+
+                // Capture any existing indentation (spaces or tabs)
+                string indent = "";
+                int j = 0;
+                while (j < line.Length && (line[j] == ' ' || line[j] == '\t'))
+                    indent += line[j++];
+
+                // Remove the indentation from the working text
+                string trimmedLine = line.Substring(indent.Length);
+
+                // Apply numbering with preserved indentation
+                numberedText.AppendLine($"{indent}{i + 1}. {trimmedLine}");
+            }
+
+            // Replace the selected text
+            richTextBox.SelectedText = numberedText.ToString();
+
+            // Restore selection (optional)
+            richTextBox.Select(selStart, numberedText.Length);
+        }
+        //private void NumberSelectedLines(RichTextBox richTextBox)
+        //{
+        //    // Get the start and end positions of the selection
+        //    int selStart = richTextBox.SelectionStart;
+        //    int selLength = richTextBox.SelectionLength;
+
+        //    // Get the text within the selection
+        //    string selectedText = richTextBox.SelectedText;
+
+        //    if (string.IsNullOrWhiteSpace(selectedText))
+        //        return;
+
+        //    // Split into lines
+        //    string[] lines = selectedText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+        //    // Build numbered lines
+        //    StringBuilder numberedText = new StringBuilder();
+        //    for (int i = 0; i < lines.Length; i++)
+        //    {
+        //        // Skip empty trailing line in selection (optional)
+        //        if (i == lines.Length - 1 && string.IsNullOrEmpty(lines[i]))
+        //            break;
+
+        //        numberedText.AppendLine($"{i + 1}. {lines[i]}");
+        //    }
+
+        //    // Replace the selected text with numbered text
+        //    richTextBox.SelectedText = numberedText.ToString();
+
+        //    // Restore selection (optional)
+        //    richTextBox.Select(selStart, numberedText.Length);
+        //}
+
+        //private void ApplyNumberingToSelection(RichTextBox rtb)
+        //{
+        //    if (rtb.SelectionLength == 0)
+        //    {
+        //        return; // No text selected
+        //    }
+
+        //    string selectedText = rtb.SelectedText;
+        //    string[] lines = selectedText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+        //    StringBuilder numberedTextBuilder = new StringBuilder();
+        //    int lineNumber = 1;
+
+        //    foreach (string line in lines)
+        //    {
+        //        if (!string.IsNullOrWhiteSpace(line)) // Only number non-empty lines
+        //        {
+        //            numberedTextBuilder.Append($"{lineNumber}. {line}{Environment.NewLine}");
+        //            lineNumber++;
+        //        }
+        //        else
+        //        {
+        //            numberedTextBuilder.Append($"{line}{Environment.NewLine}"); // Keep empty lines as they are
+        //        }
+        //    }
+
+        //    // Remove the trailing newline character if it was added unnecessarily
+        //    if (numberedTextBuilder.Length > 0 && numberedTextBuilder[numberedTextBuilder.Length - 1] == '\n')
+        //    {
+        //        numberedTextBuilder.Length -= Environment.NewLine.Length;
+        //    }
+
+        //    rtb.SelectedText = numberedTextBuilder.ToString();
+        //}
 
         private IEnumerable<string> GetLines(string text)
         {
@@ -2235,6 +2349,26 @@ namespace DocMgr
         internal bool IsNull()
         {
             return Left == -1 && Right == -1 && Top == -1 && Bottom == -1;
+        }
+    }
+
+public static class ButtonSorter
+    {
+        /// <summary>
+        /// Sorts a list of Buttons by their Name property, case-insensitively.
+        /// From ChatGPT.
+        /// </summary>
+        /// <param name="buttons">The list of Buttons to sort.</param>
+        /// <returns>A new list of Buttons sorted by name, case-insensitively.</returns>
+        public static List<Button> SortButtonsByNameCaseInsensitive(List<Button> buttons)
+        {
+            if (buttons == null)
+            {
+                return new List<Button>(); // Return an empty list or handle as appropriate
+            }
+
+            // Use OrderBy with StringComparer.OrdinalIgnoreCase for case-insensitive sorting
+            return buttons.OrderBy(button => button.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
     }
 }
