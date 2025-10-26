@@ -77,6 +77,7 @@ namespace DocMgr
             CurrentProjectName = null;
             DisplayedDoc = "";
 
+            
             ShowDoc(DocList[CurrentDocNum]);
             buttonNext.Focus();
             Cursor.Current = Cursors.Default;
@@ -171,7 +172,7 @@ namespace DocMgr
             tempRTBox.LoadFile(pathToDoc);
             string rtf = tempRTBox.Rtf;
 
-            FindMatchesInString(rtf, searchString, matchCase, matchWholeWord);
+            FindMatchesInString(tempRTBox.Text, searchString, matchCase, matchWholeWord);
 
             if (Matches == null)
                 numMatches = 0;
@@ -265,6 +266,7 @@ namespace DocMgr
 
         private void MoveHighlightedWord(bool moveMatchUp)
         {
+            int searchStart = 0;
             tempRTBox.Select(OrangeStart, OrangeLength);
             tempRTBox.SelectionBackColor = Color.Yellow;
 
@@ -296,11 +298,17 @@ namespace DocMgr
             }
 
             Match match = Matches[MatchOrderInDoc];
+            string value = match.Value;
+            int found;
 
-            tempRTBox.Select(match.Index, match.Length);
+            if ((found = GetRealLocationInString(value, tempRTBox, searchStart)) == -1)
+                return;
+
+            tempRTBox.Select(found, match.Length);
             tempRTBox.SelectionBackColor = Color.Orange;
-            OrangeStart = match.Index;
+            OrangeStart = found;
             OrangeLength = match.Length;
+            searchStart = found + value.Length;
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -330,6 +338,7 @@ namespace DocMgr
                 return;
             }
 
+            int searchStart = 0;
             bool loadDoc = false;
             string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
             labelInstanceOrder.Text = position;
@@ -359,7 +368,7 @@ namespace DocMgr
             SearchString = textString.Text;
             MatchCase = checkMatchCase.Checked;
             MatchWholeWord = checkMatchWholeWord.Checked;
-            FindMatchesInString(tempRTBox.Rtf, SearchString, MatchCase, MatchWholeWord);
+            FindMatchesInString(tempRTBox.Text, SearchString, MatchCase, MatchWholeWord);
 
             string highlightedRtf = HighlightSearchStringInRtf(tempRTBox);
 
@@ -371,10 +380,15 @@ namespace DocMgr
             MatchOrderInDoc = DirectionForward ? 0 : NumMatches - 1;
 
             Match match = Matches[MatchOrderInDoc];
-            OrangeStart = match.Index;
-            OrangeLength = match.Length;
-            tempRTBox.Select(OrangeStart, OrangeLength);
+            string value = match.Value;
+
+            int found = GetRealLocationInString(value, tempRTBox, searchStart);
+
+            tempRTBox.Select(found, match.Length);
             tempRTBox.SelectionBackColor = Color.Orange;
+            OrangeStart = found;
+            OrangeLength = match.Length;
+            searchStart = found + value.Length;
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -452,19 +466,10 @@ namespace DocMgr
         /// Locate the offset and length of each match in the text and set Matches collection.
         /// </summary>
         /// <returns></returns>
-        public void FindMatchesInString(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
+        public void FindMatchesInString(string plainText, string searchString, bool caseSensitive = false, bool wholeWord = false)
         {
-            if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
+            if (string.IsNullOrEmpty(plainText) || string.IsNullOrEmpty(searchString))
                 return;
-
-            string plainText;
-
-            // Load RTF into RichTextBox
-            using (RichTextBox rtb = new RichTextBox())
-            {
-                rtb.Rtf = rtf;
-                plainText = rtb.Text;
-            }
 
             // Build regex pattern
             string pattern = Regex.Escape(searchString);
@@ -477,15 +482,6 @@ namespace DocMgr
             // Find matches:
             Matches = regex.Matches(plainText);
 
-            //// Apply yellow background highlight to matches
-            //foreach (Match match in Matches)
-            //{
-            //    rtb.Select(match.Index, match.Length);
-            //    rtb.SelectionBackColor = Color.Yellow;
-            //    RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
-            //}
-
-            //return rtb.Rtf;
         }
 
         // BREAK OUT SEPARATE MATCH-FINDING AND YELLOW HIGHLIGHTING.
@@ -495,16 +491,64 @@ namespace DocMgr
         /// <returns></returns>
         public string HighlightSearchStringInRtf(RichTextBox rtb)
         {
+            int searchStart = 0;
+            int found;
+
+            //if (MatchCase)
+            //    rtbFinds |= RichTextBoxFinds.MatchCase;
+
+            //if (MatchWholeWord)
+            //    rtbFinds |= RichTextBoxFinds.WholeWord;
 
             // Apply yellow background highlight to matches
             foreach (Match match in Matches)
             {
-                rtb.Select(match.Index, match.Length);
-                rtb.SelectionBackColor = Color.Yellow;
-                RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+                string value = match.Value;
+                if ((found = GetRealLocationInString(value, rtb, searchStart)) == -1)
+                    break;
+
+                rtb.SelectionStart = found;
+                rtb.SelectionLength = value.Length;
+                rtb.SelectionBackColor = Color.Yellow; // or whatever highlight
+
+                // continue searching after this occurrence
+                searchStart = found + value.Length;
+
+                if (searchStart >= rtb.Text.Length)
+                    break;
             }
 
             return rtb.Rtf;
+        }
+
+        // Find the next occurrence of this exact value inside the control (respects control indexing).
+        // Was forced to add this because the match results are incorrect past other RTF objects, like
+        // images.  It's wasteful since we use both regex and RichTextBox to do redundant searches.
+        // But it works.  (Will optimize later if people are paying money for this.)
+        public int GetRealLocationInString(string value, RichTextBox rtb, int searchStart)
+        {
+            RichTextBoxFinds rtbFinds = RichTextBoxFinds.None;
+
+            if (MatchCase)
+                rtbFinds |= RichTextBoxFinds.MatchCase;
+
+            if (MatchWholeWord)
+                rtbFinds |= RichTextBoxFinds.WholeWord;
+
+            int found = richTextBox.Find(value, searchStart, rtbFinds);
+
+            if (found == -1)
+            {
+                // fallback: try from 0 (or skip). Shouldn't happen but this beats failing.
+                found = rtb.Find(value, 0, rtbFinds);
+
+                if (found == -1)
+                    return -1;
+
+                searchStart = found + value.Length;
+            }
+
+            return found;
         }
 
         public static class RichTextBoxScroller

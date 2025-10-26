@@ -1896,7 +1896,7 @@ namespace DocMgr
             if (DocName.Text.StartsWith("* "))
                 buttonSaveDoc_Click(null, null);        // Save changes.
 
-            string textCopy = new string(richTextBox.Rtf.ToCharArray());    // Back up original text.
+            //string textCopy = new string(richTextBox.Rtf.ToCharArray());    // Back up original text.
             int docNameLength = DocName.Text.Length;
 
             if (docNameLength == 0)
