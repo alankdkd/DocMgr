@@ -33,6 +33,7 @@ namespace DocMgr
         int OrangeStart, OrangeLength;
         bool MatchCase;
         bool MatchWholeWord;
+        static string SearchText;
 
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
@@ -54,6 +55,7 @@ namespace DocMgr
             // Set specific screen coordinates (e.g., X = 200, Y = 150)
             this.Location = new Point(box.Right + 20, box.Bottom - Height);
             Cursor.Position = new Point(textString.Left + 10, textString.Top + 8);
+            textString.Text = SearchText;
             this.textString.Focus();
         }
 
@@ -62,6 +64,7 @@ namespace DocMgr
             Cursor.Current = Cursors.WaitCursor;
             labelFindResults.Text = "";
             labelInstanceOrder.Text = "";
+            SearchText = textString.Text;
             GetDocsInScope(DocList);
             DocList = GetDocsWithInstances(DocList);
             buttonNext.Enabled = DocList.Count > 0;
@@ -266,7 +269,11 @@ namespace DocMgr
 
         private void MoveHighlightedWord(bool moveMatchUp)
         {
-            int searchStart = 0;
+            int searchStart = OrangeStart + OrangeLength;
+
+            if (!moveMatchUp)
+                searchStart = OrangeStart;
+
             tempRTBox.Select(OrangeStart, OrangeLength);
             tempRTBox.SelectionBackColor = Color.Yellow;
 
@@ -535,17 +542,22 @@ namespace DocMgr
             if (MatchWholeWord)
                 rtbFinds |= RichTextBoxFinds.WholeWord;
 
-            int found = richTextBox.Find(value, searchStart, rtbFinds);
+            if (!DirectionForward)
+                rtbFinds |= RichTextBoxFinds.Reverse;
+
+            int found = rtb.Find(value, searchStart, rtbFinds);
 
             if (found == -1)
             {
                 // fallback: try from 0 (or skip). Shouldn't happen but this beats failing.
-                found = rtb.Find(value, 0, rtbFinds);
+                //found = rtb.Find(value, 0, rtbFinds);
 
-                if (found == -1)
-                    return -1;
+                //if (found == -1)
+                //    return -1;
 
-                searchStart = found + value.Length;
+                //searchStart = found + value.Length;
+
+                MessageBox.Show("found is -1");
             }
 
             return found;
