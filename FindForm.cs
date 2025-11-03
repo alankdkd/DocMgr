@@ -269,13 +269,30 @@ namespace DocMgr
 
         private void MoveHighlightedWord(bool moveMatchUp)
         {
-            int searchStart = OrangeStart + OrangeLength;
+            // Determine safe searchStart for Find
+            int rtbMaxIndex = Math.Max(0, tempRTBox.TextLength - 1);
+            int searchStart;
 
-            if (!moveMatchUp)
-                searchStart = OrangeStart;
+            if (moveMatchUp)
+            {
+                // start AFTER current highlighted match
+                long possible = (long)OrangeStart + (long)OrangeLength;
+                searchStart = (int)Math.Min(Math.Max(0, possible), rtbMaxIndex);
+            }
+            else
+            {
+                // start BEFORE current highlighted match (or at doc end if none)
+                searchStart = (OrangeStart > 0) ? OrangeStart - 1 : rtbMaxIndex;
+            }
 
-            tempRTBox.Select(OrangeStart, OrangeLength);
-            tempRTBox.SelectionBackColor = Color.Yellow;
+            // De-emphasize previous orange highlight only if valid
+            if (OrangeStart >= 0 && OrangeLength > 0 &&
+                OrangeStart <= tempRTBox.TextLength &&
+                OrangeStart + OrangeLength <= tempRTBox.TextLength)
+            {
+                tempRTBox.Select(OrangeStart, OrangeLength);
+                tempRTBox.SelectionBackColor = Color.Yellow;
+            }
 
             if (moveMatchUp)
                 ++MatchOrderInDoc;
@@ -285,10 +302,8 @@ namespace DocMgr
             if (MatchOrderInDoc == -1)
             {
                 --CurrentDocNum;
-
                 if (CurrentDocNum == -1)
-                    CurrentDocNum = DocList.Count() - 1;
-
+                    CurrentDocNum = DocList.Count - 1;
                 ShowDoc(DocList[CurrentDocNum]);
                 return;
             }
@@ -296,26 +311,37 @@ namespace DocMgr
             if (MatchOrderInDoc == NumMatches)
             {
                 ++CurrentDocNum;
-
                 if (CurrentDocNum == DocList.Count)
                     CurrentDocNum = 0;
-
                 ShowDoc(DocList[CurrentDocNum]);
                 return;
             }
 
-            Match match = Matches[MatchOrderInDoc];
-            string value = match.Value;
-            int found;
-
-            if ((found = GetRealLocationInString(value, tempRTBox, searchStart)) == -1)
+            if (Matches == null || Matches.Count == 0)
                 return;
 
-            tempRTBox.Select(found, match.Length);
+            Match match = Matches[MatchOrderInDoc];
+            string value = match.Value;
+
+            int found = GetRealLocationInString(value, tempRTBox, searchStart);
+
+            // If RichTextBox.Find couldn't locate the exact RTF-aware position, fall back safely
+            if (found == -1)
+            {
+                if (match.Index >= 0 && match.Index + match.Length <= tempRTBox.TextLength)
+                    found = match.Index;
+                else
+                    return; // can't find a safe position, bail out
+            }
+
+            int selLength = match.Length;
+            if (found + selLength > tempRTBox.TextLength)
+                selLength = Math.Max(0, tempRTBox.TextLength - found);
+
+            tempRTBox.Select(found, selLength);
             tempRTBox.SelectionBackColor = Color.Orange;
             OrangeStart = found;
-            OrangeLength = match.Length;
-            searchStart = found + value.Length;
+            OrangeLength = selLength;
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -324,14 +350,12 @@ namespace DocMgr
 
             if (match.Index < firstVisibleCharIndex || match.Index > lastVisibleCharIndex)
             {
-                // It's off-screen — move caret and scroll
                 richTextBox.SelectionStart = match.Index;
                 richTextBox.SelectionLength = match.Length;
                 richTextBox.ScrollToCaret();
             }
             else
             {
-                // It's already visible — just update the selection
                 richTextBox.SelectionStart = match.Index;
                 richTextBox.SelectionLength = match.Length;
             }
@@ -345,7 +369,6 @@ namespace DocMgr
                 return;
             }
 
-            int searchStart = 0;
             bool loadDoc = false;
             string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
             labelInstanceOrder.Text = position;
@@ -353,7 +376,6 @@ namespace DocMgr
             if (currentDoc.Value.projectPath != CurrentProjectName)
             {
                 loadDoc = true;                             // If loading project, need to load doc.
-
                 if (!LoadCurrentProject(currentDoc))        // Project out of date.  Load project.
                     return;
             }
@@ -364,13 +386,15 @@ namespace DocMgr
             if (loadDoc)
             {
                 CurrentDocPath = GetPathToDoc(currentDoc.Value.docName, CurrentProjectInfo);
-
                 if (CurrentDocPath.Length == 0)
                     return;
 
                 tempRTBox.LoadFile(CurrentDocPath);
                 DisplayedDoc = currentDoc.Value.docName;
             }
+
+            // Compute searchStart after loading the doc so we have a valid TextLength.
+            int searchStart = DirectionForward ? 0 : Math.Max(0, tempRTBox.TextLength - 1);
 
             SearchString = textString.Text;
             MatchCase = checkMatchCase.Checked;
@@ -379,11 +403,10 @@ namespace DocMgr
 
             string highlightedRtf = HighlightSearchStringInRtf(tempRTBox);
 
-            NumMatches = Matches.Count();
-
-            if (NumMatches == 0)
+            if (Matches == null || Matches.Count == 0)
                 return;
 
+            NumMatches = Matches.Count();
             MatchOrderInDoc = DirectionForward ? 0 : NumMatches - 1;
 
             Match match = Matches[MatchOrderInDoc];
@@ -391,11 +414,45 @@ namespace DocMgr
 
             int found = GetRealLocationInString(value, tempRTBox, searchStart);
 
-            tempRTBox.Select(found, match.Length);
+            // Guard against -1 and try safe fallbacks
+            if (found == -1)
+            {
+                if (match.Index >= 0 && match.Index + match.Length <= tempRTBox.TextLength)
+                {
+                    found = match.Index;
+                }
+                else
+                {
+                    // final attempt: plain Find respecting flags
+                    try
+                    {
+                        RichTextBoxFinds flags = RichTextBoxFinds.None;
+                        if (MatchCase) flags |= RichTextBoxFinds.MatchCase;
+                        if (MatchWholeWord) flags |= RichTextBoxFinds.WholeWord;
+
+                        if (DirectionForward)
+                            found = tempRTBox.Find(value, 0, flags);
+                        else
+                            found = GetRealLocationInString(value, tempRTBox, tempRTBox.TextLength - 1);
+                    }
+                    catch
+                    {
+                        found = -1;
+                    }
+
+                    if (found == -1)
+                        return; // can't locate safely
+                }
+            }
+
+            int length = match.Length;
+            if (found + length > tempRTBox.TextLength)
+                length = Math.Max(0, tempRTBox.TextLength - found);
+
+            tempRTBox.Select(found, length);
             tempRTBox.SelectionBackColor = Color.Orange;
             OrangeStart = found;
-            OrangeLength = match.Length;
-            searchStart = found + value.Length;
+            OrangeLength = length;
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -535,29 +592,37 @@ namespace DocMgr
         public int GetRealLocationInString(string value, RichTextBox rtb, int searchStart)
         {
             RichTextBoxFinds rtbFinds = RichTextBoxFinds.None;
-
             if (MatchCase)
                 rtbFinds |= RichTextBoxFinds.MatchCase;
-
             if (MatchWholeWord)
                 rtbFinds |= RichTextBoxFinds.WholeWord;
-
             if (!DirectionForward)
                 rtbFinds |= RichTextBoxFinds.Reverse;
 
-            int found = rtb.Find(value, searchStart, rtbFinds);
+            if (rtb == null || string.IsNullOrEmpty(value))
+                return -1;
 
-            if (found == -1)
+            int found = -1;
+
+            try
             {
-                // fallback: try from 0 (or skip). Shouldn't happen but this beats failing.
-                //found = rtb.Find(value, 0, rtbFinds);
+                int maxIndex = Math.Max(0, rtb.TextLength - 1);
 
-                //if (found == -1)
-                //    return -1;
-
-                //searchStart = found + value.Length;
-
-                MessageBox.Show("found is -1");
+                if (DirectionForward)
+                {
+                    int startIndex = Math.Max(0, Math.Min(searchStart, maxIndex));
+                    found = rtb.Find(value, startIndex, rtbFinds);
+                }
+                else
+                {
+                    int startIndex = (searchStart > 0) ? Math.Min(searchStart - 1, maxIndex) : maxIndex;
+                    startIndex = Math.Max(0, startIndex); // guard
+                    found = rtb.Find(value, startIndex, 0, rtbFinds);
+                }
+            }
+            catch (ArgumentException)
+            {
+                found = -1;
             }
 
             return found;
