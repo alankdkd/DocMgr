@@ -272,9 +272,14 @@ namespace DocMgr
             int searchStart = OrangeStart + OrangeLength;
 
             if (!moveMatchUp)
-                searchStart = OrangeStart;
+            {
+                searchStart = OrangeStart - 1;
 
-            tempRTBox.Select(OrangeStart, OrangeLength);
+                if (searchStart < 0)
+                    searchStart = tempRTBox.Text.Length - 1;
+            }
+
+            tempRTBox.Select(OrangeStart, OrangeLength);        // Restore yellow background.
             tempRTBox.SelectionBackColor = Color.Yellow;
 
             if (moveMatchUp)
@@ -284,25 +289,74 @@ namespace DocMgr
 
             if (MatchOrderInDoc == -1)
             {
-                --CurrentDocNum;
+                if (DocList.Count == 1)
+                {
+                    MatchOrderInDoc = Matches.Count - 1;        // 1 doc; just wrap around.
+                    searchStart = tempRTBox.Text.Length - 1;
+                }
+                else
+                {
+                    --CurrentDocNum;
 
-                if (CurrentDocNum == -1)
-                    CurrentDocNum = DocList.Count() - 1;
+                    if (CurrentDocNum == -1)
+                        CurrentDocNum = DocList.Count() - 1;
 
-                ShowDoc(DocList[CurrentDocNum]);
-                return;
+                    ShowDoc(DocList[CurrentDocNum]);
+                    return;
+                }
             }
-
+            else
             if (MatchOrderInDoc == NumMatches)
             {
-                ++CurrentDocNum;
+                if (DocList.Count == 1)
+                {
+                    MatchOrderInDoc = 0;                        // 1 doc; just wrap around.
+                    searchStart = 0;
+                }
+                else
+                {
+                    if (moveMatchUp)
+                        ++CurrentDocNum;
+                    else
+                        --CurrentDocNum;
 
-                if (CurrentDocNum == DocList.Count)
-                    CurrentDocNum = 0;
+                    if (CurrentDocNum == DocList.Count)
+                        CurrentDocNum = 0;
+                    else
+                    if (CurrentDocNum < 0)
+                        CurrentDocNum = DocList.Count - 1;
 
-                ShowDoc(DocList[CurrentDocNum]);
-                return;
+                    ShowDoc(DocList[CurrentDocNum]);
+                    return;
+                }
             }
+            //ORIG:
+            //if (moveMatchUp)
+            //    ++MatchOrderInDoc;
+            //else
+            //    --MatchOrderInDoc;
+
+            //if (MatchOrderInDoc == -1)
+            //{
+            //    --CurrentDocNum;
+
+            //    if (CurrentDocNum == -1)
+            //        CurrentDocNum = DocList.Count() - 1;
+
+            //    ShowDoc(DocList[CurrentDocNum]);
+            //    return;
+            //}
+            //else
+            //if (moveMatchUp  &&  MatchOrderInDoc == NumMatches)
+            //{
+            //    ++CurrentDocNum;
+
+            //    if (CurrentDocNum == DocList.Count)
+            //        CurrentDocNum = 0;
+
+            //    ShowDoc(DocList[CurrentDocNum]);
+            //    return;
+            //}
 
             Match match = Matches[MatchOrderInDoc];
             string value = match.Value;
@@ -315,7 +369,11 @@ namespace DocMgr
             tempRTBox.SelectionBackColor = Color.Orange;
             OrangeStart = found;
             OrangeLength = match.Length;
-            searchStart = found + value.Length;
+
+            if (moveMatchUp)
+                searchStart = found + value.Length;
+            else
+                searchStart = found - 1;
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -350,7 +408,7 @@ namespace DocMgr
             string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
             labelInstanceOrder.Text = position;
 
-            if (currentDoc.Value.projectPath != CurrentProjectName)
+            if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath)  !=  CurrentProjectName)
             {
                 loadDoc = true;                             // If loading project, need to load doc.
 
@@ -545,7 +603,11 @@ namespace DocMgr
             if (!DirectionForward)
                 rtbFinds |= RichTextBoxFinds.Reverse;
 
-            int found = rtb.Find(value, searchStart, rtbFinds);
+            int found;
+            if (DirectionForward)
+                found = rtb.Find(value, searchStart, rtbFinds);
+            else
+                found = FindPrevious(value, searchStart, rtb);
 
             if (found == -1)
             {
@@ -562,8 +624,42 @@ namespace DocMgr
 
             return found;
         }
+//        using System;
+//using System.Windows.Forms;
 
-        public static class RichTextBoxScroller
+//public static class RichTextBoxHelper
+//    {
+        /// <summary>
+        /// Finds the first occurrence of a search string to the left of a given position in a RichTextBox.
+        /// </summary>
+        /// <param name="rtb">The RichTextBox to search in.</param>
+        /// <param name="position">The reference position (search ends before this index).</param>
+        /// <param name="searchText">The string to search for.</param>
+        /// <returns>
+        /// The index of the last occurrence before the given position, 
+        /// or -1 if not found to the left.  From ChatGPT.
+        /// </returns>
+        public static int FindPrevious(string searchText, int position, RichTextBox rtb)
+        {
+            if (rtb == null)
+                throw new ArgumentNullException(nameof(rtb));
+            if (searchText == null)
+                throw new ArgumentNullException(nameof(searchText));
+            if (position < 0 || position > rtb.TextLength)
+                throw new ArgumentOutOfRangeException(nameof(position));
+
+            if (position == 0)
+                return -1;
+
+            // Search from the beginning up to position - 1
+            int searchEnd = position - 1;
+
+            int index = rtb.Text.LastIndexOf(searchText, searchEnd, StringComparison.OrdinalIgnoreCase);
+            return index;
+        }
+    //}
+
+    public static class RichTextBoxScroller
         {
             [DllImport("user32.dll")]
             private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
