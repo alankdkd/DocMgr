@@ -311,7 +311,7 @@ namespace DocMgr
                 if (DocList.Count == 1)
                 {
                     MatchOrderInDoc = 0;                        // 1 doc; just wrap around.
-                    searchStart = 0;
+                    searchStart = (moveMatchUp) ? 0 : tempRTBox.Text.Length - 1;
                 }
                 else
                 {
@@ -373,7 +373,7 @@ namespace DocMgr
             if (moveMatchUp)
                 searchStart = found + value.Length;
             else
-                searchStart = found - 1;
+                searchStart = found - 1;                        // PROBLEM IF found IS ZERO!
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -403,12 +403,12 @@ namespace DocMgr
                 return;
             }
 
-            int searchStart = 0;
+            int searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length - 1;
             bool loadDoc = false;
             string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
             labelInstanceOrder.Text = position;
 
-            if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath)  !=  CurrentProjectName)
+             if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath)  !=  CurrentProjectName)
             {
                 loadDoc = true;                             // If loading project, need to load doc.
 
@@ -449,11 +449,21 @@ namespace DocMgr
 
             int found = GetRealLocationInString(value, tempRTBox, searchStart);
 
+            if (found == -1)
+            {
+                MessageBox.Show("Problem finding.  Please retry.");
+                return;
+            }
+
             tempRTBox.Select(found, match.Length);
             tempRTBox.SelectionBackColor = Color.Orange;
             OrangeStart = found;
             OrangeLength = match.Length;
-            searchStart = found + value.Length;
+
+            if (DirectionForward)
+                searchStart = found + value.Length;
+            else
+                searchStart = found - 1;                    // PROBLEM IF found IS ZERO!
 
             richTextBox.Rtf = tempRTBox.Rtf;
 
@@ -559,6 +569,8 @@ namespace DocMgr
             int searchStart = 0;
             int found;
 
+            if (!DirectionForward)
+                searchStart = rtb.Text.Length - 1;
             //if (MatchCase)
             //    rtbFinds |= RichTextBoxFinds.MatchCase;
 
@@ -577,9 +589,12 @@ namespace DocMgr
                 rtb.SelectionBackColor = Color.Yellow; // or whatever highlight
 
                 // continue searching after this occurrence
-                searchStart = found + value.Length;
+                if (DirectionForward)
+                    searchStart = found + value.Length;
+                else
+                    searchStart = found - 1;
 
-                if (searchStart >= rtb.Text.Length)
+                if (searchStart >= rtb.Text.Length  || searchStart < 0)
                     break;
             }
 
@@ -607,7 +622,8 @@ namespace DocMgr
             if (DirectionForward)
                 found = rtb.Find(value, searchStart, rtbFinds);
             else
-                found = FindPrevious(value, searchStart, rtb);
+                found = rtb.Find(value, 0, searchStart, rtbFinds);
+            //found = FindPrevious(value, searchStart, rtb);
 
             if (found == -1)
             {
