@@ -1029,7 +1029,7 @@ namespace DocMgr
             richTextBox.Focus();
         }
 
-        bool RichTextBoxContainsImage(RichTextBox richTextBox)
+        bool RichTextBoxContainsImage(RtfRichTextBox richTextBox)
         {
             string rtf = richTextBox.Rtf;
             return rtf.Contains(@"\pict");
@@ -1170,7 +1170,7 @@ namespace DocMgr
             richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, replacementText);
         }
 
-        private void NumberSelectedLines(RichTextBox richTextBox)       // WORKS BUT DOESN'T APPLY AUTO-NUMBERING PROPERTY.
+        private void NumberSelectedLines(RtfRichTextBox richTextBox)       // WORKS BUT DOESN'T APPLY AUTO-NUMBERING PROPERTY.
         {
             int selStart = richTextBox.SelectionStart;
             int selLength = richTextBox.SelectionLength;
@@ -1212,7 +1212,7 @@ namespace DocMgr
             // Restore selection (optional)
             richTextBox.Select(selStart, numberedText.Length);
         }
-        //private void NumberSelectedLines(RichTextBox richTextBox)
+        //private void NumberSelectedLines(RtfRichTextBox richTextBox)
         //{
         //    // Get the start and end positions of the selection
         //    int selStart = richTextBox.SelectionStart;
@@ -1245,7 +1245,7 @@ namespace DocMgr
         //    richTextBox.Select(selStart, numberedText.Length);
         //}
 
-        //private void ApplyNumberingToSelection(RichTextBox rtb)
+        //private void ApplyNumberingToSelection(RtfRichTextBox rtb)
         //{
         //    if (rtb.SelectionLength == 0)
         //    {
@@ -1656,11 +1656,11 @@ namespace DocMgr
         /***
         private void WriteTextToRichTextBox()
         {
-           // Clear all text from the RichTextBox;
+           // Clear all text from the RtfRichTextBox;
            //richTextBox.Clear();
            // Set the font for the opening text to a larger Arial font;
            richTextBox.SelectionFont = new Font("Arial", 16);
-           // Assign the introduction text to the RichTextBox control.
+           // Assign the introduction text to the RtfRichTextBox control.
            richTextBox.SelectedText = "The following is a list of bulleted items:" + "\n";
            // Set the Font for the first item to a smaller size Arial font.
            richTextBox.SelectionFont = new Font("Arial", 12);
@@ -1844,7 +1844,7 @@ namespace DocMgr
         }
 
         // FormatRange: Uses Win32 message to render RTF content to a device context
-        private int FormatRange(int charFrom, int charTo, PrintPageEventArgs e, RichTextBox rtb)
+        private int FormatRange(int charFrom, int charTo, PrintPageEventArgs e, RtfRichTextBox rtb)
         {
             IntPtr hdc = e.Graphics.GetHdc();
 
@@ -1877,7 +1877,7 @@ namespace DocMgr
             return textPrinted;
         }
 
-        private void FormatRangeDone(RichTextBox rtb)
+        private void FormatRangeDone(RtfRichTextBox rtb)
         {
             SendMessage(rtb.Handle, EM_FORMATRANGE, (IntPtr)0, IntPtr.Zero);
         }
@@ -1936,8 +1936,8 @@ namespace DocMgr
         //    if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
         //        return rtf;
 
-        //    // Load RTF into RichTextBox
-        //    RichTextBox rtb = new RichTextBox();
+        //    // Load RTF into RtfRichTextBox
+        //    RtfRichTextBox rtb = new RtfRichTextBox();
         //    rtb.Rtf = rtf;
         //    string plainText = rtb.Text;
 
@@ -2039,14 +2039,14 @@ namespace DocMgr
         //    private const int EM_GETFIRSTVISIBLELINE = 0x00CE;
         //    private const int EM_LINESCROLL = 0x00B6;
 
-        //    public static void ScrollToOffsetCenter(RichTextBox rtb, int offset)
+        //    public static void ScrollToOffsetCenter(RtfRichTextBox rtb, int offset)
         //    {
         //        if (offset < 0 || offset > rtb.TextLength)
         //            return;
 
         //        int lineIndex = rtb.GetLineFromCharIndex(offset);
 
-        //        // Get the number of visible lines in the RichTextBox
+        //        // Get the number of visible lines in the RtfRichTextBox
         //        int charIndexTopLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, 1));
         //        int firstVisibleLine = rtb.GetLineFromCharIndex(charIndexTopLeft);
         //        int charIndexBottomLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, rtb.ClientSize.Height - 1));
@@ -2097,8 +2097,8 @@ namespace DocMgr
         //           if (string.IsNullOrEmpty(rtf) || string.IsNullOrEmpty(searchString))
         //               return rtf;
 
-        //           // Load RTF into RichTextBox
-        //           RichTextBox rtb = new RichTextBox();
+        //           // Load RTF into RtfRichTextBox
+        //           RtfRichTextBox rtb = new RtfRichTextBox();
         //           rtb.Rtf = rtf;
         //           string plainText = rtb.Text;
 
@@ -2149,13 +2149,13 @@ namespace DocMgr
                 e.Handled = true; // Optional: Prevent further processing
             }
         }
-        private void ScrollToBeginning(RichTextBox richTextBox)
+        private void ScrollToBeginning(RtfRichTextBox richTextBox)
         {
             richTextBox.SelectionStart = 0; // Set selection start to the beginning
             richTextBox.ScrollToCaret();    // Scroll to the caret
         }
 
-        private void ScrollToEnd(RichTextBox richTextBox)
+        private void ScrollToEnd(RtfRichTextBox richTextBox)
         {
             richTextBox.SelectionStart = richTextBox.Text.Length; // Set selection start to the end
             richTextBox.ScrollToCaret();    // Scroll to the caret

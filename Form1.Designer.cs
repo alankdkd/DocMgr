@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            richTextBox = new RichTextBox();
+            richTextBox = new RtfRichTextBox();
             DocName = new Label();
             buttonClose = new Button();
             ProjectName = new Label();
@@ -387,7 +387,7 @@
 
         #endregion
 
-        private RichTextBox richTextBox;
+        private RtfRichTextBox richTextBox;
         public Label DocName;
         public Label ProjectName;
         private Button buttonClose;

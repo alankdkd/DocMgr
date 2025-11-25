@@ -15,7 +15,7 @@ namespace DocMgr
 {
     public partial class FindForm : Form
     {
-        RichTextBox richTextBox, tempRTBox = new();
+        RtfRichTextBox richTextBox, tempRTBox = new();
         string DocName, ProjName;
         //List<int> listOffset;
         //List<int> listWidth;
@@ -41,7 +41,7 @@ namespace DocMgr
         public string? DisplayedDoc = null;
 
 
-        public FindForm(RichTextBox box, Doc projectRoot, string docName, DocMgr callingForm)
+        public FindForm(RtfRichTextBox box, Doc projectRoot, string docName, DocMgr callingForm)
         {
             InitializeComponent();
             richTextBox = box;
@@ -564,7 +564,7 @@ namespace DocMgr
         /// Highlights match instances found in yellow.
         /// </summary>
         /// <returns></returns>
-        public string HighlightSearchStringInRtf(RichTextBox rtb)
+        public string HighlightSearchStringInRtf(RtfRichTextBox rtb)
         {
             int searchStart = 0;
             int found;
@@ -603,9 +603,9 @@ namespace DocMgr
 
         // Find the next occurrence of this exact value inside the control (respects control indexing).
         // Was forced to add this because the match results are incorrect past other RTF objects, like
-        // images.  It's wasteful since we use both regex and RichTextBox to do redundant searches.
+        // images.  It's wasteful since we use both regex and RtfRichTextBox to do redundant searches.
         // But it works.  (Will optimize later if people are paying money for this.)
-        public int GetRealLocationInString(string value, RichTextBox rtb, int searchStart)
+        public int  GetRealLocationInString(string value, RtfRichTextBox rtb, int searchStart)
         {
             RichTextBoxFinds rtbFinds = RichTextBoxFinds.None;
 
@@ -646,16 +646,16 @@ namespace DocMgr
 //public static class RichTextBoxHelper
 //    {
         /// <summary>
-        /// Finds the first occurrence of a search string to the left of a given position in a RichTextBox.
+        /// Finds the first occurrence of a search string to the left of a given position in a RtfRichTextBox.
         /// </summary>
-        /// <param name="rtb">The RichTextBox to search in.</param>
+        /// <param name="rtb">The RtfRichTextBox to search in.</param>
         /// <param name="position">The reference position (search ends before this index).</param>
         /// <param name="searchText">The string to search for.</param>
         /// <returns>
         /// The index of the last occurrence before the given position, 
         /// or -1 if not found to the left.  From ChatGPT.
         /// </returns>
-        public static int FindPrevious(string searchText, int position, RichTextBox rtb)
+        public static int FindPrevious(string searchText, int position, RtfRichTextBox rtb)
         {
             if (rtb == null)
                 throw new ArgumentNullException(nameof(rtb));
@@ -683,14 +683,14 @@ namespace DocMgr
             private const int EM_GETFIRSTVISIBLELINE = 0x00CE;
             private const int EM_LINESCROLL = 0x00B6;
 
-            public static void ScrollToOffsetCenter(RichTextBox rtb, int offset)
+            public static void ScrollToOffsetCenter(RtfRichTextBox rtb, int offset)
             {
                 if (offset < 0 || offset > rtb.TextLength)
                     return;
 
                 int lineIndex = rtb.GetLineFromCharIndex(offset);
 
-                // Get the number of visible lines in the RichTextBox
+                // Get the number of visible lines in the RtfRichTextBox
                 int charIndexTopLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, 1));
                 int firstVisibleLine = rtb.GetLineFromCharIndex(charIndexTopLeft);
                 int charIndexBottomLeft = rtb.GetCharIndexFromPosition(new System.Drawing.Point(1, rtb.ClientSize.Height - 1));

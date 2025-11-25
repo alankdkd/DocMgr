@@ -19,6 +19,9 @@
     <Compile Update="PropertiesForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="RtfRichTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="CreateFolderDialog.resx">

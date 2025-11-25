@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="old\**" />
+    <EmbeddedResource Remove="old\**" />
+    <None Remove="old\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="NullableIntConverter.cs" />
   </ItemGroup>
 
