@@ -380,17 +380,17 @@ namespace DocMgr
             int firstVisibleCharIndex = richTextBox.GetCharIndexFromPosition(new Point(0, 0));
             int lastVisibleCharIndex = richTextBox.GetCharIndexFromPosition(new Point(0, richTextBox.ClientSize.Height));
 
-            if (match.Index < firstVisibleCharIndex || match.Index > lastVisibleCharIndex)
+            if (found < firstVisibleCharIndex - 1 || found > lastVisibleCharIndex)
             {
                 // It's off-screen — move caret and scroll
-                richTextBox.SelectionStart = match.Index;
+                richTextBox.SelectionStart = found;
                 richTextBox.SelectionLength = match.Length;
                 richTextBox.ScrollToCaret();
             }
             else
             {
                 // It's already visible — just update the selection
-                richTextBox.SelectionStart = match.Index;
+                richTextBox.SelectionStart = found;
                 richTextBox.SelectionLength = match.Length;
             }
         }
@@ -620,7 +620,7 @@ namespace DocMgr
 
             int found;
             if (DirectionForward)
-                found = rtb.Find(value, searchStart, rtbFinds);
+                found = rtb.Find(value, searchStart, rtb.Text.Length, rtbFinds);
             else
                 found = rtb.Find(value, 0, searchStart, rtbFinds);
             //found = FindPrevious(value, searchStart, rtb);
@@ -635,7 +635,7 @@ namespace DocMgr
 
                 //searchStart = found + value.Length;
 
-                MessageBox.Show("found is -1");
+ //               MessageBox.Show("found is -1");
             }
 
             return found;

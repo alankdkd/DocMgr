@@ -1736,6 +1736,36 @@ namespace DocMgr
         private PrintRange Printer_PrintRange;
         private int Printer_FromPage, Printer_ToPage, Printer_CurrentPage;
         private int Printer_CurrentPosition;
+        private int printStart;
+        private int printEnd;
+
+        private void PrintDocument_BeginPrint(object sender, PrintEventArgs e)
+        {
+            Printer_CurrentPage = 1;
+
+            if (Printer_PrintRange == PrintRange.Selection)
+            {
+                if (richTextBox.SelectionLength == 0)
+                {
+                    printStart = 0;
+                    printEnd = 0;
+                    return;
+                }
+
+                printStart = richTextBox.SelectionStart;
+                printEnd = printStart + richTextBox.SelectionLength;
+            }
+            else
+            {
+                printStart = 0;
+                printEnd = richTextBox.TextLength;
+            }
+
+            Printer_CurrentPosition = printStart;
+
+            // Must be called before first FormatRange
+            FormatRangeDone(richTextBox);
+        }
 
         private void buttonPrint_Click(object sender, EventArgs e)
         {
@@ -1754,6 +1784,7 @@ namespace DocMgr
             if (MyMargins.Bottom != -1)
                 printDocument.DefaultPageSettings.Margins.Bottom = (int)Math.Round(MyMargins.Bottom / 14.4);
 
+            printDocument.BeginPrint += PrintDocument_BeginPrint;
             printDocument.PrintPage += PrintDocument_PrintPage;
 
             PrintDialog printDialog = new PrintDialog { Document = printDocument };  // Connect dialog & doc.
@@ -1776,40 +1807,20 @@ namespace DocMgr
 
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
-            int startPrintPos = 0;
-            int endPrintPos = richTextBox.TextLength;
-
-            if (Printer_PrintRange == PrintRange.Selection)
-            {
-                if (richTextBox.SelectionLength == 0)
-                {
-                    e.HasMorePages = false;
-                    return;
-                }
-
-                startPrintPos = richTextBox.SelectionStart;
-                endPrintPos = startPrintPos + richTextBox.SelectionLength;
-                Printer_CurrentPosition = startPrintPos;
-            }
-
-            if (Printer_CurrentPage == 0)
-                Printer_CurrentPosition = startPrintPos;
-
-            // First, calculate the logical page we are about to print
-            //int logicalPage = Printer_CurrentPage;// + 1; // Pages are 1-based
-
-            // Check if we should print this page
+            // ---- HANDLE PAGE RANGE ----
             if (Printer_PrintRange == PrintRange.SomePages)
             {
                 if (Printer_CurrentPage < Printer_FromPage)
                 {
-                    // Skip this page without printing anything
-                    Printer_CurrentPosition = SkipOnePage(Printer_CurrentPosition, endPrintPos, e);
+                    // Skip this page by logically advancing one page
+                    Printer_CurrentPosition = SkipOnePage(Printer_CurrentPosition, printEnd, e);
+
                     Printer_CurrentPage++;
-                    e.HasMorePages = true;
+                    e.HasMorePages = (Printer_CurrentPosition < printEnd);
                     return;
                 }
-                else if (Printer_CurrentPage > Printer_ToPage)
+
+                if (Printer_CurrentPage > Printer_ToPage)
                 {
                     e.HasMorePages = false;
                     FormatRangeDone(richTextBox);
@@ -1817,11 +1828,11 @@ namespace DocMgr
                 }
             }
 
-            // Actually print this page
-            Printer_CurrentPosition = FormatRange(Printer_CurrentPosition, endPrintPos, e, richTextBox);
+            // ---- PRINT THIS PAGE ----
+            Printer_CurrentPosition =
+                FormatRange(Printer_CurrentPosition, printEnd, e, richTextBox);
 
-            // Are there more pages?
-            e.HasMorePages = (Printer_CurrentPosition < endPrintPos);
+            e.HasMorePages = (Printer_CurrentPosition < printEnd);
 
             Printer_CurrentPage++;
 
@@ -1830,6 +1841,67 @@ namespace DocMgr
                 FormatRangeDone(richTextBox);
             }
         }
+
+        //private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
+
+
+        // OLD:
+        //private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
+        //{
+        //    int startPrintPos = 0;
+        //    int endPrintPos = richTextBox.TextLength;
+
+        //    if (Printer_PrintRange == PrintRange.Selection)
+        //    {
+        //        if (richTextBox.SelectionLength == 0)
+        //        {
+        //            e.HasMorePages = false;
+        //            return;
+        //        }
+
+        //        startPrintPos = richTextBox.SelectionStart;
+        //        endPrintPos = startPrintPos + richTextBox.SelectionLength;
+        //        Printer_CurrentPosition = startPrintPos;
+        //    }
+
+        //    if (Printer_CurrentPage == 0)
+        //        Printer_CurrentPosition = startPrintPos;
+
+        //    // First, calculate the logical page we are about to print
+        //    //int logicalPage = Printer_CurrentPage;// + 1; // Pages are 1-based
+
+        //    // Check if we should print this page
+        //    if (Printer_PrintRange == PrintRange.SomePages)
+        //    {
+        //        if (Printer_CurrentPage < Printer_FromPage)
+        //        {
+        //            // Skip this page without printing anything
+        //            Printer_CurrentPosition = SkipOnePage(Printer_CurrentPosition, endPrintPos, e);
+        //            Printer_CurrentPage++;
+        //            e.HasMorePages = true;
+        //            return;
+        //        }
+        //        else if (Printer_CurrentPage > Printer_ToPage)
+        //        {
+        //            e.HasMorePages = false;
+        //            FormatRangeDone(richTextBox);
+        //            return;
+        //        }
+        //    }
+
+        //    // Actually print this page
+        //    Printer_CurrentPosition = FormatRange(Printer_CurrentPosition, endPrintPos, e, richTextBox);
+
+        //    // Are there more pages?
+        //    e.HasMorePages = (Printer_CurrentPosition < endPrintPos);
+
+        //    Printer_CurrentPage++;
+
+        //    if (!e.HasMorePages)
+        //    {
+        //        FormatRangeDone(richTextBox);
+        //    }
+        //}
 
         // Helper to simulate skipping one page without outputting anything
         private int SkipOnePage(int start, int end, PrintPageEventArgs e)

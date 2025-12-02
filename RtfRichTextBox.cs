@@ -212,7 +212,7 @@ public class RtfRichTextBox : RichTextBox
                 int start = int.Parse(html.Substring(startIndexMarker + startMarker.Length, startLineEnd - (startIndexMarker + startMarker.Length)).Trim());
                 int end = int.Parse(html.Substring(endIndexMarker + endMarker.Length, endLineEnd - (endIndexMarker + endMarker.Length)).Trim());
 
-                if (end > html.Length)
+                if (end > html.Length)          // Shouldn't ever happen but it does.
                     end = html.Length;
 
                 if (start >= 0 && end > start && end <= html.Length)
