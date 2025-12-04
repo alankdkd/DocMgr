@@ -423,6 +423,9 @@ namespace DocMgr
         {
             float buttonWidth = MIN_BUTTON_WIDTH;
 
+            if (buttons == null)
+                return;
+
             if (buttons.Count() == 0)
             {
                 richTextBox.Left = originalLeft;
@@ -454,7 +457,7 @@ namespace DocMgr
                         Controls.Add(b2);
                     }
 
-                    buttonColumn.Clear();
+                    buttonColumn.Clear();   // Set next position to top of next column:
                     next.X += ((int)buttonWidth + BUTTON_COLUMN_GAP);
                     next.Y = ButtonListStart.Y;
                     buttonWidth = MIN_BUTTON_WIDTH;
@@ -1319,6 +1322,8 @@ namespace DocMgr
             int FormHeight = Height;
             size.Height = FormHeight - 150;
             richTextBox.Size = size;
+            ResizeAndAddButtons(buttons);
+            ArrangeControls();
         }
 
         private void button_MouseHover(object sender, EventArgs e)

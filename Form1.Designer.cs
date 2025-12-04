@@ -57,7 +57,7 @@
             // 
             // richTextBox
             // 
-            richTextBox.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            richTextBox.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
             richTextBox.Location = new Point(143, 81);
             richTextBox.Name = "richTextBox";
             richTextBox.Size = new Size(922, 864);
@@ -69,7 +69,7 @@
             // DocName
             // 
             DocName.AutoSize = true;
-            DocName.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            DocName.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             DocName.ForeColor = SystemColors.ButtonHighlight;
             DocName.Location = new Point(143, 56);
             DocName.Name = "DocName";
@@ -81,7 +81,7 @@
             // 
             buttonClose.BackColor = SystemColors.Control;
             buttonClose.DialogResult = DialogResult.Cancel;
-            buttonClose.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonClose.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonClose.Location = new Point(1090, 16);
             buttonClose.Name = "buttonClose";
             buttonClose.Size = new Size(175, 31);
@@ -93,7 +93,7 @@
             // ProjectName
             // 
             ProjectName.AutoSize = true;
-            ProjectName.Font = new Font("Calibri", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
+            ProjectName.Font = new Font("Calibri", 11.25F, FontStyle.Bold);
             ProjectName.ForeColor = SystemColors.ButtonHighlight;
             ProjectName.Location = new Point(971, 64);
             ProjectName.Name = "ProjectName";
@@ -104,7 +104,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Calibri", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.Font = new Font("Calibri", 11.25F, FontStyle.Bold);
             label1.ForeColor = SystemColors.ButtonHighlight;
             label1.Location = new Point(918, 64);
             label1.Name = "label1";
@@ -115,7 +115,7 @@
             // buttonLoadProj
             // 
             buttonLoadProj.BackColor = SystemColors.Control;
-            buttonLoadProj.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonLoadProj.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonLoadProj.Location = new Point(142, 16);
             buttonLoadProj.Name = "buttonLoadProj";
             buttonLoadProj.Size = new Size(175, 31);
@@ -128,7 +128,7 @@
             // 
             buttonLoadDoc.BackColor = SystemColors.Control;
             buttonLoadDoc.Enabled = false;
-            buttonLoadDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonLoadDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonLoadDoc.Location = new Point(360, 16);
             buttonLoadDoc.Name = "buttonLoadDoc";
             buttonLoadDoc.Size = new Size(175, 31);
@@ -142,7 +142,7 @@
             // 
             buttonRemoveDoc.BackColor = SystemColors.Control;
             buttonRemoveDoc.Enabled = false;
-            buttonRemoveDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonRemoveDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonRemoveDoc.Location = new Point(1090, 214);
             buttonRemoveDoc.Name = "buttonRemoveDoc";
             buttonRemoveDoc.Size = new Size(175, 31);
@@ -156,7 +156,7 @@
             // 
             buttonSaveDoc.BackColor = SystemColors.Control;
             buttonSaveDoc.Enabled = false;
-            buttonSaveDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonSaveDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonSaveDoc.Location = new Point(578, 16);
             buttonSaveDoc.Name = "buttonSaveDoc";
             buttonSaveDoc.Size = new Size(175, 31);
@@ -169,7 +169,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Calibri", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Font = new Font("Calibri", 11.25F, FontStyle.Bold);
             label2.ForeColor = SystemColors.ButtonHighlight;
             label2.Location = new Point(9, 60);
             label2.Name = "label2";
@@ -180,7 +180,7 @@
             // ButtonNewDoc
             // 
             ButtonNewDoc.BackColor = SystemColors.Control;
-            ButtonNewDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            ButtonNewDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             ButtonNewDoc.Location = new Point(1090, 81);
             ButtonNewDoc.Name = "ButtonNewDoc";
             ButtonNewDoc.Size = new Size(175, 31);
@@ -193,7 +193,7 @@
             // ButtonNewProj
             // 
             ButtonNewProj.BackColor = SystemColors.Control;
-            ButtonNewProj.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            ButtonNewProj.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             ButtonNewProj.Location = new Point(1090, 146);
             ButtonNewProj.Name = "ButtonNewProj";
             ButtonNewProj.Size = new Size(175, 31);
@@ -205,7 +205,7 @@
             // ButtonSaveAs
             // 
             ButtonSaveAs.BackColor = SystemColors.Control;
-            ButtonSaveAs.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            ButtonSaveAs.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             ButtonSaveAs.Location = new Point(796, 16);
             ButtonSaveAs.Name = "ButtonSaveAs";
             ButtonSaveAs.Size = new Size(175, 31);
@@ -218,7 +218,7 @@
             // buttonNumberLines
             // 
             buttonNumberLines.BackColor = SystemColors.Control;
-            buttonNumberLines.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonNumberLines.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonNumberLines.Location = new Point(1090, 353);
             buttonNumberLines.Name = "buttonNumberLines";
             buttonNumberLines.Size = new Size(175, 31);
@@ -231,7 +231,7 @@
             // buttonBackUpFile
             // 
             buttonBackUpFile.BackColor = SystemColors.Control;
-            buttonBackUpFile.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonBackUpFile.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonBackUpFile.Location = new Point(1090, 422);
             buttonBackUpFile.Name = "buttonBackUpFile";
             buttonBackUpFile.Size = new Size(175, 31);
@@ -244,7 +244,7 @@
             // buttonBackUpProject
             // 
             buttonBackUpProject.BackColor = SystemColors.Control;
-            buttonBackUpProject.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonBackUpProject.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonBackUpProject.Location = new Point(1090, 465);
             buttonBackUpProject.Name = "buttonBackUpProject";
             buttonBackUpProject.Size = new Size(175, 31);
@@ -257,7 +257,7 @@
             // buttonProperties
             // 
             buttonProperties.BackColor = SystemColors.Control;
-            buttonProperties.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonProperties.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonProperties.Location = new Point(1090, 823);
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(175, 31);
@@ -270,7 +270,7 @@
             // buttonPrint
             // 
             buttonPrint.BackColor = SystemColors.Control;
-            buttonPrint.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonPrint.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonPrint.Location = new Point(1090, 619);
             buttonPrint.Name = "buttonPrint";
             buttonPrint.Size = new Size(175, 31);
@@ -283,7 +283,7 @@
             // buttonArchiveFile
             // 
             buttonArchiveFile.BackColor = SystemColors.Control;
-            buttonArchiveFile.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonArchiveFile.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonArchiveFile.Location = new Point(1090, 508);
             buttonArchiveFile.Name = "buttonArchiveFile";
             buttonArchiveFile.Size = new Size(175, 31);
@@ -296,7 +296,7 @@
             // buttonArchiveProject
             // 
             buttonArchiveProject.BackColor = SystemColors.Control;
-            buttonArchiveProject.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonArchiveProject.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonArchiveProject.Location = new Point(1090, 551);
             buttonArchiveProject.Name = "buttonArchiveProject";
             buttonArchiveProject.Size = new Size(175, 31);
@@ -309,7 +309,7 @@
             // buttonFind
             // 
             buttonFind.BackColor = SystemColors.Control;
-            buttonFind.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonFind.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonFind.Location = new Point(1090, 687);
             buttonFind.Name = "buttonFind";
             buttonFind.Size = new Size(175, 31);
@@ -322,7 +322,7 @@
             // buttonOpenFolder
             // 
             buttonOpenFolder.BackColor = SystemColors.Control;
-            buttonOpenFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonOpenFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonOpenFolder.Location = new Point(1090, 284);
             buttonOpenFolder.Name = "buttonOpenFolder";
             buttonOpenFolder.Size = new Size(175, 31);
@@ -335,7 +335,7 @@
             // buttonFont
             // 
             buttonFont.BackColor = SystemColors.Control;
-            buttonFont.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonFont.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonFont.Location = new Point(1090, 755);
             buttonFont.Name = "buttonFont";
             buttonFont.Size = new Size(175, 31);
