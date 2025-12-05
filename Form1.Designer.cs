@@ -63,6 +63,7 @@
             richTextBox.Size = new Size(922, 864);
             richTextBox.TabIndex = 0;
             richTextBox.Text = "";
+            richTextBox.LinkClicked += richTextBox_LinkClicked;
             richTextBox.TextChanged += richTextBox_TextChanged;
             richTextBox.KeyPress += richTextBox1_KeyPress;
             // 

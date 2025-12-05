@@ -2270,6 +2270,28 @@ namespace DocMgr
 
             return null;
         }
+
+        private void richTextBox_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            try
+            {
+                // Open with default browser
+                System.Diagnostics.Process.Start(new ProcessStartInfo(e.LinkText)
+                {
+                    UseShellExecute = true
+                });
+            }
+            catch (System.ComponentModel.Win32Exception noBrowser)
+            {
+                // Handle the case where no browser is installed
+                if (noBrowser.ErrorCode == -2147467259)
+                    MessageBox.Show(noBrowser.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not open link: " + ex.Message);
+            }
+        }
     }
 
     public static class WindowExtensions
