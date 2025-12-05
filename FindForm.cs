@@ -55,6 +55,10 @@ namespace DocMgr
             // Set specific screen coordinates (e.g., X = 200, Y = 150)
             this.Location = new Point(box.Right + 20, box.Bottom - Height);
             Cursor.Position = new Point(textString.Left + 10, textString.Top + 8);
+
+            if (Location.X + Width > Screen.PrimaryScreen.WorkingArea.Width)    // Fix if off right edge:
+                Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - Width - 10, Location.Y);
+
             textString.Text = SearchText;
             this.textString.Focus();
         }
