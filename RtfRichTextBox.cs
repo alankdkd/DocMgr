@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocMgr;
+using System;
 using System.Windows.Forms;
 
 public class RtfRichTextBox : RichTextBox
@@ -76,7 +77,12 @@ public class RtfRichTextBox : RichTextBox
                 // }
 
                 // Otherwise fallback to WebBrowser copy approach:
-                ConvertHtmlToRtfAndPaste(html);
+
+                // ORIG: ConvertHtmlToRtfAndPaste(html);
+                string theRtf = HtmlToRtf_NoNuGet.Convert(html);
+                //this.SelectedRtf = theRtf;
+                this.Rtf = theRtf;
+
                 return;
             }
         }
