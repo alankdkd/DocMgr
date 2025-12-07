@@ -70,6 +70,7 @@
             checkMatchCase.TabIndex = 2;
             checkMatchCase.Text = "Match Case";
             checkMatchCase.UseVisualStyleBackColor = true;
+            checkMatchCase.CheckedChanged += checkMatchCase_CheckedChanged;
             // 
             // checkMatchWholeWord
             // 
@@ -80,6 +81,7 @@
             checkMatchWholeWord.TabIndex = 3;
             checkMatchWholeWord.Text = "Match Whole Word";
             checkMatchWholeWord.UseVisualStyleBackColor = true;
+            checkMatchWholeWord.CheckedChanged += checkMatchWholeWord_CheckedChanged;
             // 
             // radioCurrentDoc
             // 

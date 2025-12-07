@@ -31,8 +31,8 @@ namespace DocMgr
         int TotalMatches, NumMatches;
         int MatchOrderInDoc;
         int OrangeStart, OrangeLength;
-        bool MatchCase;
-        bool MatchWholeWord;
+        static bool MatchCase = false;
+        static bool MatchWholeWord = false;
         static string SearchText;
         enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
         static SearchScope CurrentScope = SearchScope.CurrentDoc;
@@ -62,15 +62,15 @@ namespace DocMgr
                 Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - Width - 10, Location.Y);
 
             textString.Text = SearchText;
-            SetScope();
+            SetAttributes();
             this.textString.Focus();
         }
 
 
-        private void SetScope()
+        private void SetAttributes()
         {
             switch (CurrentScope)
-                {
+            {
                 case SearchScope.CurrentDoc:
                     radioCurrentDoc.Checked = true;
                     break;
@@ -80,8 +80,11 @@ namespace DocMgr
                 case SearchScope.AllProjects:
                     radioAllProjects.Checked = true;
                     break;
-                }
             }
+
+            checkMatchCase.Checked = MatchCase;
+            checkMatchWholeWord.Checked = MatchWholeWord;
+        }
 
         private void buttonFind_Click(object sender, EventArgs e)
         {
@@ -756,6 +759,7 @@ namespace DocMgr
             Close();
         }
 
+        #region FindAttributesHandlers
         private void radioCurrentDoc_CheckedChanged(object sender, EventArgs e)
         {
             CurrentScope = SearchScope.CurrentDoc;
@@ -770,5 +774,16 @@ namespace DocMgr
         {
             CurrentScope = SearchScope.AllProjects;
         }
+
+        private void checkMatchCase_CheckedChanged(object sender, EventArgs e)
+        {
+            MatchCase = checkMatchCase.Checked;
+        }
+
+        private void checkMatchWholeWord_CheckedChanged(object sender, EventArgs e)
+        {
+            MatchWholeWord = checkMatchWholeWord.Checked;
+        }
+        #endregion
     }
 }
