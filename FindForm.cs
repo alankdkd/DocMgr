@@ -34,6 +34,8 @@ namespace DocMgr
         bool MatchCase;
         bool MatchWholeWord;
         static string SearchText;
+        enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
+        static SearchScope CurrentScope = SearchScope.CurrentDoc;
 
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
@@ -60,8 +62,26 @@ namespace DocMgr
                 Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - Width - 10, Location.Y);
 
             textString.Text = SearchText;
+            SetScope();
             this.textString.Focus();
         }
+
+
+        private void SetScope()
+        {
+            switch (CurrentScope)
+                {
+                case SearchScope.CurrentDoc:
+                    radioCurrentDoc.Checked = true;
+                    break;
+                case SearchScope.CurrentProject:
+                    radioCurrentProject.Checked = true;
+                    break;
+                case SearchScope.AllProjects:
+                    radioAllProjects.Checked = true;
+                    break;
+                }
+            }
 
         private void buttonFind_Click(object sender, EventArgs e)
         {
@@ -84,7 +104,7 @@ namespace DocMgr
             CurrentProjectName = null;
             DisplayedDoc = "";
 
-            
+
             ShowDoc(DocList[CurrentDocNum]);
             buttonNext.Focus();
             Cursor.Current = Cursors.Default;
@@ -108,19 +128,19 @@ namespace DocMgr
         {
             DocList = new();
 
-            if (radioCurrentDoc.Checked)
+            if (CurrentScope == SearchScope.CurrentDoc)
             {
                 if (DocName != "" && ProjName != "")
                     DocList.Add(new(DocName, Root.DocPath));      // The only doc.
             }
             else
-                if (radioCurrentProject.Checked)
+                if (CurrentScope == SearchScope.CurrentProject)
             {
                 if (ProjName != "")
                     AddProjectsDocsToList(DocList, Root);     // All docs in project.
             }
             else
-                    if (radioAllProjects.Checked)
+                    if (CurrentScope == SearchScope.AllProjects)
                 AddAllProjectsDocsToList(DocList);        // All projects.
         }
 
@@ -209,7 +229,7 @@ namespace DocMgr
                 if (totalMatches != 1)
                     sb.Append("s");
 
-                if (!radioCurrentDoc.Checked)
+                if (CurrentScope != SearchScope.CurrentDoc)
                 {
                     sb.Append($" in {docsWithList.Count} document");
 
@@ -217,7 +237,7 @@ namespace DocMgr
                         sb.Append("s");
                 }
 
-                if (radioAllProjects.Checked)
+                if (CurrentScope == SearchScope.AllProjects)
                 {
                     sb.Append($" in {projectNames.Count} project");
 
@@ -412,7 +432,7 @@ namespace DocMgr
             string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
             labelInstanceOrder.Text = position;
 
-             if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath)  !=  CurrentProjectName)
+            if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath) != CurrentProjectName)
             {
                 loadDoc = true;                             // If loading project, need to load doc.
 
@@ -598,7 +618,7 @@ namespace DocMgr
                 else
                     searchStart = found - 1;
 
-                if (searchStart >= rtb.Text.Length  || searchStart < 0)
+                if (searchStart >= rtb.Text.Length || searchStart < 0)
                     break;
             }
 
@@ -609,7 +629,7 @@ namespace DocMgr
         // Was forced to add this because the match results are incorrect past other RTF objects, like
         // images.  It's wasteful since we use both regex and RtfRichTextBox to do redundant searches.
         // But it works.  (Will optimize later if people are paying money for this.)
-        public int  GetRealLocationInString(string value, RtfRichTextBox rtb, int searchStart)
+        public int GetRealLocationInString(string value, RtfRichTextBox rtb, int searchStart)
         {
             RichTextBoxFinds rtbFinds = RichTextBoxFinds.None;
 
@@ -639,16 +659,16 @@ namespace DocMgr
 
                 //searchStart = found + value.Length;
 
- //               MessageBox.Show("found is -1");
+                //               MessageBox.Show("found is -1");
             }
 
             return found;
         }
-//        using System;
-//using System.Windows.Forms;
+        //        using System;
+        //using System.Windows.Forms;
 
-//public static class RichTextBoxHelper
-//    {
+        //public static class RichTextBoxHelper
+        //    {
         /// <summary>
         /// Finds the first occurrence of a search string to the left of a given position in a RtfRichTextBox.
         /// </summary>
@@ -677,9 +697,9 @@ namespace DocMgr
             int index = rtb.Text.LastIndexOf(searchText, searchEnd, StringComparison.OrdinalIgnoreCase);
             return index;
         }
-    //}
+        //}
 
-    public static class RichTextBoxScroller
+        public static class RichTextBoxScroller
         {
             [DllImport("user32.dll")]
             private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
@@ -729,11 +749,26 @@ namespace DocMgr
             if (CurrentDocPath != null)
                 mainForm.CurrentFilePath = CurrentDocPath;
 
-            if (!radioCurrentProject.Checked)
+            if (CurrentScope != SearchScope.CurrentProject)
                 DisplayedDoc = "";
 
             richTextBox.SelectionStart = ScrollPos;
             Close();
+        }
+
+        private void radioCurrentDoc_CheckedChanged(object sender, EventArgs e)
+        {
+            CurrentScope = SearchScope.CurrentDoc;
+        }
+
+        private void radioCurrentProject_CheckedChanged(object sender, EventArgs e)
+        {
+            CurrentScope = SearchScope.CurrentProject;
+        }
+
+        private void radioAllProjects_CheckedChanged(object sender, EventArgs e)
+        {
+            CurrentScope = SearchScope.AllProjects;
         }
     }
 }

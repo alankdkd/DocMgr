@@ -92,6 +92,7 @@
             radioCurrentDoc.TabStop = true;
             radioCurrentDoc.Text = "Current Document";
             radioCurrentDoc.UseVisualStyleBackColor = true;
+            radioCurrentDoc.CheckedChanged += radioCurrentDoc_CheckedChanged;
             // 
             // radioCurrentProject
             // 
@@ -103,6 +104,7 @@
             radioCurrentProject.TabStop = true;
             radioCurrentProject.Text = "Current Project";
             radioCurrentProject.UseVisualStyleBackColor = true;
+            radioCurrentProject.CheckedChanged += radioCurrentProject_CheckedChanged;
             // 
             // radioAllProjects
             // 
@@ -114,6 +116,7 @@
             radioAllProjects.TabStop = true;
             radioAllProjects.Text = "All Projects";
             radioAllProjects.UseVisualStyleBackColor = true;
+            radioAllProjects.CheckedChanged += radioAllProjects_CheckedChanged;
             // 
             // groupBox1
             // 
