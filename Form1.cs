@@ -162,6 +162,8 @@ namespace DocMgr
             public int nTrackPos;
         }
 
+        private const int WM_MOUSEWHEEL = 0x020A;
+
         // P/Invoke declaration
         [DllImport("user32.dll", SetLastError = true)]
         private static extern int SetScrollInfo(IntPtr hwnd, int nBar, ref SCROLLINFO lpsi, bool redraw);
@@ -700,6 +702,25 @@ namespace DocMgr
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
             DocMgr_KeyPress(sender, e);                 // Forward key to parent form.
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            SendWheelToRtb(e.Delta);
+        }
+
+        private void SendWheelToRtb(int delta)
+        {
+            // delta goes in the high word of wParam
+            // low word of wParam contains key-state flags (none = 0)
+            int wParam = (delta << 16);
+
+            // lParam contains mouse coordinates in screen space, but RichTextBox ignores it
+            int lParam = 0;
+
+            SendMessage(richTextBox.Handle, WM_MOUSEWHEEL,
+                new IntPtr(wParam),
+                new IntPtr(lParam));
         }
 
         private void buttonLoadProj_Click(object sender, EventArgs e)
@@ -1354,7 +1375,6 @@ namespace DocMgr
 
             Process.Start("explorer", ProjectFolder);
         }
-
 
         #region BackupsAndArchives
         private void buttonBackUpFile_Click(object sender, EventArgs e)
