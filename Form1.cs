@@ -675,7 +675,7 @@ namespace DocMgr
             Close();
         }
 
-        private void DocMgr_KeyPress(object sender, KeyPressEventArgs e)
+        public void DocMgr_KeyPress(object sender, KeyPressEventArgs e)
         {
             //if (e.KeyChar == (int)Keys.Escape)
             //    buttonClose_Click(sender, e);           // User wants to exit.

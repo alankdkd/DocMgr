@@ -217,6 +217,7 @@
             TopMost = true;
             FormClosed += FindForm_FormClosed;
             Shown += FindForm_Shown;
+            KeyDown += FindForm_KeyDown;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ResumeLayout(false);

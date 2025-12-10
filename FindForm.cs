@@ -46,6 +46,7 @@ namespace DocMgr
         public FindForm(RtfRichTextBox box, Doc projectRoot, string docName, DocMgr callingForm)
         {
             InitializeComponent();
+            this.KeyPreview = true;
             richTextBox = box;
             Root = projectRoot;
             DocName = docName;
@@ -785,5 +786,17 @@ namespace DocMgr
             MatchWholeWord = checkMatchWholeWord.Checked;
         }
         #endregion
+
+        private void FindForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Check if both the Control key is pressed AND the F key is pressed
+            if (e.Control && e.KeyCode == Keys.F)
+            {
+                // Replace search text:
+                textString.SelectAll();
+                // Optional: set e.Handled to true if you want to stop the key press from being processed further
+                e.Handled = true;
+            }
+        }
     }
 }
