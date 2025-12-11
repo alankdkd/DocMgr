@@ -431,7 +431,6 @@ namespace DocMgr
                 return;
             }
 
-            int searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length - 1;
             bool loadDoc = false;
             string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
             labelInstanceOrder.Text = position;
@@ -457,6 +456,8 @@ namespace DocMgr
                 tempRTBox.LoadFile(CurrentDocPath);
                 DisplayedDoc = currentDoc.Value.docName;
             }
+
+            int searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length - 1;
 
             SearchString = textString.Text;
             MatchCase = checkMatchCase.Checked;
