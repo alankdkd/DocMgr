@@ -110,6 +110,7 @@ namespace DocMgr
 
 
             ShowDoc(DocList[CurrentDocNum]);
+            Program.CenterCursorInButton(buttonNext, 0, 6);
             buttonNext.Focus();
             Cursor.Current = Cursors.Default;
 
