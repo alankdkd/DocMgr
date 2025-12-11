@@ -793,6 +793,7 @@ namespace DocMgr
             if (e.Control && e.KeyCode == Keys.F)
             {
                 // Replace search text:
+                textString.Focus();
                 textString.SelectAll();
                 // Optional: set e.Handled to true if you want to stop the key press from being processed further
                 e.Handled = true;
