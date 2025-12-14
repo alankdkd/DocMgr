@@ -34,7 +34,7 @@ namespace DocMgr
         int OrangeStart, OrangeLength;
         static bool MatchCase = false;
         static bool MatchWholeWord = false;
-        static string SearchText;
+        static string SearchText = new("");
         enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
         static SearchScope CurrentScope = SearchScope.CurrentDoc;
 
@@ -63,7 +63,11 @@ namespace DocMgr
             if (Location.X + Width > Screen.PrimaryScreen.WorkingArea.Width)    // Fix if off right edge:
                 Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - Width - 10, Location.Y);
 
+            if (richTextBox.SelectionLength > 0)
+                SearchText = richTextBox.SelectedText;
+
             textString.Text = SearchText;
+
             SetAttributes();
             EnableResults(false);
             this.textString.Focus();
