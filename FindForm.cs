@@ -777,6 +777,11 @@ namespace DocMgr
             }
         }
 
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            mainForm.SendWheelToRtb(e.Delta);
+        }
+
         private void FindForm_Shown(object sender, EventArgs e)
         {
             buttonFind.CenterCursorInButton(0, 6);          // This has to be done after the ctor.

@@ -709,7 +709,7 @@ namespace DocMgr
             SendWheelToRtb(e.Delta);
         }
 
-        private void SendWheelToRtb(int delta)
+        public void SendWheelToRtb(int delta)
         {
             // delta goes in the high word of wParam
             // low word of wParam contains key-state flags (none = 0)
@@ -1721,14 +1721,14 @@ namespace DocMgr
                 if (createDialog.ShowDialog() == DialogResult.OK)
                 {
                     string newFolderPath = createDialog.NewFolderPath;
-                    string projFilePath = newFolderPath + '\\' + createDialog.textProjName.Text + ".json";
+                    ProjectPath = newFolderPath + '\\' + createDialog.textProjName.Text + ".json";
                     Root = new Doc(createDialog.textProjName.Text);
-                    SaveProject(projFilePath, Root);
-                    SetProjectPath(projFilePath);
+                    SaveProject(ProjectPath, Root);
+                    SetProjectPath(ProjectPath);
                     richTextBox.Clear();
                     DocName.Text = "";
                     Root.DocPath = newFolderPath;
-                    LoadProject(projFilePath, out Root);
+                    LoadProject(ProjectPath, out Root);
                     MakeButtons(Root.SubDocs);
                     DocName.Text = "";
                 }
