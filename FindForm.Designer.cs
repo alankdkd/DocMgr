@@ -40,8 +40,8 @@
             buttonClose = new Button();
             buttonNext = new Button();
             buttonPrevious = new Button();
-            labelInstanceOrder = new Label();
             labelFindResults = new Label();
+            labelInstanceOrder = new Label();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
@@ -174,15 +174,6 @@
             buttonPrevious.UseVisualStyleBackColor = true;
             buttonPrevious.Click += buttonPrevious_Click;
             // 
-            // labelInstanceOrder
-            // 
-            labelInstanceOrder.AutoSize = true;
-            labelInstanceOrder.Location = new Point(22, 340);
-            labelInstanceOrder.Name = "labelInstanceOrder";
-            labelInstanceOrder.Size = new Size(172, 25);
-            labelInstanceOrder.TabIndex = 12;
-            labelInstanceOrder.Text = "Showing X of XXX";
-            // 
             // labelFindResults
             // 
             labelFindResults.AutoSize = true;
@@ -191,6 +182,15 @@
             labelFindResults.Size = new Size(434, 25);
             labelFindResults.TabIndex = 13;
             labelFindResults.Text = "Found X instances in x documents in x projects.";
+            // 
+            // labelInstanceOrder
+            // 
+            labelInstanceOrder.AutoSize = true;
+            labelInstanceOrder.Location = new Point(22, 340);
+            labelInstanceOrder.Name = "labelInstanceOrder";
+            labelInstanceOrder.Size = new Size(172, 25);
+            labelInstanceOrder.TabIndex = 12;
+            labelInstanceOrder.Text = "Showing X of XXX";
             // 
             // FindForm
             // 
@@ -238,7 +238,7 @@
         private Button buttonClose;
         private Button buttonNext;
         private Button buttonPrevious;
-        private Label labelInstanceOrder;
         private Label labelFindResults;
+        private Label labelInstanceOrder;
     }
 }

@@ -30,6 +30,7 @@ namespace DocMgr
         bool DirectionForward = true;
         int TotalMatches, NumMatches;
         int MatchOrderInDoc;
+        int InstanceNum;
         int OrangeStart, OrangeLength;
         static bool MatchCase = false;
         static bool MatchWholeWord = false;
@@ -64,6 +65,7 @@ namespace DocMgr
 
             textString.Text = SearchText;
             SetAttributes();
+            EnableResults(false);
             this.textString.Focus();
         }
 
@@ -92,6 +94,7 @@ namespace DocMgr
             Cursor.Current = Cursors.WaitCursor;
             labelFindResults.Text = "";
             labelInstanceOrder.Text = "";
+            EnableResults(false);
             SearchText = textString.Text;
             GetDocsInScope(DocList);
             DocList = GetDocsWithInstances(DocList);
@@ -107,8 +110,11 @@ namespace DocMgr
             CurrentDocNum = GetNumberOfDoc(DocName, DocList);
             CurrentProjectName = null;
             DisplayedDoc = "";
+            InstanceNum = 0;
 
-
+            EnableResults(true);
+            string position = $"Showing 1 of {TotalMatches}";
+            labelInstanceOrder.Text = position;
             ShowDoc(DocList[CurrentDocNum]);
             Program.CenterCursorInButton(buttonNext, 0, 6);
             buttonNext.Focus();
@@ -117,6 +123,21 @@ namespace DocMgr
             //buttonNext_Click(null, null);
         }
 
+        private void EnableResults(bool enable)
+        {
+            if (enable)
+            {
+                labelFindResults.Show();
+                labelInstanceOrder.Show();
+            }
+            else
+            {
+                labelFindResults.Hide();
+                labelInstanceOrder.Hide();
+            }
+        }
+
+        // Get an int descriptor for doc with this name.
         private int GetNumberOfDoc(string docName, List<(string docName, string projectPath)> docList)
         {
             int docNum = 0;
@@ -287,20 +308,20 @@ namespace DocMgr
         private void buttonNext_Click(object sender, EventArgs e)
         {
             DirectionForward = true;
-            MoveHighlightedWord(DirectionForward);
+            MoveHighlightedWord();
         }
 
         private void buttonPrevious_Click(object sender, EventArgs e)
         {
             DirectionForward = false;
-            MoveHighlightedWord(DirectionForward);
+            MoveHighlightedWord();
         }
 
-        private void MoveHighlightedWord(bool moveMatchUp)
+        private void MoveHighlightedWord()
         {
             int searchStart = OrangeStart + OrangeLength;
 
-            if (!moveMatchUp)
+            if (!DirectionForward)
             {
                 searchStart = OrangeStart - 1;
 
@@ -310,8 +331,9 @@ namespace DocMgr
 
             tempRTBox.Select(OrangeStart, OrangeLength);        // Restore yellow background.
             tempRTBox.SelectionBackColor = Color.Yellow;
+            UpdateInstanceDisplay();
 
-            if (moveMatchUp)
+            if (DirectionForward)
                 ++MatchOrderInDoc;
             else
                 --MatchOrderInDoc;
@@ -340,11 +362,11 @@ namespace DocMgr
                 if (DocList.Count == 1)
                 {
                     MatchOrderInDoc = 0;                        // 1 doc; just wrap around.
-                    searchStart = (moveMatchUp) ? 0 : tempRTBox.Text.Length - 1;
+                    searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length - 1;
                 }
                 else
                 {
-                    if (moveMatchUp)
+                    if (DirectionForward)
                         ++CurrentDocNum;
                     else
                         --CurrentDocNum;
@@ -399,7 +421,7 @@ namespace DocMgr
             OrangeStart = found;
             OrangeLength = match.Length;
 
-            if (moveMatchUp)
+            if (DirectionForward)
                 searchStart = found + value.Length;
             else
                 searchStart = found - 1;                        // PROBLEM IF found IS ZERO!
@@ -422,6 +444,23 @@ namespace DocMgr
                 richTextBox.SelectionStart = found;
                 richTextBox.SelectionLength = match.Length;
             }
+
+            void UpdateInstanceDisplay()
+            {
+                if (DirectionForward)
+                {
+                    if ((++InstanceNum) >= TotalMatches)
+                        InstanceNum = 0;
+                }
+                else
+                {
+                    if (--InstanceNum < 0)
+                        InstanceNum = TotalMatches - 1;
+                }
+
+                string position = $"Showing {InstanceNum + 1} of {TotalMatches}";
+                labelInstanceOrder.Text = position;
+            }
         }
 
         private void ShowDoc((string docName, string projectPath)? currentDoc)
@@ -433,8 +472,6 @@ namespace DocMgr
             }
 
             bool loadDoc = false;
-            string position = $"Showing {CurrentDocNum + 1} of {TotalMatches}";
-            labelInstanceOrder.Text = position;
 
             if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath) != CurrentProjectName)
             {
