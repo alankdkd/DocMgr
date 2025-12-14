@@ -1122,9 +1122,9 @@ namespace DocMgr
                 MakeButtons(Root.SubDocs);
                 buttonSaveDoc.Enabled = true;
                 SaveProject(ProjectPath, Root);
-                DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath) + ':';
                 SetProjectsLastDoc(CurrentFilePath);
-                HighlightThisButton("&" + fcd.textBoxDocName.Text);
+                HighlightThisButton(fcd.textBoxDocName.Text);
 
                 loadingDoc = true;
                 richTextBox.Clear();
