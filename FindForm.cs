@@ -107,6 +107,7 @@ namespace DocMgr
 
             if (DocList.Count == 0)
             {
+                labelFindResults.Visible = true;
                 labelFindResults.Text = "Not found.";
                 return;
             }
