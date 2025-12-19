@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="FindRtf.cs" />
     <Compile Remove="NullableIntConverter.cs" />
   </ItemGroup>
 
