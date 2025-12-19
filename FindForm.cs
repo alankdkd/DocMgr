@@ -545,7 +545,7 @@ namespace DocMgr
                 mainForm.ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentProjectInfo.DocPath);
             }
 
-            RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, match.Index);
+            RichTextBoxScroller.ScrollToOffsetCenter(richTextBox, found);
         }
 
         private string GetPathToProject(string projName)
@@ -690,12 +690,15 @@ namespace DocMgr
             if (!DirectionForward)
                 rtbFinds |= RichTextBoxFinds.Reverse;
 
+            //rtb.Text = rtb.Text.Normalize(NormalizationForm.FormC);
+            //string normalText = rtb.Text.Normalize(NormalizationForm.FormC);
+            //string normalValue = value.Normalize(NormalizationForm.FormC);
+
             int found;
             if (DirectionForward)
                 found = rtb.Find(value, searchStart, rtb.Text.Length, rtbFinds);
             else
                 found = rtb.Find(value, 0, searchStart, rtbFinds);
-            //found = FindPrevious(value, searchStart, rtb);
 
             if (found == -1)
             {
