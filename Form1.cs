@@ -2222,6 +2222,21 @@ namespace DocMgr
 
         //           return rtb.Rtf;
         //       }
+        private const int WM_VSCROLL = 0x0115;
+        private const int SB_LINEDOWN = 1;
+        private const int SB_LINEUP = 0;
+        private const int SB_PAGEDOWN = 3;
+        private const int SB_PAGEUP = 2;
+
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        private const int EM_GETFIRSTVISIBLELINE = 0xCE;
+
+        int GetTopLine(RichTextBox rtb)
+        {
+            return SendMessage(rtb.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
+        }
 
         private void DocMgr_KeyDown(object sender, KeyEventArgs e)
         {
@@ -2238,6 +2253,43 @@ namespace DocMgr
                 ScrollToEnd(richTextBox);
                 e.Handled = true; // Optional: Prevent further processing
             }
+
+            if (e.KeyCode == Keys.PageUp)
+            {
+                SendMessage(richTextBox.Handle,
+                            WM_VSCROLL,
+                            (IntPtr)SB_PAGEUP,
+                            IntPtr.Zero);
+                e.Handled = true;
+            }
+
+            if (e.KeyCode == Keys.PageDown)
+            {
+                SendMessage(richTextBox.Handle,
+                            WM_VSCROLL,
+                            (IntPtr)SB_PAGEDOWN,
+                            IntPtr.Zero);
+                e.Handled = true;
+            }
+
+            if (e.Control && e.KeyCode == Keys.Up)
+            {
+                SendMessage(richTextBox.Handle,
+                            WM_VSCROLL,
+                            (IntPtr)SB_LINEUP,
+                            IntPtr.Zero);
+                e.Handled = true;
+            }
+
+            if (e.Control && e.KeyCode == Keys.Down)
+            {
+                SendMessage(richTextBox.Handle,
+                            WM_VSCROLL,
+                            (IntPtr)SB_LINEDOWN,
+                            IntPtr.Zero);
+                e.Handled = true;
+            }
+
 
             if (e.Control && e.KeyCode == Keys.O)
             {

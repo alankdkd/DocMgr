@@ -850,6 +850,16 @@ namespace DocMgr
                 // Optional: set e.Handled to true if you want to stop the key press from being processed further
                 e.Handled = true;
             }
+
+            if (e.KeyCode == Keys.F3)
+            {
+                if (e.Shift)
+                    buttonPrevious_Click(null, null);
+                else
+                    buttonNext_Click(null, null);
+
+                e.Handled = true;
+            }
         }
     }
 }
