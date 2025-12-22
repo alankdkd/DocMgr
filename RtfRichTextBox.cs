@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 public class RtfRichTextBox : RichTextBox
@@ -33,6 +34,15 @@ public class RtfRichTextBox : RichTextBox
 
     public void PasteRtfOrHtml()
     {
+        bool isSingleHtmlImage = ContainsSingleHtmlImage();
+
+        if (isSingleHtmlImage)
+        {
+            // For single HTML images, use default paste to get the image data.
+            Paste();
+            return;
+        }
+
         IDataObject data = Clipboard.GetDataObject();
         if (data == null) return;
 
@@ -87,7 +97,44 @@ public class RtfRichTextBox : RichTextBox
             this.SelectedText = Clipboard.GetText(TextDataFormat.UnicodeText);
         }
     }
+    public static bool ContainsSingleHtmlImage()
+    {
+        IDataObject dataObject = Clipboard.GetDataObject();
 
+        if (dataObject == null)
+        {
+            return false;
+        }
+
+        // Check if both an image format (Bitmap) and the HTML format are present
+        bool containsImage = dataObject.GetDataPresent(DataFormats.Bitmap);
+        bool containsHtml = dataObject.GetDataPresent(DataFormats.Html);
+
+        if (containsImage && containsHtml)
+        {
+            string htmlContent = dataObject.GetData(DataFormats.Html) as string;
+
+            if (!string.IsNullOrEmpty(htmlContent))
+            {
+                // Use a regular expression to find all <img> tags in the HTML
+                // The RegexOptions.Singleline is useful if the HTML spans multiple lines.
+                MatchCollection matches = Regex.Matches(htmlContent, @"<img\b[^>]*>", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+                // A single HTML image scenario usually means exactly one <img> tag
+                if (matches.Count == 1)
+                {
+                    // Optional: Further logic can be added to check if other elements 
+                    // (like text) are present. Often, the HTML fragment for a single 
+                    // image will contain just the <img> tag and some boilerplate HTML
+                    // fragment headers.
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     private void ConvertHtmlToRtfAndPaste(string html)
     {
         // Wrap fragment in minimal HTML doc to ensure consistent rendering
