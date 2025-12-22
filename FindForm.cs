@@ -851,6 +851,12 @@ namespace DocMgr
                 e.Handled = true;
             }
 
+            if (e.Control && e.KeyCode == Keys.B)
+            {
+                buttonPrevious_Click(null, null);
+                e.Handled = true;
+            }
+
             if (e.KeyCode == Keys.F3)
             {
                 if (e.Shift)
