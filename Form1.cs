@@ -2356,22 +2356,14 @@ namespace DocMgr
 
         private void buttonFont_Click(object sender, EventArgs e)
         {
-            // Check if there is any text selected
-            if (richTextBox.SelectionLength > 0)
-            {
-                // Get the current font of the selection
-                System.Drawing.Font currentFont = richTextBox.SelectionFont;
-                System.Drawing.Font? newFont = GetFontSelection(currentFont);
+            System.Drawing.Font currentFont;
 
+            currentFont = richTextBox.SelectionFont;    // Get the current font at the selection.
+            System.Drawing.Font? newFont = GetFontSelection(currentFont);
+            richTextBox.Focus();                        // Return focus to RichTextBox.
 
-                if (newFont != null)
-                    richTextBox.SelectionFont = newFont;    // Apply the new font to the selected text.
-            }
-            else
-            {
-                CenterCursor(88, 72);
-                MessageBox.Show("Please select some text to change its font.");
-            }
+            if (newFont != null)
+                richTextBox.SelectionFont = newFont;    // Apply the new font to the selected text.
         }
 
         private Font? GetFontSelection(Font currentFont)
