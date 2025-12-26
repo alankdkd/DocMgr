@@ -26,7 +26,7 @@ namespace DocMgr
         string BackupsAndArchivesFolder = Properties.Settings.Default.BackupsAndArchivesFolder;
         //TEMP FOR USB BACKUP: string BackupsAndArchivesFolder = @"D:\BackupsAndArchives";
         string BackupFolder, ArchiveFolder;
-        string ProjName;
+        public static string ProjName;
         static MarginSt MyMargins;    // In twips; 1/1440 inch.  Twentieth of a point.
         static bool HaveMargins = false;
 

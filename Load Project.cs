@@ -20,7 +20,16 @@ namespace DocMgr
             AddProjectsToListBox();
             listBox1.Enabled = projMap.Count > 0;
             DialogResult = DialogResult.Cancel;
+            HighlightCurrentProject(DocMgr.ProjName);
             KeyPreview = true;
+        }
+
+        private void HighlightCurrentProject(string projName)
+        {
+            int index = listBox1.FindStringExact(projName);
+
+            if (index != ListBox.NoMatches)
+                listBox1.SelectedIndex = index; // This highlights the line
         }
 
         private void AddProjectsToListBox()
