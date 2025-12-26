@@ -53,6 +53,7 @@
             buttonFind = new Button();
             buttonOpenFolder = new Button();
             buttonFont = new Button();
+            buttonOpenPrintQueue = new Button();
             SuspendLayout();
             // 
             // richTextBox
@@ -85,7 +86,7 @@
             buttonClose.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonClose.Location = new Point(1090, 16);
             buttonClose.Name = "buttonClose";
-            buttonClose.Size = new Size(175, 31);
+            buttonClose.Size = new Size(179, 31);
             buttonClose.TabIndex = 3;
             buttonClose.Text = "&Close";
             buttonClose.UseVisualStyleBackColor = false;
@@ -146,7 +147,7 @@
             buttonRemoveDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonRemoveDoc.Location = new Point(1090, 214);
             buttonRemoveDoc.Name = "buttonRemoveDoc";
-            buttonRemoveDoc.Size = new Size(175, 31);
+            buttonRemoveDoc.Size = new Size(179, 31);
             buttonRemoveDoc.TabIndex = 8;
             buttonRemoveDoc.Text = "&Remove Document";
             toolTips.SetToolTip(buttonRemoveDoc, "Remove document from project but do NOT delete it.");
@@ -184,7 +185,7 @@
             ButtonNewDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             ButtonNewDoc.Location = new Point(1090, 81);
             ButtonNewDoc.Name = "ButtonNewDoc";
-            ButtonNewDoc.Size = new Size(175, 31);
+            ButtonNewDoc.Size = new Size(179, 31);
             ButtonNewDoc.TabIndex = 11;
             ButtonNewDoc.Text = "&New Document...";
             toolTips.SetToolTip(ButtonNewDoc, "Add new blank document to the project.");
@@ -197,7 +198,7 @@
             ButtonNewProj.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             ButtonNewProj.Location = new Point(1090, 146);
             ButtonNewProj.Name = "ButtonNewProj";
-            ButtonNewProj.Size = new Size(175, 31);
+            ButtonNewProj.Size = new Size(179, 31);
             ButtonNewProj.TabIndex = 12;
             ButtonNewProj.Text = "New Pro&ject...";
             ButtonNewProj.UseVisualStyleBackColor = false;
@@ -222,7 +223,7 @@
             buttonNumberLines.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonNumberLines.Location = new Point(1090, 353);
             buttonNumberLines.Name = "buttonNumberLines";
-            buttonNumberLines.Size = new Size(175, 31);
+            buttonNumberLines.Size = new Size(179, 31);
             buttonNumberLines.TabIndex = 14;
             buttonNumberLines.Text = "N&umber Lines";
             toolTips.SetToolTip(buttonNumberLines, "Add auto-numbering to the selected text.");
@@ -235,7 +236,7 @@
             buttonBackUpFile.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonBackUpFile.Location = new Point(1090, 422);
             buttonBackUpFile.Name = "buttonBackUpFile";
-            buttonBackUpFile.Size = new Size(175, 31);
+            buttonBackUpFile.Size = new Size(179, 31);
             buttonBackUpFile.TabIndex = 16;
             buttonBackUpFile.Text = "&Back Up Document";
             toolTips.SetToolTip(buttonBackUpFile, "Update the single backup copy with incremental progress until it's ready to archive.");
@@ -248,7 +249,7 @@
             buttonBackUpProject.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonBackUpProject.Location = new Point(1090, 465);
             buttonBackUpProject.Name = "buttonBackUpProject";
-            buttonBackUpProject.Size = new Size(175, 31);
+            buttonBackUpProject.Size = new Size(179, 31);
             buttonBackUpProject.TabIndex = 17;
             buttonBackUpProject.Text = "Bac&k Up Project";
             toolTips.SetToolTip(buttonBackUpProject, "Update the single backup copy with incremental progress until it's ready to archive.");
@@ -259,9 +260,9 @@
             // 
             buttonProperties.BackColor = SystemColors.Control;
             buttonProperties.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            buttonProperties.Location = new Point(1090, 823);
+            buttonProperties.Location = new Point(1090, 864);
             buttonProperties.Name = "buttonProperties";
-            buttonProperties.Size = new Size(175, 31);
+            buttonProperties.Size = new Size(179, 31);
             buttonProperties.TabIndex = 20;
             buttonProperties.Text = "Prop&erties...";
             toolTips.SetToolTip(buttonProperties, "Set the Backup/Archive folder, margins for printing, or default font.");
@@ -274,7 +275,7 @@
             buttonPrint.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonPrint.Location = new Point(1090, 619);
             buttonPrint.Name = "buttonPrint";
-            buttonPrint.Size = new Size(175, 31);
+            buttonPrint.Size = new Size(179, 31);
             buttonPrint.TabIndex = 21;
             buttonPrint.Text = "&Print...";
             toolTips.SetToolTip(buttonPrint, "Print document or selection.  Ctrl-P");
@@ -287,7 +288,7 @@
             buttonArchiveFile.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonArchiveFile.Location = new Point(1090, 508);
             buttonArchiveFile.Name = "buttonArchiveFile";
-            buttonArchiveFile.Size = new Size(175, 31);
+            buttonArchiveFile.Size = new Size(179, 31);
             buttonArchiveFile.TabIndex = 18;
             buttonArchiveFile.Text = "Arc&hive Document";
             toolTips.SetToolTip(buttonArchiveFile, "Save a time-stamped permanent copy.");
@@ -300,7 +301,7 @@
             buttonArchiveProject.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonArchiveProject.Location = new Point(1090, 551);
             buttonArchiveProject.Name = "buttonArchiveProject";
-            buttonArchiveProject.Size = new Size(175, 31);
+            buttonArchiveProject.Size = new Size(179, 31);
             buttonArchiveProject.TabIndex = 19;
             buttonArchiveProject.Text = "Archi&ve Project";
             toolTips.SetToolTip(buttonArchiveProject, "Save a time-stamped permanent copy.");
@@ -311,9 +312,9 @@
             // 
             buttonFind.BackColor = SystemColors.Control;
             buttonFind.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            buttonFind.Location = new Point(1090, 687);
+            buttonFind.Location = new Point(1090, 728);
             buttonFind.Name = "buttonFind";
-            buttonFind.Size = new Size(175, 31);
+            buttonFind.Size = new Size(179, 31);
             buttonFind.TabIndex = 22;
             buttonFind.Text = "&Find...";
             toolTips.SetToolTip(buttonFind, "Find a string in the current document, project, or all projects.  Ctrl-F");
@@ -326,7 +327,7 @@
             buttonOpenFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonOpenFolder.Location = new Point(1090, 284);
             buttonOpenFolder.Name = "buttonOpenFolder";
-            buttonOpenFolder.Size = new Size(175, 31);
+            buttonOpenFolder.Size = new Size(179, 31);
             buttonOpenFolder.TabIndex = 15;
             buttonOpenFolder.Text = "&Open Folder...";
             toolTips.SetToolTip(buttonOpenFolder, "Open browser on folder containing the document.  Ctrl-O");
@@ -337,21 +338,35 @@
             // 
             buttonFont.BackColor = SystemColors.Control;
             buttonFont.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            buttonFont.Location = new Point(1090, 755);
+            buttonFont.Location = new Point(1090, 796);
             buttonFont.Name = "buttonFont";
-            buttonFont.Size = new Size(175, 31);
+            buttonFont.Size = new Size(179, 31);
             buttonFont.TabIndex = 23;
             buttonFont.Text = "Font...";
             toolTips.SetToolTip(buttonFont, "Set the font for selected text.");
             buttonFont.UseVisualStyleBackColor = false;
             buttonFont.Click += buttonFont_Click;
             // 
+            // buttonOpenPrintQueue
+            // 
+            buttonOpenPrintQueue.BackColor = SystemColors.Control;
+            buttonOpenPrintQueue.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
+            buttonOpenPrintQueue.Location = new Point(1090, 660);
+            buttonOpenPrintQueue.Name = "buttonOpenPrintQueue";
+            buttonOpenPrintQueue.Size = new Size(179, 31);
+            buttonOpenPrintQueue.TabIndex = 24;
+            buttonOpenPrintQueue.Text = "&Open Print Queue...";
+            toolTips.SetToolTip(buttonOpenPrintQueue, "Print document or selection.  Ctrl-P");
+            buttonOpenPrintQueue.UseVisualStyleBackColor = false;
+            buttonOpenPrintQueue.Click += buttonOpenPrintQueue_Click;
+            // 
             // DocMgr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlDarkDark;
-            ClientSize = new Size(1296, 985);
+            ClientSize = new Size(1302, 985);
+            Controls.Add(buttonOpenPrintQueue);
             Controls.Add(buttonFont);
             Controls.Add(buttonFind);
             Controls.Add(buttonPrint);
@@ -412,5 +427,6 @@
         private Button buttonPrint;
         private Button buttonFind;
         private Button buttonFont;
+        private Button buttonOpenPrintQueue;
     }
 }

@@ -406,7 +406,8 @@ namespace DocMgr
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
                 ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
                 buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
-                buttonArchiveProject, buttonProperties, buttonPrint, buttonFind, buttonFont};
+                buttonArchiveProject, buttonProperties, buttonPrint,
+                buttonOpenPrintQueue, buttonFind, buttonFont};
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -1830,6 +1831,31 @@ namespace DocMgr
             }
         }
 
+        private void buttonOpenPrintQueue_Click(object sender, EventArgs e)
+        {
+            OpenPrintQueue(new PrinterSettings().PrinterName);
+        }
+
+        void OpenPrintQueue(string printerName)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                // For standard executables like rundll32, UseShellExecute = true 
+                // ensures Windows handles the command string correctly.
+                FileName = "rundll32.exe",
+                Arguments = $"printui.dll,PrintUIEntry /o /n \"{printerName}\"",
+                UseShellExecute = true
+            };
+
+            try
+            {
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not open queue: {ex.Message}");
+            }
+        }
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
             // ---- HANDLE PAGE RANGE ----
