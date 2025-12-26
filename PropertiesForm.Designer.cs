@@ -42,7 +42,7 @@
             // 
             // buttonSave
             // 
-            buttonSave.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonSave.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonSave.Location = new Point(804, 49);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(123, 43);
@@ -53,7 +53,7 @@
             // 
             // buttonCancel
             // 
-            buttonCancel.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonCancel.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonCancel.Location = new Point(804, 129);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(123, 43);
@@ -73,6 +73,7 @@
             Controls.Add(propertyGrid);
             Name = "PropertiesForm";
             Text = "DocMgr Properties";
+            KeyDown += PropertiesForm_KeyDown;
             ResumeLayout(false);
         }
 

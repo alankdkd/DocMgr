@@ -17,6 +17,7 @@ namespace DocMgr
             InitializeComponent();
             CenterToScreen();
             DocMgr.CenterCursor(-50, -170);
+            KeyPreview = true;
         }
 
         //ORIG: internal void SetProperties(Properties.Settings settings)
@@ -37,6 +38,15 @@ namespace DocMgr
         {
             SaveSettings = false;
             Close();
+        }
+
+        private void PropertiesForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+                e.Handled = true;
+            }
         }
     }
 }
