@@ -20,6 +20,7 @@ namespace DocMgr
             AddProjectsToListBox();
             listBox1.Enabled = projMap.Count > 0;
             DialogResult = DialogResult.Cancel;
+            KeyPreview = true;
         }
 
         private void AddProjectsToListBox()
@@ -165,6 +166,15 @@ namespace DocMgr
             selectedPath = projMap[projName];
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void LoadProjectDlg_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.Close();
+                e.Handled = true;
+            }
         }
     }
 }

@@ -87,10 +87,11 @@
             Controls.Add(buttonBrowse);
             Controls.Add(listBox1);
             Controls.Add(label1);
-            Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
             Margin = new Padding(5);
             Name = "LoadProjectDlg";
             Text = "LoadProject";
+            KeyDown += LoadProjectDlg_KeyDown;
             ResumeLayout(false);
             PerformLayout();
         }

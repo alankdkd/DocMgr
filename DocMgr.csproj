@@ -18,8 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Env.cs" />
     <Compile Remove="FindRtf.cs" />
     <Compile Remove="NullableIntConverter.cs" />
+    <Compile Remove="RichEditOleCallback.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DocMgrBAD.json" />
   </ItemGroup>
 
   <ItemGroup>
