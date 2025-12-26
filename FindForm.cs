@@ -37,6 +37,7 @@ namespace DocMgr
         static string SearchText = new("");
         enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
         static SearchScope CurrentScope = SearchScope.CurrentDoc;
+        private System.Windows.Forms.Timer _clickTracker;
 
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
@@ -67,6 +68,11 @@ namespace DocMgr
                 SearchText = richTextBox.SelectedText;
 
             textString.Text = SearchText;
+
+            // 1. Initialize the timer
+            _clickTracker = new System.Windows.Forms.Timer();
+            _clickTracker.Interval = 50; // Check every 50ms (fast enough to feel instant)
+            _clickTracker.Tick += ClickTracker_Tick;
 
             SetAttributes();
             EnableResults(false);
@@ -866,6 +872,36 @@ namespace DocMgr
 
                 e.Handled = true;
             }
+        }
+
+        private void FindForm_Load(object sender, EventArgs e)
+        {
+            // 1. Start tracking as soon as the dialog is shown
+            _clickTracker.Start();
+        }
+
+        private void ClickTracker_Tick(object sender, EventArgs e)
+        {
+            // 2. Check if the Left Mouse Button is physically pressed down
+            if (Control.MouseButtons == MouseButtons.Left)
+            {
+                // 3. Get current mouse position relative to the screen
+                Point mousePos = Cursor.Position;
+
+                // 4. If the mouse is NOT inside the dialog's area, close it
+                if (!this.Bounds.Contains(mousePos))
+                {
+                    this.Close();
+                }
+            }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            // 6. Stop and clean up the timer
+            _clickTracker.Stop();
+            _clickTracker.Dispose();
+            base.OnFormClosed(e);
         }
     }
 }

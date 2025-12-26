@@ -216,6 +216,7 @@
             Text = "Find";
             TopMost = true;
             FormClosed += FindForm_FormClosed;
+            Load += FindForm_Load;
             Shown += FindForm_Shown;
             KeyDown += FindForm_KeyDown;
             groupBox1.ResumeLayout(false);

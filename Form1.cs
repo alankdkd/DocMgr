@@ -2025,7 +2025,6 @@ namespace DocMgr
             }
         }
 
-
         //public class RtfHighlighter
         //{
         //public static string HighlightSearchStringInRtf(string rtf, string searchString, bool caseSensitive = false, bool wholeWord = false)
