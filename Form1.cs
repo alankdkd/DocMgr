@@ -699,7 +699,7 @@ namespace DocMgr
             {
                 e.Handled = true;
 
-                if (shift)
+                if (shift)                              // Ctrl-Shift-F Find in project.
                     SearchDialog.CurrentScope = SearchDialog.SearchScope.CurrentProject;
 
                 buttonFind_Click(sender, e);           // Invoke find.
@@ -1007,10 +1007,20 @@ namespace DocMgr
             {
                 if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath)
                     && !RichTextBoxContainsImage(richTextBox))
-                    if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
-                        + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
-                        != DialogResult.OK)
-                        return;
+                {
+                    using (RichTextBox rtb = new())
+                    {
+                        rtb.LoadFile(CurrentFilePath);
+
+                        if (rtb.Text.Length > 0)
+                        {
+                            if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
+                            + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
+                            != DialogResult.OK)
+                                return;
+                        }
+                    }
+                }
 
                 SaveScrollPosition();
                 //ORIG: richTextBox.SaveFile(CurrentFilePath);
