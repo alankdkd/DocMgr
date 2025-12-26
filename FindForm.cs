@@ -74,6 +74,7 @@ namespace DocMgr
             _clickTracker.Interval = 50; // Check every 50ms (fast enough to feel instant)
             _clickTracker.Tick += ClickTracker_Tick;
 
+            KeyPreview = true;
             SetAttributes();
             EnableResults(false);
             this.textString.Focus();
@@ -875,6 +876,11 @@ namespace DocMgr
 
                 e.Handled = true;
             }
+
+            if (e.KeyCode == Keys.PageUp || e.KeyCode == Keys.PageDown
+                || e.KeyCode == Keys.Up || e.KeyCode == Keys.Down
+                || e.KeyCode == Keys.Home || e.KeyCode == Keys.End)
+                mainForm.DocMgr_KeyDown(this, e);
         }
 
         private void FindForm_Load(object sender, EventArgs e)

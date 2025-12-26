@@ -2263,7 +2263,7 @@ namespace DocMgr
             return SendMessage(rtb.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
         }
 
-        private void DocMgr_KeyDown(object sender, KeyEventArgs e)
+        public void DocMgr_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.Home)
             {
