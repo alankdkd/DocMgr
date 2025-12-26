@@ -493,7 +493,10 @@ namespace DocMgr
             }
 
             if (currentDoc.Value.docName != DisplayedDoc)
+            {
                 loadDoc = true;                             // If displayed doc different, load current.
+                mainForm.HighlightThisButton(currentDoc.Value.docName);
+            }
 
             if (loadDoc)
             {

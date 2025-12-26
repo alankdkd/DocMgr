@@ -1143,7 +1143,7 @@ namespace DocMgr
                 SaveScrollPosition();
         }
 
-        private void HighlightThisButton(string text)
+        public void HighlightThisButton(string text)
         {
             foreach (Control con in Controls)
                 if ((con is Button) && (con.Text == text))
