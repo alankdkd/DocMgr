@@ -1374,10 +1374,10 @@ namespace DocMgr
             if (ProjectFolder == null)
                 ProjectFolder = Path.GetDirectoryName(ProjectPath);
 
-            if (!File.Exists(CurrentFilePath))
-                Process.Start("explorer", ProjectFolder);
-            else
+            if (File.Exists(CurrentFilePath))
                 Process.Start("explorer", $"/select,\"{CurrentFilePath}\"");
+            else
+                Process.Start("explorer", ProjectFolder);
         }
 
         #region BackupsAndArchives

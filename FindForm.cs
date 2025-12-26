@@ -900,7 +900,7 @@ namespace DocMgr
                 // 4. If the mouse is NOT inside the dialog's area, close it
                 if (!this.Bounds.Contains(mousePos))
                 {
-                    this.Close();
+                    Close();
                 }
             }
         }
