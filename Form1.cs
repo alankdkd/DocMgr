@@ -12,9 +12,11 @@ using System.Drawing.Printing;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
+using SearchDialog = DocMgr.FindForm;
 
 namespace DocMgr
 {
+
     public partial class DocMgr : Form
     {
         readonly int BUTTON_Y_SPACING = 40;
@@ -678,8 +680,8 @@ namespace DocMgr
 
         public void DocMgr_KeyPress(object sender, KeyPressEventArgs e)
         {
-            //if (e.KeyChar == (int)Keys.Escape)
-            //    buttonClose_Click(sender, e);           // User wants to exit.
+            bool shift = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
+            bool ctrl = (Control.ModifierKeys & Keys.Control) == Keys.Control;
 
             if (e.KeyChar == 19 && buttonSaveDoc.Enabled) // Ctrl-S.  Civilized way to do this not apparent.
             {
@@ -693,9 +695,13 @@ namespace DocMgr
                 buttonPrint_Click(sender, e);           // Invoke print.
             }
 
-            if (e.KeyChar == 6)                        // Ctrl-F.  Find.
+            if (e.KeyChar == 6)                         // Ctrl-F.  Find.
             {
                 e.Handled = true;
+
+                if (shift)
+                    SearchDialog.CurrentScope = SearchDialog.SearchScope.CurrentProject;
+
                 buttonFind_Click(sender, e);           // Invoke find.
             }
         }

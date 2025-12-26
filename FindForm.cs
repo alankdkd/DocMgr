@@ -35,8 +35,8 @@ namespace DocMgr
         static bool MatchCase = false;
         static bool MatchWholeWord = false;
         static string SearchText = new("");
-        enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
-        static SearchScope CurrentScope = SearchScope.CurrentDoc;
+        public enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
+        public static SearchScope CurrentScope = SearchScope.CurrentDoc;
         private System.Windows.Forms.Timer _clickTracker;
 
         Dictionary<string, string> projMap;     // Map project name to path.
