@@ -24,8 +24,11 @@ namespace DocMgr
             KeyPreview = true;
         }
 
-        private void HighlightCurrentProject(string projName)
+        private void HighlightCurrentProject(string? projName)
         {
+            if (projName == null)
+                return;
+
             int index = listBox1.FindStringExact(projName);
 
             if (index != ListBox.NoMatches)
