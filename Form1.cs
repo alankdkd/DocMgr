@@ -695,8 +695,15 @@ namespace DocMgr
                 buttonPrint_Click(sender, e);           // Invoke print.
             }
 
-            if (e.KeyChar == 6)                         // Ctrl-F.  Find.
+            if (e.KeyChar == 6  ||  e.KeyChar == 2)     // Ctrl-F (Find) or Ctrl-B (Back or Bold).
             {
+                SearchDialog.DirectionForward = true;   // Default: Forward search.
+
+                if (e.KeyChar == 2  &&  richTextBox.SelectedText.Length == 0)
+                    SearchDialog.DirectionForward = false;  // Ctrl-B: Backward search.
+                else
+                    ;   // If text selected, do normal bold.  [NOT YET IMPLEMENTED.]
+
                 e.Handled = true;
 
                 if (shift)                              // Ctrl-Shift-F Find in project.
@@ -2053,6 +2060,7 @@ namespace DocMgr
                 finding = true;
                 FindForm ff = new(richTextBox, Root, justDocName, this);
                 ff.ShowDialog();
+                SearchDialog.DirectionForward = true;   // Restore default: Forward search.
 
                 if (ff.DisplayedDoc != null && ff.DisplayedDoc.Length > 0)
                 {

@@ -27,7 +27,7 @@ namespace DocMgr
         string? CurrentDocPath = null;
         string SearchString;
         Doc CurrentProjectInfo;
-        bool DirectionForward = true;
+        public static bool DirectionForward = true;
         int TotalMatches, NumMatches;
         int MatchOrderInDoc;
         int InstanceNum;
@@ -128,8 +128,18 @@ namespace DocMgr
             string position = $"Showing 1 of {TotalMatches}";
             labelInstanceOrder.Text = position;
             ShowDoc(DocList[CurrentDocNum]);
-            Program.CenterCursorInButton(buttonNext, 0, 6);
-            buttonNext.Focus();
+
+            if (DirectionForward)
+            {
+                Program.CenterCursorInButton(buttonNext, 0, 6);
+                buttonNext.Focus();
+            }
+            else
+            {
+                Program.CenterCursorInButton(buttonPrevious, 0, 6);
+                buttonPrevious.Focus();
+            }
+
             Cursor.Current = Cursors.Default;
 
             //buttonNext_Click(null, null);
