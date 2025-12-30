@@ -719,7 +719,35 @@ namespace DocMgr
 
         private void MakeSelectedTextBold()
         {
-            throw new NotImplementedException();
+            // Suspend layout to prevent flickering during rapid selection changes
+            richTextBox.SuspendLayout();
+
+            int start = richTextBox.SelectionStart;
+            int length = richTextBox.SelectionLength;
+
+            // Iterate through each character in the current selection
+            for (int i = start; i < start + length; i++)
+            {
+                // Select exactly one character
+                richTextBox.Select(i, 1);
+
+                if (richTextBox.SelectionFont != null)
+                {
+                    Font currentFont = richTextBox.SelectionFont;
+                    FontStyle newStyle;
+
+                    // Use XOR (^) to toggle the Bold bit specifically
+                    // This leaves other styles like Italic or Underline untouched
+                    newStyle = currentFont.Style ^ FontStyle.Bold;
+
+                    // Re-apply the font using the original family and size, but new style
+                    richTextBox.SelectionFont = new Font(currentFont.FontFamily, currentFont.Size, newStyle);
+                }
+            }
+
+            // Restore the original user selection
+            richTextBox.Select(start, length);
+            richTextBox.ResumeLayout();
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
