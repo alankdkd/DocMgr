@@ -704,7 +704,7 @@ namespace DocMgr
                         SearchDialog.DirectionForward = false;  // Ctrl-B: No selection; backward search.
                     else
                     {
-                        MakeSelectedTextBold();  // If text selected, do normal bold.  [NOT YET IMPLEMENTED.]
+                        StyleSelectedText(FontStyle.Bold);  // If text selected, do normal bold.
                         return;
                     }
                 else
@@ -715,15 +715,30 @@ namespace DocMgr
 
                 buttonFind_Click(sender, e);           // Invoke find.
             }
+            else
+                if (e.KeyChar == 9 && ctrl)            // Ctrl-I Italics.
+                    e.Handled = StyleSelectedText(FontStyle.Italic);
+                else
+                    if (e.KeyChar == 21 && ctrl)       // Ctrl-U Underline.
+                        e.Handled = StyleSelectedText(FontStyle.Underline);
+                    else
+                        if (e.KeyChar == 20 && ctrl)   // Ctrl-T Strikeout
+                            e.Handled = StyleSelectedText(FontStyle.Strikeout);
         }
 
-        private void MakeSelectedTextBold()
+        /// <summary>
+        /// Set the given style (bold, italic, underline, strikeout) on the selected
+        /// text if any of the selected text does not have that style.  Else unset it.
+        /// </summary>
+        private bool StyleSelectedText(FontStyle style)
         {
             // Suspend layout to prevent flickering during rapid selection changes
             richTextBox.SuspendLayout();
 
             int start = richTextBox.SelectionStart;
             int length = richTextBox.SelectionLength;
+
+            bool setStyle = AnyWithoutStyle(start, length, style);  // Set if any unset.
 
             // Iterate through each character in the current selection
             for (int i = start; i < start + length; i++)
@@ -736,9 +751,13 @@ namespace DocMgr
                     Font currentFont = richTextBox.SelectionFont;
                     FontStyle newStyle;
 
-                    // Use XOR (^) to toggle the Bold bit specifically
+                    // Use the style to toggle the style bit specifically.
                     // This leaves other styles like Italic or Underline untouched
-                    newStyle = currentFont.Style ^ FontStyle.Bold;
+
+                    if (setStyle)
+                        newStyle = currentFont.Style | style;
+                    else
+                        newStyle = currentFont.Style & ~style;
 
                     // Re-apply the font using the original family and size, but new style
                     richTextBox.SelectionFont = new Font(currentFont.FontFamily, currentFont.Size, newStyle);
@@ -748,6 +767,34 @@ namespace DocMgr
             // Restore the original user selection
             richTextBox.Select(start, length);
             richTextBox.ResumeLayout();
+            return true;
+        }
+
+        /// <summary>
+        /// Return true if any character in the selection does NOT have the specified style.
+        /// </summary>
+        private bool AnyWithoutStyle(int start, int length, FontStyle style)
+        {
+            bool withoutStyle = false;
+
+            for (int i = start; i < start + length; i++)
+            {
+                // Select exactly one character
+                richTextBox.Select(i, 1);
+
+                if (richTextBox.SelectionFont != null)
+                {
+                    Font currentFont = richTextBox.SelectionFont;
+
+                    if ((currentFont.Style & style) == 0)
+                    {
+                        withoutStyle = true;
+                        break;
+                    }
+                }
+            }
+
+                return withoutStyle;
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
