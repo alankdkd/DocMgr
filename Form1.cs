@@ -1520,6 +1520,7 @@ namespace DocMgr
                 CenterCursor(162, 88);
                 MessageBox.Show($"{DocName.Text.Substring(0, DocName.Text.Length - 1)} is saved to "
                     + destFolder + ".");
+                richTextBox.Focus();
                 return;
             }
 
@@ -1563,6 +1564,7 @@ namespace DocMgr
                 CenterCursor(162, 88);
                 MessageBox.Show($"Project {ProjName} is saved to "
                     + destFolder + ".");
+                richTextBox.Focus();
                 return;
             }
 
