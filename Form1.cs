@@ -695,7 +695,7 @@ namespace DocMgr
                 buttonPrint_Click(sender, e);           // Invoke print.
             }
 
-            if (e.KeyChar == 6  ||  e.KeyChar == 2)     // Ctrl-F (Find) or Ctrl-B (Back or Bold).
+            if (e.KeyChar == 6 || e.KeyChar == 2)     // Ctrl-F (Find) or Ctrl-B (Back or Bold).
             {
                 e.Handled = true;
 
@@ -717,13 +717,13 @@ namespace DocMgr
             }
             else
                 if (e.KeyChar == 9 && ctrl)            // Ctrl-I Italics.
-                    e.Handled = StyleSelectedText(FontStyle.Italic);
-                else
+                e.Handled = StyleSelectedText(FontStyle.Italic);
+            else
                     if (e.KeyChar == 21 && ctrl)       // Ctrl-U Underline.
-                        e.Handled = StyleSelectedText(FontStyle.Underline);
-                    else
+                e.Handled = StyleSelectedText(FontStyle.Underline);
+            else
                         if (e.KeyChar == 20 && ctrl)   // Ctrl-T Strikeout
-                            e.Handled = StyleSelectedText(FontStyle.Strikeout);
+                e.Handled = StyleSelectedText(FontStyle.Strikeout);
         }
 
         /// <summary>
@@ -794,7 +794,7 @@ namespace DocMgr
                 }
             }
 
-                return withoutStyle;
+            return withoutStyle;
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -2448,10 +2448,8 @@ namespace DocMgr
         }
 
         private void buttonFont_Click(object sender, EventArgs e)
-        {
-            System.Drawing.Font currentFont;
-
-            currentFont = richTextBox.SelectionFont;    // Get the current font at the selection.
+        {                               // Get the current font at the selection:
+            System.Drawing.Font currentFont = richTextBox.SelectionFont;
             System.Drawing.Font? newFont = GetFontSelection(currentFont);
             richTextBox.Focus();                        // Return focus to RichTextBox.
 
@@ -2464,6 +2462,7 @@ namespace DocMgr
             using (FontDialog fd = new())
             {
                 fd.Font = currentFont;
+                CenterCursor(-120, -228);
 
                 if (fd.ShowDialog() == DialogResult.OK)
                     return fd.Font;
@@ -2492,6 +2491,29 @@ namespace DocMgr
             {
                 MessageBox.Show("Could not open link: " + ex.Message);
             }
+        }
+
+        private void buttonBold_Click(object sender, EventArgs e)
+        {
+            if (richTextBox.SelectedText.Length == 0)
+                SearchDialog.DirectionForward = false;  // Ctrl-B: No selection; backward search.
+            else
+                StyleSelectedText(FontStyle.Bold);  // If text selected, do normal bold.
+        }
+
+        private void buttonItalic_Click(object sender, EventArgs e)
+        {
+            StyleSelectedText(FontStyle.Italic);  // If text selected, do normal bold.
+        }
+
+        private void buttonUnderline_Click(object sender, EventArgs e)
+        {
+            StyleSelectedText(FontStyle.Underline);  // If text selected, do normal bold.
+        }
+
+        private void buttonSrikeout_Click(object sender, EventArgs e)
+        {
+            StyleSelectedText(FontStyle.Strikeout);  // If text selected, do normal bold.
         }
     }
 

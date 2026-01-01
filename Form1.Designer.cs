@@ -54,6 +54,10 @@
             buttonOpenFolder = new Button();
             buttonFont = new Button();
             buttonOpenPrintQueue = new Button();
+            buttonBold = new Button();
+            buttonItalic = new Button();
+            buttonUnderline = new Button();
+            buttonSrikeout = new Button();
             SuspendLayout();
             // 
             // richTextBox
@@ -260,7 +264,7 @@
             // 
             buttonProperties.BackColor = SystemColors.Control;
             buttonProperties.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            buttonProperties.Location = new Point(1090, 864);
+            buttonProperties.Location = new Point(1090, 892);
             buttonProperties.Name = "buttonProperties";
             buttonProperties.Size = new Size(179, 31);
             buttonProperties.TabIndex = 20;
@@ -360,12 +364,68 @@
             buttonOpenPrintQueue.UseVisualStyleBackColor = false;
             buttonOpenPrintQueue.Click += buttonOpenPrintQueue_Click;
             // 
+            // buttonBold
+            // 
+            buttonBold.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            buttonBold.Location = new Point(1090, 840);
+            buttonBold.Name = "buttonBold";
+            buttonBold.Size = new Size(40, 40);
+            buttonBold.TabIndex = 25;
+            buttonBold.Text = "B";
+            buttonBold.TextAlign = ContentAlignment.TopCenter;
+            toolTips.SetToolTip(buttonBold, "Bold  Ctrl-B");
+            buttonBold.UseVisualStyleBackColor = true;
+            buttonBold.Click += buttonBold_Click;
+            // 
+            // buttonItalic
+            // 
+            buttonItalic.Font = new Font("Segoe UI", 18F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            buttonItalic.Location = new Point(1137, 840);
+            buttonItalic.Name = "buttonItalic";
+            buttonItalic.Size = new Size(40, 40);
+            buttonItalic.TabIndex = 26;
+            buttonItalic.Text = "I";
+            buttonItalic.TextAlign = ContentAlignment.TopCenter;
+            toolTips.SetToolTip(buttonItalic, "Italic  Ctrl-I");
+            buttonItalic.UseVisualStyleBackColor = true;
+            buttonItalic.Click += buttonItalic_Click;
+            // 
+            // buttonUnderline
+            // 
+            buttonUnderline.Font = new Font("Segoe UI", 18F, FontStyle.Underline, GraphicsUnit.Point, 0);
+            buttonUnderline.Location = new Point(1186, 840);
+            buttonUnderline.Name = "buttonUnderline";
+            buttonUnderline.Size = new Size(40, 40);
+            buttonUnderline.TabIndex = 27;
+            buttonUnderline.Text = "U";
+            buttonUnderline.TextAlign = ContentAlignment.TopCenter;
+            toolTips.SetToolTip(buttonUnderline, "Underline  Ctrl-U");
+            buttonUnderline.UseVisualStyleBackColor = true;
+            buttonUnderline.Click += buttonUnderline_Click;
+            // 
+            // buttonSrikeout
+            // 
+            buttonSrikeout.Font = new Font("Segoe UI", 18F, FontStyle.Strikeout, GraphicsUnit.Point, 0);
+            buttonSrikeout.Location = new Point(1238, 840);
+            buttonSrikeout.Name = "buttonSrikeout";
+            buttonSrikeout.Size = new Size(40, 40);
+            buttonSrikeout.TabIndex = 28;
+            buttonSrikeout.Text = "T";
+            buttonSrikeout.TextAlign = ContentAlignment.TopCenter;
+            toolTips.SetToolTip(buttonSrikeout, "Strikeout  Ctrl-T");
+            buttonSrikeout.UseVisualStyleBackColor = true;
+            buttonSrikeout.Click += buttonSrikeout_Click;
+            // 
             // DocMgr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlDarkDark;
             ClientSize = new Size(1302, 985);
+            Controls.Add(buttonSrikeout);
+            Controls.Add(buttonUnderline);
+            Controls.Add(buttonItalic);
+            Controls.Add(buttonBold);
             Controls.Add(buttonOpenPrintQueue);
             Controls.Add(buttonFont);
             Controls.Add(buttonFind);
@@ -428,5 +488,10 @@
         private Button buttonFind;
         private Button buttonFont;
         private Button buttonOpenPrintQueue;
+        private Button button1;
+        private Button buttonItalic;
+        private Button buttonUnderline;
+        private Button buttonSrikeout;
+        private Button buttonBold;
     }
 }
