@@ -777,6 +777,8 @@ namespace DocMgr
             // Restore the original user selection
             richTextBox.Select(start, length);
             richTextBox.ResumeLayout();
+            richTextBox.Focus();
+
             return true;
         }
 

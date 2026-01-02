@@ -39,7 +39,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            label1.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             label1.Location = new Point(33, 45);
             label1.Name = "label1";
             label1.Size = new Size(300, 23);
@@ -49,7 +49,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             label2.Location = new Point(210, 96);
             label2.Name = "label2";
             label2.Size = new Size(123, 23);
@@ -58,7 +58,7 @@
             // 
             // textParentFolder
             // 
-            textParentFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            textParentFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             textParentFolder.Location = new Point(336, 40);
             textParentFolder.Name = "textParentFolder";
             textParentFolder.Size = new Size(639, 31);
@@ -66,7 +66,7 @@
             // 
             // textProjName
             // 
-            textProjName.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            textProjName.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             textProjName.Location = new Point(336, 91);
             textProjName.Name = "textProjName";
             textProjName.Size = new Size(639, 31);
@@ -75,7 +75,7 @@
             // buttonOk
             // 
             buttonOk.DialogResult = DialogResult.OK;
-            buttonOk.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonOk.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonOk.Location = new Point(994, 38);
             buttonOk.Name = "buttonOk";
             buttonOk.Size = new Size(94, 34);
@@ -87,7 +87,7 @@
             // buttonCancel
             // 
             buttonCancel.DialogResult = DialogResult.Cancel;
-            buttonCancel.Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonCancel.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
             buttonCancel.Location = new Point(994, 87);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(94, 34);
@@ -109,8 +109,10 @@
             Controls.Add(textParentFolder);
             Controls.Add(label2);
             Controls.Add(label1);
+            KeyPreview = true;
             Name = "CreateFolderDialog";
             Load += CreateFolderDialog_Load;
+            KeyPress += CreateFolderDialog_KeyPress;
             ResumeLayout(false);
             PerformLayout();
         }

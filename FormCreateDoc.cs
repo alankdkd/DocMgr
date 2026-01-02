@@ -76,7 +76,10 @@ namespace DocMgr
         private void FormCreateDoc_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (int)Keys.Escape)
+            {
+                e.Handled = true;
                 buttonClose_Click(sender, e);           // User wants to exit.
+            }
         }
 
         private void textBoxDocName_TextChanged(object sender, EventArgs e)

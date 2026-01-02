@@ -211,6 +211,7 @@
             Controls.Add(label1);
             Controls.Add(groupBox1);
             Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
+            KeyPreview = true;
             Margin = new Padding(5);
             Name = "FindForm";
             Text = "Find";

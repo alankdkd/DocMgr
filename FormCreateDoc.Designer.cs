@@ -39,7 +39,7 @@
             // 
             // buttonSelect
             // 
-            buttonSelect.Font = new Font("Calibri", 20.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonSelect.Font = new Font("Calibri", 20.25F, FontStyle.Bold);
             buttonSelect.Location = new Point(925, 36);
             buttonSelect.Name = "buttonSelect";
             buttonSelect.Size = new Size(46, 38);
@@ -121,7 +121,8 @@
             Controls.Add(label2);
             Controls.Add(buttonCreate);
             Controls.Add(buttonSelect);
-            Font = new Font("Calibri", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            Font = new Font("Calibri", 14.25F, FontStyle.Bold);
+            KeyPreview = true;
             Margin = new Padding(4, 5, 4, 5);
             Name = "FormCreateDoc";
             Text = "Create New Document";

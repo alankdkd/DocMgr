@@ -64,5 +64,14 @@ namespace DocMgr
         {//DFW: textProjName.Focus();
             ActiveControl = textProjName;
         }
+
+        private void CreateFolderDialog_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (int)Keys.Escape)
+            {
+                e.Handled = true;
+                Close();                // User wants to exit.
+            }
+        }
     }
 }
