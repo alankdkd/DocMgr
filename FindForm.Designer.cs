@@ -58,7 +58,7 @@
             // 
             textString.Location = new Point(75, 21);
             textString.Name = "textString";
-            textString.Size = new Size(549, 33);
+            textString.Size = new Size(400, 33);
             textString.TabIndex = 1;
             // 
             // checkMatchCase
@@ -125,7 +125,7 @@
             groupBox1.Controls.Add(radioCurrentDoc);
             groupBox1.Controls.Add(radioCurrentProject);
             groupBox1.Controls.Add(radioAllProjects);
-            groupBox1.Location = new Point(340, 133);
+            groupBox1.Location = new Point(18, 127);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(284, 148);
             groupBox1.TabIndex = 7;
@@ -134,7 +134,7 @@
             // 
             // buttonFind
             // 
-            buttonFind.Location = new Point(650, 19);
+            buttonFind.Location = new Point(340, 127);
             buttonFind.Name = "buttonFind";
             buttonFind.Size = new Size(135, 65);
             buttonFind.TabIndex = 8;
@@ -145,7 +145,7 @@
             // buttonClose
             // 
             buttonClose.DialogResult = DialogResult.Cancel;
-            buttonClose.Location = new Point(650, 145);
+            buttonClose.Location = new Point(340, 210);
             buttonClose.Name = "buttonClose";
             buttonClose.Size = new Size(135, 65);
             buttonClose.TabIndex = 9;
@@ -166,7 +166,7 @@
             // buttonPrevious
             // 
             buttonPrevious.Enabled = false;
-            buttonPrevious.Location = new Point(190, 395);
+            buttonPrevious.Location = new Point(181, 395);
             buttonPrevious.Name = "buttonPrevious";
             buttonPrevious.Size = new Size(135, 65);
             buttonPrevious.TabIndex = 11;
@@ -198,7 +198,7 @@
             AutoScaleDimensions = new SizeF(11F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = buttonClose;
-            ClientSize = new Size(814, 478);
+            ClientSize = new Size(503, 483);
             Controls.Add(labelFindResults);
             Controls.Add(labelInstanceOrder);
             Controls.Add(buttonPrevious);

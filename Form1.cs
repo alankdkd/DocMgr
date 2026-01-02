@@ -409,7 +409,7 @@ namespace DocMgr
                 ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
                 buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
                 buttonArchiveProject, buttonProperties, buttonPrint,
-                buttonOpenPrintQueue, buttonFind, buttonFont};
+                buttonOpenPrintQueue, buttonFind, buttonFont, buttonBold};
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -421,6 +421,16 @@ namespace DocMgr
             {
                 b.Left = leftTopButtons;
                 leftTopButtons += (b.Width + 32);
+            }
+
+            Button[] fontButtons = new Button[] { buttonBold,
+                buttonItalic, buttonUnderline, buttonStrikeout};
+            int nextXPosition = buttonBold.Left;
+
+            foreach (var button in fontButtons)
+            {
+                button.Left = nextXPosition;
+                nextXPosition += (button.Width + 8);
             }
         }
 
@@ -2511,7 +2521,7 @@ namespace DocMgr
             StyleSelectedText(FontStyle.Underline);  // If text selected, do normal bold.
         }
 
-        private void buttonSrikeout_Click(object sender, EventArgs e)
+        private void buttonStrikeout_Click(object sender, EventArgs e)
         {
             StyleSelectedText(FontStyle.Strikeout);  // If text selected, do normal bold.
         }
