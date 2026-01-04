@@ -265,7 +265,7 @@ namespace DocMgr
 
         private void ButtonSaveAs_Click(object sender, EventArgs e)
         {
-            string? fileName = GetSaveFileName("RTF Files|*.rtf|All Files|*.*", true);
+            string? fileName = GetSaveFileName("rtf files (*.rtf)|*.rtf|text files (*.txt)|*.txt|All files (*.*)|*.*", true);
 
             if (string.IsNullOrEmpty(fileName))
                 return;
@@ -553,7 +553,13 @@ namespace DocMgr
                 {
                     try
                     {
-                        richTextBox.LoadFile(CurrentFilePath);
+                        if (CurrentFilePath.EndsWith(".rtf"))
+                            richTextBox.LoadFile(CurrentFilePath);
+                        else
+                             if (CurrentFilePath.EndsWith(".txt"))
+                                richTextBox.Text = File.ReadAllText(CurrentFilePath);
+                        else
+                            throw new Exception("Unsupported file type.");
                     }
                     catch (Exception ex)
                     {
@@ -1053,7 +1059,7 @@ namespace DocMgr
             if (DocName.Text.StartsWith('*'))
                 buttonSaveDoc_Click(null, null);                            // In case changes not saved.
 
-            string? DocPath = OpenFile("rtf files (*.rtf)|*.rtf|All files (*.*)|*.*");
+            string? DocPath = OpenFile("rtf files (*.rtf)|*.rtf|text files (*.txt)|*.txt|All files (*.*)|*.*");
 
             if (IsNullOrEmpty(DocPath))
                 return;
@@ -1140,7 +1146,7 @@ namespace DocMgr
 
                 if (DocName.Text.Length == 0)
                 {
-                    string? fileName = GetSaveFileName("RTF Files|*.rtf|All Files|*.*", true);
+                    string? fileName = GetSaveFileName("rtf files (*.rtf)|*.rtf|text files (*.txt)|*.txt|All files (*.*)|*.*", true);
 
                     if (fileName == null)
                         return;
@@ -1149,8 +1155,19 @@ namespace DocMgr
                     DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath) + ":";
                 }
 
-                File.WriteAllText(CurrentFilePath, rtfWithMargins);
-                saveOk = true;
+                if (CurrentFilePath.EndsWith(".rtf"))
+                {
+                    File.WriteAllText(CurrentFilePath, rtfWithMargins);
+                    saveOk = true;
+                }
+                else
+                    if (CurrentFilePath.EndsWith(".txt"))
+                    {
+                        File.WriteAllText(CurrentFilePath, richTextBox.Text);
+                        saveOk = true;
+                    }
+                    else
+                        throw new Exception("Unsupported file type.");
             }
             catch (UnauthorizedAccessException)
             {

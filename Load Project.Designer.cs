@@ -52,6 +52,7 @@
             listBox1.Margin = new Padding(5);
             listBox1.Name = "listBox1";
             listBox1.Size = new Size(441, 554);
+            listBox1.Sorted = true;
             listBox1.TabIndex = 1;
             listBox1.Click += listBox1_Click;
             listBox1.DoubleClick += listBox1_DoubleClick;

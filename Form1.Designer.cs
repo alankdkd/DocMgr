@@ -410,7 +410,7 @@
             buttonStrikeout.Name = "buttonStrikeout";
             buttonStrikeout.Size = new Size(38, 38);
             buttonStrikeout.TabIndex = 28;
-            buttonStrikeout.Text = "T";
+            buttonStrikeout.Text = "S";
             buttonStrikeout.TextAlign = ContentAlignment.TopCenter;
             toolTips.SetToolTip(buttonStrikeout, "Strikeout  Ctrl-T");
             buttonStrikeout.UseVisualStyleBackColor = true;
