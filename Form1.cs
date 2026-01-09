@@ -854,6 +854,7 @@ namespace DocMgr
             SaveScrollPosition();
             ProjectPath = SelectProjectFile();
             buttonSaveDoc.Enabled = false;
+            buttonNameClicked = null;
             loadingDoc = true;
 
             if (ProjectPath != null)

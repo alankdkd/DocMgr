@@ -125,7 +125,7 @@ namespace DocMgr
             InstanceNum = 0;
 
             EnableResults(true);
-            string position = $"Showing 1 of {TotalMatches}";
+            string position = $"Showing 1 of {TotalMatches}.";
             labelInstanceOrder.Text = position;
             ShowDoc(DocList[CurrentDocNum]);
 
@@ -480,7 +480,7 @@ namespace DocMgr
                         InstanceNum = TotalMatches - 1;
                 }
 
-                string position = $"Showing {InstanceNum + 1} of {TotalMatches}";
+                string position = $"Showing {InstanceNum + 1} of {TotalMatches}.";
                 labelInstanceOrder.Text = position;
             }
         }

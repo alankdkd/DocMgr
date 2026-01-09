@@ -192,7 +192,7 @@
             ButtonNewDoc.Size = new Size(179, 31);
             ButtonNewDoc.TabIndex = 11;
             ButtonNewDoc.Text = "&New Document...";
-            toolTips.SetToolTip(ButtonNewDoc, "Add new blank document to the project.");
+            toolTips.SetToolTip(ButtonNewDoc, "Add new blank document to the project.  Ctrl-N");
             ButtonNewDoc.UseVisualStyleBackColor = false;
             ButtonNewDoc.Click += ButtonNewDoc_Click;
             // 

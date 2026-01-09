@@ -91,6 +91,24 @@ public class RtfRichTextBox : RichTextBox
             }
         }
 
+        // Is it a bitmap?
+        if (Clipboard.ContainsImage())
+        {
+            // Get the specific DataFormats.Format for a Bitmap
+            DataFormats.Format bitmapFormat = DataFormats.GetFormat(DataFormats.Bitmap);
+
+            // Verify that the RichTextBox control supports pasting this format
+            if (CanPaste(bitmapFormat))
+            {
+                // Paste the image at the current cursor position
+                Paste(bitmapFormat);
+            }
+            else
+            {
+                MessageBox.Show("The clipboard image format is not supported by this RichTextBox.");
+            }
+        }
+
         // Fallback to plain text
         if (data.GetDataPresent(DataFormats.UnicodeText))
         {
