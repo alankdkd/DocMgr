@@ -33,7 +33,7 @@ namespace DocMgr
         static bool HaveMargins = false;
 
         public string? CurrentFilePath;
-        static string? ProjectPath, lastDocName;
+        static string? ProjectPath, lastDocName, buttonNameClicked = null;
         bool loadingDoc = false;
         bool finding = false;
         int originalLeft;
@@ -544,6 +544,7 @@ namespace DocMgr
             ColorButtonBknd(but);
 
             DocName.Text = "";
+            buttonNameClicked = but.Name;
 
             if (but.Tag != null)
             {
@@ -703,6 +704,12 @@ namespace DocMgr
             {
                 e.Handled = true;
                 buttonSaveDoc_Click(sender, e);         // Save document.
+            }
+
+            if (e.KeyChar == 14)                        // Ctrl-N.  New Document.
+            {
+                e.Handled = true;
+                ButtonNewDoc_Click(sender, e);           // Invoke print.
             }
 
             if (e.KeyChar == 16)                        // Ctrl-P.  Print.
@@ -1198,15 +1205,16 @@ namespace DocMgr
 
         private void buttonRemoveDoc_Click(object sender, EventArgs e)      // Just removes from project.
         {                                                                   // .rtf file is untouched.
-            if (IsNullOrEmpty(DocName.Text) || IsNullOrEmpty(ProjectPath))
+            if (IsNullOrEmpty(buttonNameClicked) || IsNullOrEmpty(ProjectPath))
                 return;
 
-            lastDocName = DocName.Text;
+            lastDocName = buttonNameClicked;
             richTextBox.Clear();
             CurrentFilePath = null;
 
-            if (lastDocName[0] == '*')
-                lastDocName = lastDocName.Remove(0, 2);
+            if (lastDocName != null  && lastDocName.Length > 1)
+                if (lastDocName[0] == '*')
+                    lastDocName = lastDocName.Remove(0, 2);
 
             if (lastDocName.EndsWith(':'))
                 lastDocName = lastDocName.Remove(lastDocName.Length - 1, 1);
@@ -1226,7 +1234,7 @@ namespace DocMgr
                 }
 
             lastDocName = null;
-            MessageBox.Show("Path " + CurrentFilePath + " not found in documents.");
+            // HAPPENS WHEN DOC DELETED: MessageBox.Show("Path " + CurrentFilePath + " not found in documents.");
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
