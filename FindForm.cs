@@ -348,7 +348,7 @@ namespace DocMgr
                 searchStart = OrangeStart - 1;
 
                 if (searchStart < 0)
-                    searchStart = tempRTBox.Text.Length - 1;
+                    searchStart = tempRTBox.Text.Length;
             }
 
             tempRTBox.Select(OrangeStart, OrangeLength);        // Restore yellow background.
@@ -365,7 +365,7 @@ namespace DocMgr
                 if (DocList.Count == 1)
                 {
                     MatchOrderInDoc = Matches.Count - 1;        // 1 doc; just wrap around.
-                    searchStart = tempRTBox.Text.Length - 1;
+                    searchStart = tempRTBox.Text.Length;
                 }
                 else
                 {
@@ -384,7 +384,7 @@ namespace DocMgr
                 if (DocList.Count == 1)
                 {
                     MatchOrderInDoc = 0;                        // 1 doc; just wrap around.
-                    searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length - 1;
+                    searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length;
                 }
                 else
                 {
@@ -520,7 +520,7 @@ namespace DocMgr
                 DisplayedDoc = currentDoc.Value.docName;
             }
 
-            int searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length - 1;
+            int searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length;
 
             SearchString = textString.Text;
             MatchCase = checkMatchCase.Checked;
@@ -662,7 +662,7 @@ namespace DocMgr
             int found;
 
             if (!DirectionForward)
-                searchStart = rtb.Text.Length - 1;
+                searchStart = rtb.Text.Length;
             //if (MatchCase)
             //    rtbFinds |= RichTextBoxFinds.MatchCase;
 
@@ -730,7 +730,7 @@ namespace DocMgr
 
                 //searchStart = found + value.Length;
 
-                //               MessageBox.Show("found is -1");
+                               MessageBox.Show("found is -1");
             }
 
             return found;
