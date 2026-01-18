@@ -1301,188 +1301,64 @@ namespace DocMgr
                 }
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PARAFORMAT2
+        {
+            public int cbSize;
+            public uint dwMask;
+            public short wNumbering;
+            public short wReserved;
+            public int dxStartIndent;
+            public int dxRightIndent;
+            public int dxOffset;
+            public short wAlignment;
+            public short cTabCount;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            public int[] rgxTabs;
+            public int dySpaceBefore;
+            public int dySpaceAfter;
+            public int dyLineSpacing;
+            public short sStyle;
+            public byte bLineSpacingRule;
+            public byte bOutlineLevel;
+            public short wShadingValue;
+            public short wShadingStyle;
+            public short wNumberingStart; // Added: starting value (e.g., 1)
+            public short wNumberingStyle; // Added: style (e.g., period)
+            public short wNumberingTab;
+            public short wBorderSpace;
+            public short wBorderWidth;
+            public short wBorders;
+        }
+
+        private const int EM_SETPARAFORMAT = 0x0447;
+        private const uint PFM_NUMBERING = 0x00000020;
+        private const uint PFM_NUMBERINGSTYLE = 0x00002000;
+        private const uint PFM_NUMBERINGSTART = 0x00008000;
+        private const uint PFM_OFFSET = 0x00000004;
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, ref PARAFORMAT2 lParam);
+
+        public void ApplyAutoNumbering(RichTextBox rtb)
+        {
+            PARAFORMAT2 pf = new PARAFORMAT2();
+            pf.cbSize = Marshal.SizeOf(pf);
+
+            // Mask must include PFM_NUMBERINGSTART and PFM_NUMBERINGSTYLE
+            pf.dwMask = PFM_NUMBERING | PFM_NUMBERINGSTYLE | PFM_NUMBERINGSTART | PFM_OFFSET;
+
+            pf.wNumbering = 2;         // 2 = Arabic numbers (1, 2, 3)
+            pf.wNumberingStart = 1;    // Explicitly start at 1
+            pf.wNumberingStyle = 0x200; // 0x200 = Follow with a period (1.)
+            pf.dxOffset = 360;         // Text indent from the number (1/4 inch)
+
+            SendMessage(rtb.Handle, EM_SETPARAFORMAT, IntPtr.Zero, ref pf);
+        }
+
         private void buttonNumberLines_Click(object sender, EventArgs e)
         {
-            //NumberSelectedLines(richTextBox);
-            string text = richTextBox.SelectedText.Trim();            // Get selected lines to number.
-
-            if (text.Length == 0)
-            {
-                MessageBox.Show("No text lines are selected.");
-                return;
-            }
-
-            //int numLines = CountChar(text, '\n') + 1;                 // Count # of lines: /n count plus 1.
-            string rtfText = ReplaceNewLinesWithParagraphEnd(text);   // Convert selected lines to RTF format.
-            int pos = richTextBox.Rtf.IndexOf(rtfText);               // Find position of lines in RTF text.
-
-            if (pos == -1)
-            {
-                MessageBox.Show("List not found.");
-                return;
-            }
-
-            //MessageBox.Show("Index = " + pos + ".  # lines = " + numLines);
-
-            int lineNum = 0;
-            StringBuilder numberedList = new StringBuilder(
-                @"{\pntext\f0 1.\tab}{\*\pn\pnlvlbody\pnf0\pnindent0\pnstart1\pndec{\pntxta.}}" + "\n");
-
-            foreach (string line in GetLines(text))
-                if (++lineNum == 1)
-                    numberedList.Append($@"\fi-360\li720\sl276\slmult1\f0\lang9 {line}\par");
-                else
-                    numberedList.Append(@"{\pntext\f0 " + lineNum.ToString() + @".\tab}" +
-                        line + @"\par");
-
-            numberedList.Append(@"\pard");
-
-            string replacementText = numberedList.ToString();
-            //File.WriteAllText("out.txt", replacementText);
-            richTextBox.Rtf = richTextBox.Rtf.Replace(rtfText, replacementText);
-        }
-
-        private void NumberSelectedLines(RtfRichTextBox richTextBox)       // WORKS BUT DOESN'T APPLY AUTO-NUMBERING PROPERTY.
-        {
-            int selStart = richTextBox.SelectionStart;
-            int selLength = richTextBox.SelectionLength;
-
-            string selectedText = richTextBox.SelectedText;
-
-            if (string.IsNullOrWhiteSpace(selectedText))
-                return;
-
-            // Split selected text into lines
-            string[] lines = selectedText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-
-            StringBuilder numberedText = new StringBuilder();
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string line = lines[i];
-
-                // Skip last empty line (optional)
-                if (i == lines.Length - 1 && string.IsNullOrEmpty(line))
-                    break;
-
-                // Capture any existing indentation (spaces or tabs)
-                string indent = "";
-                int j = 0;
-                while (j < line.Length && (line[j] == ' ' || line[j] == '\t'))
-                    indent += line[j++];
-
-                // Remove the indentation from the working text
-                string trimmedLine = line.Substring(indent.Length);
-
-                // Apply numbering with preserved indentation
-                numberedText.AppendLine($"{indent}{i + 1}. {trimmedLine}");
-            }
-
-            // Replace the selected text
-            richTextBox.SelectedText = numberedText.ToString();
-
-            // Restore selection (optional)
-            richTextBox.Select(selStart, numberedText.Length);
-        }
-        //private void NumberSelectedLines(RtfRichTextBox richTextBox)
-        //{
-        //    // Get the start and end positions of the selection
-        //    int selStart = richTextBox.SelectionStart;
-        //    int selLength = richTextBox.SelectionLength;
-
-        //    // Get the text within the selection
-        //    string selectedText = richTextBox.SelectedText;
-
-        //    if (string.IsNullOrWhiteSpace(selectedText))
-        //        return;
-
-        //    // Split into lines
-        //    string[] lines = selectedText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-
-        //    // Build numbered lines
-        //    StringBuilder numberedText = new StringBuilder();
-        //    for (int i = 0; i < lines.Length; i++)
-        //    {
-        //        // Skip empty trailing line in selection (optional)
-        //        if (i == lines.Length - 1 && string.IsNullOrEmpty(lines[i]))
-        //            break;
-
-        //        numberedText.AppendLine($"{i + 1}. {lines[i]}");
-        //    }
-
-        //    // Replace the selected text with numbered text
-        //    richTextBox.SelectedText = numberedText.ToString();
-
-        //    // Restore selection (optional)
-        //    richTextBox.Select(selStart, numberedText.Length);
-        //}
-
-        //private void ApplyNumberingToSelection(RtfRichTextBox rtb)
-        //{
-        //    if (rtb.SelectionLength == 0)
-        //    {
-        //        return; // No text selected
-        //    }
-
-        //    string selectedText = rtb.SelectedText;
-        //    string[] lines = selectedText.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-
-        //    StringBuilder numberedTextBuilder = new StringBuilder();
-        //    int lineNumber = 1;
-
-        //    foreach (string line in lines)
-        //    {
-        //        if (!string.IsNullOrWhiteSpace(line)) // Only number non-empty lines
-        //        {
-        //            numberedTextBuilder.Append($"{lineNumber}. {line}{Environment.NewLine}");
-        //            lineNumber++;
-        //        }
-        //        else
-        //        {
-        //            numberedTextBuilder.Append($"{line}{Environment.NewLine}"); // Keep empty lines as they are
-        //        }
-        //    }
-
-        //    // Remove the trailing newline character if it was added unnecessarily
-        //    if (numberedTextBuilder.Length > 0 && numberedTextBuilder[numberedTextBuilder.Length - 1] == '\n')
-        //    {
-        //        numberedTextBuilder.Length -= Environment.NewLine.Length;
-        //    }
-
-        //    rtb.SelectedText = numberedTextBuilder.ToString();
-        //}
-
-        private IEnumerable<string> GetLines(string text)
-        {
-            int pos = 0, len = text.Length, endPos;
-            string nextLine;
-
-            while (pos < len)
-            {
-                endPos = text.IndexOf("\n", pos);
-
-                if (endPos == -1)
-                {
-                    nextLine = text.Substring(pos);
-                    pos = len;
-                }
-                else
-                {
-                    nextLine = text.Substring(pos, endPos - pos);
-                    pos = endPos + 1;
-                }
-
-                yield return nextLine;
-            }
-        }
-
-        private string ReplaceNewLinesWithParagraphEnd(string v)
-        {
-            StringBuilder sb = new StringBuilder(v);
-
-            sb.Replace("\n", "\\par\r\n");  // This is how RTF ends paragraphs:
-            sb.Append("\\par\r\n");
-            return sb.ToString();
+            ApplyAutoNumbering(richTextBox);
         }
 
         private void DocMgr_Resize(object sender, EventArgs e)

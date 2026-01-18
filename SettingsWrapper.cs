@@ -9,27 +9,6 @@ using System.Windows.Forms.Design;
 
 namespace DocMgr
 {
-    //public class SettingsWrapper
-    //{
-    //    [Category("Paths")]
-    //    [Description("Specify the file or folder path.")]
-    //    [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
-    //    public string BackupsAndArchivesFolder
-    //    {
-    //        get => Properties.Settings.Default.BackupsAndArchivesFolder; // Access the setting
-    //        set
-    //        {
-    //            Properties.Settings.Default.BackupsAndArchivesFolder = value; // Update the setting
-    //            Properties.Settings.Default.Save();        // Persist the change
-    //        }
-    //    }
-
-    //    [Category("General Settings")]
-    //    [Description("The defaut font.")]
-    //    public Font DefaultFont { get; set; }
-
-    //}
-
     public class FolderPathEditor : UITypeEditor
     {
         // Indicate that this editor provides a modal dialog.
