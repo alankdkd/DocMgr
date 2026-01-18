@@ -1092,6 +1092,7 @@ namespace DocMgr
                     Root.AddDoc(docPath);
                     WriteUpdatedPath();
                     MakeButtons(Root.SubDocs);
+                    DisableNumbering(richTextBox);
                 }
 
                 ClickButtonWithName(docName);
@@ -1276,7 +1277,9 @@ namespace DocMgr
 
                 loadingDoc = true;
                 richTextBox.Clear();
+                DisableNumbering(richTextBox);
                 loadingDoc = false;
+                buttonRemoveDoc.Enabled = true;
                 richTextBox.Font = font;
                 richTextBox.Focus();
             }
@@ -1352,6 +1355,21 @@ namespace DocMgr
             pf.wNumberingStart = 1;    // Explicitly start at 1
             pf.wNumberingStyle = 0x200; // 0x200 = Follow with a period (1.)
             pf.dxOffset = 360;         // Text indent from the number (1/4 inch)
+
+            SendMessage(rtb.Handle, EM_SETPARAFORMAT, IntPtr.Zero, ref pf);
+        }
+
+        public void DisableNumbering(RichTextBox rtb)
+        {
+            PARAFORMAT2 pf = new PARAFORMAT2();
+            pf.cbSize = Marshal.SizeOf(pf);
+
+            // Mask for numbering and indentation
+            pf.dwMask = PFM_NUMBERING | PFM_OFFSET | 0x00000001; // 0x00000001 is PFM_STARTINDENT
+
+            pf.wNumbering = 0;     // 0 = No paragraph numbering or bullets
+            pf.dxOffset = 0;      // Reset the hanging indent
+            pf.dxStartIndent = 0; // Reset the left margin indent
 
             SendMessage(rtb.Handle, EM_SETPARAFORMAT, IntPtr.Zero, ref pf);
         }
