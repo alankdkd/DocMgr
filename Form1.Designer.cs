@@ -69,6 +69,7 @@
             richTextBox.TabIndex = 0;
             richTextBox.Text = "";
             richTextBox.LinkClicked += richTextBox_LinkClicked;
+            richTextBox.SelectionChanged += richTextBox_SelectionChanged;
             richTextBox.TextChanged += richTextBox_TextChanged;
             richTextBox.KeyPress += richTextBox1_KeyPress;
             // 

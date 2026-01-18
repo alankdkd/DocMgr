@@ -40,6 +40,7 @@ namespace DocMgr
         //static string TextCopy = null;
         static readonly int BAD_INT = int.MinValue;
         static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
+        static private readonly Color BUTTON_HIGHLIGHT = Color.FromArgb(255, 210, 250, 255);
 
         static private PropertyGrid propertyGrid;
         static private MySettings settings;
@@ -558,7 +559,7 @@ namespace DocMgr
                             richTextBox.LoadFile(CurrentFilePath);
                         else
                              if (CurrentFilePath.EndsWith(".txt"))
-                                richTextBox.Text = File.ReadAllText(CurrentFilePath);
+                            richTextBox.Text = File.ReadAllText(CurrentFilePath);
                         else
                             throw new Exception("Unsupported file type.");
                     }
@@ -586,6 +587,7 @@ namespace DocMgr
                 richTextBox.Font = Properties.Settings.Default.DefaultFont;
 
             buttonRemoveDoc.Enabled = true;
+            UpdateFontButtons();
             richTextBox.Focus();
             loadingDoc = false;
         }
@@ -594,7 +596,7 @@ namespace DocMgr
         {
             foreach (Button b in buttons)
                 if (b == but)
-                    b.BackColor = Color.FromArgb(255, 210, 250, 255);
+                    b.BackColor = BUTTON_HIGHLIGHT;
                 else
                     b.BackColor = Color.FromArgb(255, 250, 250, 250);
         }
@@ -1170,12 +1172,12 @@ namespace DocMgr
                 }
                 else
                     if (CurrentFilePath.EndsWith(".txt"))
-                    {
-                        File.WriteAllText(CurrentFilePath, richTextBox.Text);
-                        saveOk = true;
-                    }
-                    else
-                        throw new Exception("Unsupported file type.");
+                {
+                    File.WriteAllText(CurrentFilePath, richTextBox.Text);
+                    saveOk = true;
+                }
+                else
+                    throw new Exception("Unsupported file type.");
             }
             catch (UnauthorizedAccessException)
             {
@@ -1213,7 +1215,7 @@ namespace DocMgr
             richTextBox.Clear();
             CurrentFilePath = null;
 
-            if (lastDocName != null  && lastDocName.Length > 1)
+            if (lastDocName != null && lastDocName.Length > 1)
                 if (lastDocName[0] == '*')
                     lastDocName = lastDocName.Remove(0, 2);
 
@@ -2552,6 +2554,19 @@ namespace DocMgr
         private void buttonStrikeout_Click(object sender, EventArgs e)
         {
             StyleSelectedText(FontStyle.Strikeout);  // If text selected, do normal bold.
+        }
+
+        private void UpdateFontButtons()
+        {
+            buttonBold.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Bold ? BUTTON_HIGHLIGHT : SystemColors.Control;
+            buttonItalic.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Italic ? BUTTON_HIGHLIGHT : SystemColors.Control;
+            buttonUnderline.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Underline ? BUTTON_HIGHLIGHT : SystemColors.Control;
+            buttonStrikeout.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Strikeout ? BUTTON_HIGHLIGHT : SystemColors.Control;
+        }
+
+        private void richTextBox_SelectionChanged(object sender, EventArgs e)
+        {
+            UpdateFontButtons();
         }
     }
 
