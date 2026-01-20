@@ -41,7 +41,8 @@ namespace DocMgr
         static readonly int BAD_INT = int.MinValue;
         static readonly string BASE_REGISTRY_KEY = @"Software\PatternScope Systems\DocMgr";
         static private readonly Color BUTTON_HIGHLIGHT = Color.FromArgb(255, 210, 250, 255);
-
+        static private readonly Color BUTTON_ACTIVE = Color.FromArgb(255, 160, 160, 160);
+        
         static private PropertyGrid propertyGrid;
         static private MySettings settings;
 
@@ -84,6 +85,14 @@ namespace DocMgr
         {
             InitializeComponent();
             ArrangeLayout();
+
+            //static private readonly Color BUTTON_HIGHLIGHT = Color.FromArgb(255, 210, 250, 255);
+
+            //BackColor = Color.FromArgb(20, 105, 125);
+            //BackColor = Color.FromArgb(10, 52, 62);
+            //BackColor = Color.FromArgb(255, 155, 185, 200);
+            //BackColor = Color.FromArgb(255, 210, 250, 255);
+
 
             string version = GetSubstringUpToSecondPeriod(Application.ProductVersion);
             Text = "DocMgr v" + version;
@@ -407,10 +416,11 @@ namespace DocMgr
             }
 
             Button[] rightButtons = new Button[] { buttonClose, ButtonNewDoc,
-                ButtonNewProj, buttonRemoveDoc, buttonOpenFolder, buttonNumberLines,
-                buttonBackUpFile, buttonBackUpProject, buttonArchiveFile,
-                buttonArchiveProject, buttonProperties, buttonPrint,
-                buttonOpenPrintQueue, buttonFind, buttonFont, buttonBold};
+                ButtonNewProj, buttonRemoveDoc, buttonRenameDoc, buttonOpenFolder,
+                buttonNumberLines, buttonBackUpFile, buttonBackUpProject,
+                buttonArchiveFile, buttonArchiveProject, buttonProperties,
+                buttonPrint, buttonOpenPrintQueue, buttonFind, buttonFont,
+                buttonBold };
             foreach (Button b in rightButtons)
                 b.Left = richTextBox.Right + 10;
 
@@ -573,7 +583,7 @@ namespace DocMgr
                     DocName.Text = but.Name + ':';
                     ScrollToDocPosition(but.Name);
                     buttonSaveDoc.Enabled = false;
-                    buttonRemoveDoc.Enabled = ProjectPath != null;
+                    buttonRemoveDoc.Enabled = buttonRenameDoc.Enabled = ProjectPath != null;
                     SetProjectsLastDoc(CurrentFilePath);
                     HaveMargins = false;
                 }
@@ -586,7 +596,7 @@ namespace DocMgr
             if (richTextBox.Text.Length == 0)
                 richTextBox.Font = Properties.Settings.Default.DefaultFont;
 
-            buttonRemoveDoc.Enabled = true;
+            buttonRenameDoc.Enabled = buttonRemoveDoc.Enabled = true;
             UpdateFontButtons();
             richTextBox.Focus();
             loadingDoc = false;
@@ -669,7 +679,7 @@ namespace DocMgr
                 DocName.Text = "";
             }
 
-            buttonRemoveDoc.Enabled = false;
+            buttonRenameDoc.Enabled = buttonRemoveDoc.Enabled = false;
             CurrentFilePath = null;
         }
 
@@ -1227,7 +1237,7 @@ namespace DocMgr
                 if (doc.DocName == lastDocName)
                 {
                     //richTextBox.Clear();
-                    buttonRemoveDoc.Enabled = false;
+                    buttonRenameDoc.Enabled = buttonRemoveDoc.Enabled = false;
                     Root.SubDocs.Remove(doc);
                     MakeButtons(Root.SubDocs);
                     string text = System.Text.Json.JsonSerializer.Serialize<Doc>(Root);
@@ -1239,6 +1249,54 @@ namespace DocMgr
 
             lastDocName = null;
             // HAPPENS WHEN DOC DELETED: MessageBox.Show("Path " + CurrentFilePath + " not found in documents.");
+        }
+
+        private void buttonRenameDoc_Click(object sender, EventArgs e)
+        {
+            using (FormRenameDoc form = new FormRenameDoc(CurrentFilePath))
+            {
+                if (form.ShowDialog() != DialogResult.OK)
+                    return;
+
+                if (DocName.Text.StartsWith("* "))
+                    buttonSaveDoc_Click(null, null);        // Save changes.
+
+                string newDocPath = form.GetNewPath();
+                //MessageBox.Show("Renaming document to: " + newDocPath);
+                File.Move(CurrentFilePath, newDocPath);
+
+                CurrentFilePath = newDocPath;
+                WriteUpdatedPath();
+                string docName = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                //HighlightThisButton(docName);
+
+                if (Root != null)
+                {
+                    foreach (var doc in Root.SubDocs)
+                    {
+                        if (doc.DocName == buttonNameClicked)
+                        {
+                            doc.DocName = docName;
+                            doc.DocPath = CurrentFilePath;
+                            break;
+                        }
+                    }
+                }
+                DocName.Text = docName + ':';
+                SetProjectsLastDoc(CurrentFilePath);
+                MakeButtons(Root.SubDocs);
+
+                foreach (Button but in buttons)
+                    if (but.Name == docName)
+                    {
+                        ColorButtonBknd(but);
+                        break;
+                    }
+
+                SaveProject(ProjectPath, Root);
+                buttonSaveDoc.Enabled = false;
+                richTextBox.Focus();
+            }
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
@@ -1279,7 +1337,7 @@ namespace DocMgr
                 richTextBox.Clear();
                 DisableNumbering(richTextBox);
                 loadingDoc = false;
-                buttonRemoveDoc.Enabled = true;
+                buttonRenameDoc.Enabled = buttonRemoveDoc.Enabled = true;
                 richTextBox.Font = font;
                 richTextBox.Focus();
             }
@@ -2452,10 +2510,10 @@ namespace DocMgr
 
         private void UpdateFontButtons()
         {
-            buttonBold.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Bold ? BUTTON_HIGHLIGHT : SystemColors.Control;
-            buttonItalic.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Italic ? BUTTON_HIGHLIGHT : SystemColors.Control;
-            buttonUnderline.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Underline ? BUTTON_HIGHLIGHT : SystemColors.Control;
-            buttonStrikeout.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Strikeout ? BUTTON_HIGHLIGHT : SystemColors.Control;
+            buttonBold.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Bold ? BUTTON_ACTIVE : SystemColors.Control;
+            buttonItalic.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Italic ? BUTTON_ACTIVE : SystemColors.Control;
+            buttonUnderline.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Underline ? BUTTON_ACTIVE : SystemColors.Control;
+            buttonStrikeout.BackColor = richTextBox.SelectionFont != null && richTextBox.SelectionFont.Strikeout ? BUTTON_ACTIVE : SystemColors.Control;
         }
 
         private void richTextBox_SelectionChanged(object sender, EventArgs e)

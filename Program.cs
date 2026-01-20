@@ -14,7 +14,7 @@ namespace DocMgr
             Application.Run(new DocMgr());
         }
 
-        // THIS SHOULDN'T GO HERE!  WHAT WAS I THINKING?
+        // TODO: Maybe move this to a utility class later.
         public static void CenterCursorInButton(this Button but, int dx = 0, int dy = 0)
         {
             Point screenTopLeft = but.PointToScreen(Point.Empty);

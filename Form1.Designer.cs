@@ -58,6 +58,7 @@
             buttonItalic = new Button();
             buttonUnderline = new Button();
             buttonStrikeout = new Button();
+            buttonRenameDoc = new Button();
             SuspendLayout();
             // 
             // richTextBox
@@ -150,7 +151,7 @@
             buttonRemoveDoc.BackColor = SystemColors.Control;
             buttonRemoveDoc.Enabled = false;
             buttonRemoveDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            buttonRemoveDoc.Location = new Point(1090, 214);
+            buttonRemoveDoc.Location = new Point(1090, 163);
             buttonRemoveDoc.Name = "buttonRemoveDoc";
             buttonRemoveDoc.Size = new Size(179, 31);
             buttonRemoveDoc.TabIndex = 8;
@@ -201,7 +202,7 @@
             // 
             ButtonNewProj.BackColor = SystemColors.Control;
             ButtonNewProj.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            ButtonNewProj.Location = new Point(1090, 146);
+            ButtonNewProj.Location = new Point(1090, 122);
             ButtonNewProj.Name = "ButtonNewProj";
             ButtonNewProj.Size = new Size(179, 31);
             ButtonNewProj.TabIndex = 12;
@@ -330,7 +331,7 @@
             // 
             buttonOpenFolder.BackColor = SystemColors.Control;
             buttonOpenFolder.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
-            buttonOpenFolder.Location = new Point(1090, 284);
+            buttonOpenFolder.Location = new Point(1090, 248);
             buttonOpenFolder.Name = "buttonOpenFolder";
             buttonOpenFolder.Size = new Size(179, 31);
             buttonOpenFolder.TabIndex = 15;
@@ -417,12 +418,27 @@
             buttonStrikeout.UseVisualStyleBackColor = true;
             buttonStrikeout.Click += buttonStrikeout_Click;
             // 
+            // buttonRenameDoc
+            // 
+            buttonRenameDoc.BackColor = SystemColors.Control;
+            buttonRenameDoc.Enabled = false;
+            buttonRenameDoc.Font = new Font("Calibri", 14.25F, FontStyle.Bold);
+            buttonRenameDoc.Location = new Point(1090, 205);
+            buttonRenameDoc.Name = "buttonRenameDoc";
+            buttonRenameDoc.Size = new Size(179, 31);
+            buttonRenameDoc.TabIndex = 29;
+            buttonRenameDoc.Text = "Rename Document";
+            toolTips.SetToolTip(buttonRenameDoc, "Rename the currently selected document.");
+            buttonRenameDoc.UseVisualStyleBackColor = false;
+            buttonRenameDoc.Click += buttonRenameDoc_Click;
+            // 
             // DocMgr
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = SystemColors.ControlDarkDark;
+            BackColor = SystemColors.WindowFrame;
             ClientSize = new Size(1302, 985);
+            Controls.Add(buttonRenameDoc);
             Controls.Add(buttonStrikeout);
             Controls.Add(buttonUnderline);
             Controls.Add(buttonItalic);
@@ -451,6 +467,7 @@
             Controls.Add(DocName);
             Controls.Add(richTextBox);
             Controls.Add(label1);
+            ForeColor = SystemColors.MenuText;
             Name = "DocMgr";
             Text = "DocMgr";
             WindowState = FormWindowState.Maximized;
@@ -493,5 +510,6 @@
         private Button buttonUnderline;
         private Button buttonStrikeout;
         private Button buttonBold;
+        private Button buttonRenameDoc;
     }
 }
