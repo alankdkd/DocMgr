@@ -13,7 +13,7 @@ namespace DocMgr
 {
     public partial class FormRenameDoc : Form
     {
-        string NewName;
+        string NewName, Extension;
         public string FolderForDoc;// { get => folderForDoc; set => folderForDoc = value; }
         //public string FolderForDoc { get => folderForDoc; set => folderForDoc = value; }
 
@@ -23,6 +23,7 @@ namespace DocMgr
             FolderForDoc = Path.GetDirectoryName(currentFilePath);
             labelPath.Text = FolderForDoc;
             labelCurrentDocName.Text = Path.GetFileNameWithoutExtension(currentFilePath);
+            Extension = Path.GetExtension(currentFilePath);
             //DFW: buttonRename.CenterCursorInButton();
             Point here = new Point(buttonRename.Left + buttonRename.Width / 2, buttonRename.Top + buttonRename.Height / 2 + 6);
             Cursor.Position = PointToScreen(here);
@@ -58,8 +59,7 @@ namespace DocMgr
 
             NewName = Path.Combine(FolderForDoc, textNewDocName.Text.Trim());
 
-            if (!NewName.EndsWith(".rtf") && !NewName.EndsWith(".txt"))
-                NewName += ".rtf";                  // The default extension is .rtf.
+            NewName += Extension;    // Keep the same extension as the original document.
 
             if (File.Exists(NewName))
             {
