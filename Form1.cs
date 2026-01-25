@@ -1,17 +1,18 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Win32;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
 using System;
-using System.Text;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing.Design;
-using System.ComponentModel;
 using System.Drawing.Printing;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+//using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using SearchDialog = DocMgr.FindForm;
 
 namespace DocMgr
@@ -118,6 +119,26 @@ namespace DocMgr
                 + label2.Height + 3;
             ButtonListStart = newStart;
             originalLeft = richTextBox.Left;
+            buttonFont.MouseEnter += new EventHandler(buttonFont_MouseEnter);
+        }
+
+        private void buttonFont_MouseEnter(object? sender, EventArgs e)
+        {
+            string fontName = richTextBox.SelectionFont.FontFamily.Name;
+            string fontSize = richTextBox.SelectionFont.Size.ToString("F1");
+            string fontStyle = "";
+            if (richTextBox.SelectionFont.Bold)
+                fontStyle += " Bold";
+            if (richTextBox.SelectionFont.Italic) 
+                fontStyle += " Italic";
+
+            if (richTextBox.SelectionFont.Underline)
+                fontStyle += " Underline";
+            if (richTextBox.SelectionFont.Strikeout)
+                fontStyle += " Strikeout";
+            string toolTipText = $"{fontName}, {fontSize} pt, {fontStyle}";
+
+            toolTips.SetToolTip(buttonFont, toolTipText);
         }
 
         public enum ScrollBarType : uint
@@ -1174,7 +1195,12 @@ namespace DocMgr
                         return;
 
                     CurrentFilePath = fileName;
-                    DocName.Text = Path.GetFileNameWithoutExtension(CurrentFilePath) + ":";
+                    string docName = Path.GetFileNameWithoutExtension(CurrentFilePath);
+                    DocName.Text = docName + ":";
+
+                    Root.AddDoc(CurrentFilePath, docName);
+                    MakeButtons(Root.SubDocs);
+                    HighlightThisButton(docName);
                 }
 
                 if (CurrentFilePath.EndsWith(".rtf"))
