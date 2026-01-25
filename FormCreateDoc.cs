@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
-using System.Threading;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DocMgr
 {
@@ -58,11 +59,8 @@ namespace DocMgr
 
             using (FileStream fs = File.Create(FilePath))
             using (var sw = new StreamWriter(fs))
-            {                                           // Crude kludge.  C# malfunctions saving blank RTF file.
-                sw.Write(@"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\b1\fnil\fcharset0 Calibri;}}\
-{\*\generator Riched20 10.0.22621}\viewkind4\uc1\
-\pard\sa200\sl276\slmult1\f0\b1\fs22\lang9\par\
-}");
+            {                                               // Empty RTF file:
+                sw.Write(@"{\rtf1\ansi\deff0 {\fonttbl {\f0 fnil Arial; }}\pard\f0\fs20\par}");
                 DialogResult = DialogResult.OK;
                 Close();
             }

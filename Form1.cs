@@ -96,6 +96,7 @@ namespace DocMgr
 
             string version = GetSubstringUpToSecondPeriod(Application.ProductVersion);
             Text = "DocMgr v" + version;
+            richTextBox.AcceptsTab = true;
             this.KeyPreview = true; // Enable KeyPreview programmatically
         }
 
@@ -2419,7 +2420,6 @@ namespace DocMgr
                 e.Handled = true;
             }
 
-
             if (e.Control && e.KeyCode == Keys.O)
             {
                 // Ctrl + End is pressed
@@ -2427,6 +2427,37 @@ namespace DocMgr
                 e.Handled = true; // Optional: Prevent further processing
             }
         }
+
+        protected override bool ProcessCmdKey(ref System.Windows.Forms.Message msg, Keys keyData)
+        {
+            // Check for Ctrl + Tab combination
+            if (keyData == (Keys.Control | Keys.Shift | Keys.Tab))
+            {
+                MessageBox.Show("Ctrl-Shift-Tab Detected!");
+
+                // Return true to stop the key from being processed by other controls
+                return true;
+            }
+
+            // Check for Ctrl + Tab combination
+            if (keyData == (Keys.Control | Keys.Tab))
+            {
+                MessageBox.Show("Ctrl-Tab Detected!");
+                return true;
+            }
+
+            // Check for Ctrl + Tab combination
+            if (keyData == (Keys.Shift | Keys.Tab))
+            {
+                MessageBox.Show("Shift-Tab Detected!");
+                return true;
+            }
+
+            // Call the base method for all other keys
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+
         private void ScrollToBeginning(RtfRichTextBox richTextBox)
         {
             richTextBox.SelectionStart = 0; // Set selection start to the beginning
