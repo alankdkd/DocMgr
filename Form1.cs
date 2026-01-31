@@ -124,6 +124,9 @@ namespace DocMgr
 
         private void buttonFont_MouseEnter(object? sender, EventArgs e)
         {
+            if (richTextBox.SelectionFont == null)
+                return;
+
             string fontName = richTextBox.SelectionFont.FontFamily.Name;
             string fontSize = richTextBox.SelectionFont.Size.ToString("F1");
             string fontStyle = "";
@@ -569,7 +572,8 @@ namespace DocMgr
 
         private void SelectDocClick(object? sender, EventArgs e)    // Called when document button is
         {                                                           // clicked to load the document.
-            SaveChanges();
+            if (!SaveChanges())
+                return;
 
             loadingDoc = true;
             richTextBox.Clear();
@@ -590,8 +594,8 @@ namespace DocMgr
                         if (CurrentFilePath.EndsWith(".rtf"))
                             richTextBox.LoadFile(CurrentFilePath);
                         else
-                             if (CurrentFilePath.EndsWith(".txt"))
-                            richTextBox.Text = File.ReadAllText(CurrentFilePath);
+                            if (CurrentFilePath.EndsWith(".txt"))
+                                richTextBox.Text = File.ReadAllText(CurrentFilePath);
                         else
                             throw new Exception("Unsupported file type.");
                     }
@@ -743,7 +747,7 @@ namespace DocMgr
             if (e.KeyChar == 14)                        // Ctrl-N.  New Document.
             {
                 e.Handled = true;
-                ButtonNewDoc_Click(sender, e);           // Invoke print.
+                ButtonNewDoc_Click(sender, e);          // Invoke print.
             }
 
             if (e.KeyChar == 16)                        // Ctrl-P.  Print.
@@ -900,8 +904,12 @@ namespace DocMgr
                 DocName.Text = "";
 
                 if (!LoadProjectsLastDoc(Root.DocName))
+                {
                     if (Root.SubDocs.Count == 1)
                         ClickSingleButton();
+
+                    richTextBox.Focus();
+                }
             }
 
             loadingDoc = false;
@@ -1065,7 +1073,7 @@ namespace DocMgr
             {
                 string? path = GetDefaultPath();
 
-                saveFileDialog.Title = "Select File";
+                saveFileDialog.Title = "Select File to Save Document";
                 saveFileDialog.InitialDirectory = path;
                 saveFileDialog.Filter = filter;
                 saveFileDialog.CheckFileExists = !overwriteOk;
@@ -1159,13 +1167,13 @@ namespace DocMgr
             {
                 if (richTextBox.Text.Trim().Length == 0 && File.Exists(CurrentFilePath)
                     && !RichTextBoxContainsImage(richTextBox))
-                {
+                {                                   // Empty text and file exists.
                     using (RichTextBox rtb = new())
                     {
                         rtb.LoadFile(CurrentFilePath);
 
-                        if (rtb.Text.Length > 0)
-                        {
+                        if (rtb.Text.Length > 0)    // About to overwrite non-empty file with empty string?
+                        {                           // Yes.  Warn user:
                             if (MessageBox.Show("Warning: You are about to overwrite a file with an empty string."
                             + "  Click OK to continue or Cancel to cancel.", "Overwrite Warning", MessageBoxButtons.OKCancel)
                             != DialogResult.OK)
@@ -1187,7 +1195,7 @@ namespace DocMgr
                 else
                     rtfWithMargins = RtfMarginHelper.AddMarginsToRtf(richTextBox.Rtf, MyMargins);
 
-                if (DocName.Text.Length == 0)
+                if (DocName.Text.Length == 0  ||  DocName.Text == "* ")
                 {
                     string? fileName = GetSaveFileName("rtf files (*.rtf)|*.rtf|text files (*.txt)|*.txt|All files (*.*)|*.*", true);
 
@@ -1251,6 +1259,7 @@ namespace DocMgr
 
             lastDocName = buttonNameClicked;
             richTextBox.Clear();
+            richTextBox.Focus();
             CurrentFilePath = null;
 
             if (lastDocName != null && lastDocName.Length > 1)
@@ -1332,7 +1341,7 @@ namespace DocMgr
             {
                 buttonSaveDoc.Enabled = true;
                 // Indicate document modified:
-                if (DocName.Text.Length > 0 && DocName.Text[0] != '*')
+                if (DocName.Text.Length == 0  ||  DocName.Text[0] != '*')
                     DocName.Text = DocName.Text.Insert(0, "* ");
             }
         }
@@ -1350,7 +1359,9 @@ namespace DocMgr
 
             if (success == true && Root != null)
             {
-                SaveChanges();
+                if (!SaveChanges())
+                    return;
+
                 CurrentFilePath = fcd.FilePath;
                 Root.AddDoc(CurrentFilePath, fcd.DocName);
                 MakeButtons(Root.SubDocs);
@@ -1370,13 +1381,26 @@ namespace DocMgr
             }
         }
 
-        private void SaveChanges()
+        private bool SaveChanges()
         {
-            if (DocName.Text.Length > 0 && DocName.Text[0] == '*')
+            if (/*DocName.Text.Length == 0 || */(DocName.Text.Length > 0 && DocName.Text[0] == '*'))
+            {
                 buttonSaveDoc_Click(null, null);                    // Save changes.
+
+                if (buttonSaveDoc.Enabled)
+                {
+                    if (MessageBox.Show("Changes not saved.  OK to discard?",
+                        "OK to discard?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning,
+                        MessageBoxDefaultButton.Button2) // Sets Cancel as the default button.
+                            != DialogResult.OK)
+                        return false;
+                }
+            }
 
             if (DocName.Text.Length > 0)
                 SaveScrollPosition();
+
+            return true;
         }
 
         public void HighlightThisButton(string text)

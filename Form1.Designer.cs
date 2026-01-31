@@ -94,7 +94,7 @@
             buttonClose.Name = "buttonClose";
             buttonClose.Size = new Size(179, 31);
             buttonClose.TabIndex = 3;
-            buttonClose.Text = "&Close";
+            buttonClose.Text = "Close";
             buttonClose.UseVisualStyleBackColor = false;
             buttonClose.Click += buttonClose_Click;
             // 
