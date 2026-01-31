@@ -6,9 +6,9 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Description>DocMgr v0.2.  Manages collection of rich-text-format documents for each project.</Description>
-    <Copyright>Copyright (c) 2025 by Alan D. Balkany</Copyright>
-	<Version>0.2.0.0</Version>
+    <Description>DocMgr v0.3.  Manages collection of rich-text-format documents for each project.</Description>
+    <Copyright>Copyright (c) 2026 by Alan D. Balkany</Copyright>
+	<Version>0.3.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

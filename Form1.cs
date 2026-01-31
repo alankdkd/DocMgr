@@ -1280,6 +1280,7 @@ namespace DocMgr
                     File.WriteAllText(ProjectPath, text);
                     DocName.Text = "";
                     buttonSaveDoc.Enabled = false;
+                    DisableNumbering(richTextBox);
                     return;
                 }
 
@@ -2201,7 +2202,7 @@ namespace DocMgr
                 MessageBox.Show($"Problem finding: {exception.Message}");
             }
             finally
-            {
+             {
                 finding = false;
             }
         }

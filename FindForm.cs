@@ -723,6 +723,7 @@ namespace DocMgr
             if (found == -1)
             {
                 // fallback: try from 0 (or skip). Shouldn't happen but this beats failing.
+                // NOTE: Should start at beginning or end depending on direction.
                 //found = rtb.Find(value, 0, rtbFinds);
 
                 //if (found == -1)
@@ -730,7 +731,7 @@ namespace DocMgr
 
                 //searchStart = found + value.Length;
 
-                               MessageBox.Show("found is -1");
+                MessageBox.Show("found is -1");
             }
 
             return found;
