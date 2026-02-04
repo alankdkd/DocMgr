@@ -131,22 +131,22 @@ namespace DocMgr
             string position = $"Showing 1 of {TotalMatches}.";
             labelInstanceOrder.Text = position;
             ShowDoc(DocList[CurrentDocNum]);
+            buttonNext.Enabled = buttonPrevious.Enabled = (TotalMatches > 1);
 
-            if (DirectionForward)
-            {
-                Program.CenterCursorInButton(buttonNext, 0, 6);
-                buttonNext.Focus();
-            }
-            else
-            {
-                Program.CenterCursorInButton(buttonPrevious, 0, 6);
-                buttonPrevious.Focus();
-            }
+            if (buttonNext.Enabled)
+                if (DirectionForward)
+                {
+                    Program.CenterCursorInButton(buttonNext, 0, 6);
+                    buttonNext.Focus();
+                }
+                else
+                {
+                    Program.CenterCursorInButton(buttonPrevious, 0, 6);
+                    buttonPrevious.Focus();
+                }
 
             Finding = false;
             Cursor.Current = Cursors.Default;
-
-            //buttonNext_Click(null, null);
         }
 
         private void EnableResults(bool enable)
@@ -248,21 +248,11 @@ namespace DocMgr
                 return false;
             }
 
-            //tempRTBox.LoadFile(pathToDoc);
-            //if (pathToDoc.EndsWith(".rtf"))
-            //    richTextBox.LoadFile(pathToDoc);
-            //else
-            //    if (pathToDoc.EndsWith(".txt"))
-            //        richTextBox.Text = File.ReadAllText(pathToDoc);
-            //    else
-            //        throw new Exception("Unsupported file type.");
             if (!RtfRichTextBox.LoadFileIntoRtfBox(richTextBox, pathToDoc))
             {
                 numMatches = 0;
                 return false;
             }
-
-            //string rtf = richTextBox.Rtf;
 
             FindMatchesInString(richTextBox.Text, searchString, matchCase, matchWholeWord);
 
@@ -533,14 +523,6 @@ namespace DocMgr
                 if (CurrentDocPath.Length == 0)
                     return;
 
-                //tempRTBox.LoadFile(CurrentDocPath);
-                //if (CurrentDocPath.EndsWith(".rtf"))
-                //    tempRTBox.LoadFile(CurrentDocPath);
-                //else
-                //    if (CurrentDocPath.EndsWith(".txt"))
-                //        tempRTBox.Text = File.ReadAllText(CurrentDocPath);
-                //    else
-                //        throw new Exception("Unsupported file type.");
                 if (!RtfRichTextBox.LoadFileIntoRtfBox(tempRTBox, CurrentDocPath))
                     return;
 
