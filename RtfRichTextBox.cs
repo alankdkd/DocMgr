@@ -292,6 +292,25 @@ public class RtfRichTextBox : RichTextBox
         return html;
     }
 
+    static public bool LoadFileIntoRtfBox(RichTextBox richTextBox, string filePath)
+    {
+        if (filePath.EndsWith(".rtf"))
+            richTextBox.LoadFile(filePath);
+        else
+            if (filePath.EndsWith(".txt"))
+            {
+                richTextBox.Font = DocMgr.Properties.Settings.Default.DefaultFont; ;
+                richTextBox.Text = File.ReadAllText(filePath);
+            }
+            else
+            {
+                MessageBox.Show("Unsupported file type.");
+                return false;
+            }
+
+        return true;
+    }
+
     //// Diagnostic: write RTF to a temp file and show a short preview so you can inspect whether
     //// the RTF contains a \fonttbl and bold control words (\b).
     //private void InspectRtfIfNeeded(string rtf, string context)

@@ -591,13 +591,15 @@ namespace DocMgr
                 {
                     try
                     {
-                        if (CurrentFilePath.EndsWith(".rtf"))
-                            richTextBox.LoadFile(CurrentFilePath);
-                        else
-                            if (CurrentFilePath.EndsWith(".txt"))
-                                richTextBox.Text = File.ReadAllText(CurrentFilePath);
-                        else
-                            throw new Exception("Unsupported file type.");
+                        //if (CurrentFilePath.EndsWith(".rtf"))
+                        //    richTextBox.LoadFile(CurrentFilePath);
+                        //else
+                        //    if (CurrentFilePath.EndsWith(".txt"))
+                        //        richTextBox.Text = File.ReadAllText(CurrentFilePath);
+                        //else
+                        //    throw new Exception("Unsupported file type.");
+                        if (!RtfRichTextBox.LoadFileIntoRtfBox(richTextBox, CurrentFilePath))
+                            throw new Exception("");
                     }
                     catch (Exception ex)
                     {
@@ -1170,7 +1172,9 @@ namespace DocMgr
                 {                                   // Empty text and file exists.
                     using (RichTextBox rtb = new())
                     {
-                        rtb.LoadFile(CurrentFilePath);
+                        //rtb.LoadFile(CurrentFilePath);
+                        if (!RtfRichTextBox.LoadFileIntoRtfBox(rtb, CurrentFilePath))
+                            return;
 
                         if (rtb.Text.Length > 0)    // About to overwrite non-empty file with empty string?
                         {                           // Yes.  Warn user:

@@ -249,13 +249,18 @@ namespace DocMgr
             }
 
             //tempRTBox.LoadFile(pathToDoc);
-            if (pathToDoc.EndsWith(".rtf"))
-                richTextBox.LoadFile(pathToDoc);
-            else
-                if (pathToDoc.EndsWith(".txt"))
-                    richTextBox.Text = File.ReadAllText(pathToDoc);
-                else
-                    throw new Exception("Unsupported file type.");
+            //if (pathToDoc.EndsWith(".rtf"))
+            //    richTextBox.LoadFile(pathToDoc);
+            //else
+            //    if (pathToDoc.EndsWith(".txt"))
+            //        richTextBox.Text = File.ReadAllText(pathToDoc);
+            //    else
+            //        throw new Exception("Unsupported file type.");
+            if (!RtfRichTextBox.LoadFileIntoRtfBox(richTextBox, pathToDoc))
+            {
+                numMatches = 0;
+                return false;
+            }
 
             //string rtf = richTextBox.Rtf;
 
@@ -528,7 +533,17 @@ namespace DocMgr
                 if (CurrentDocPath.Length == 0)
                     return;
 
-                tempRTBox.LoadFile(CurrentDocPath);
+                //tempRTBox.LoadFile(CurrentDocPath);
+                //if (CurrentDocPath.EndsWith(".rtf"))
+                //    tempRTBox.LoadFile(CurrentDocPath);
+                //else
+                //    if (CurrentDocPath.EndsWith(".txt"))
+                //        tempRTBox.Text = File.ReadAllText(CurrentDocPath);
+                //    else
+                //        throw new Exception("Unsupported file type.");
+                if (!RtfRichTextBox.LoadFileIntoRtfBox(tempRTBox, CurrentDocPath))
+                    return;
+
                 DisplayedDoc = currentDoc.Value.docName;
             }
 
