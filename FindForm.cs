@@ -38,6 +38,7 @@ namespace DocMgr
         public enum SearchScope { CurrentDoc, CurrentProject, AllProjects };
         public static SearchScope CurrentScope = SearchScope.CurrentDoc;
         private System.Windows.Forms.Timer _clickTracker;
+        private bool Finding = false;
 
         Dictionary<string, string> projMap;     // Map project name to path.
         Doc Root;
@@ -103,6 +104,7 @@ namespace DocMgr
         private void buttonFind_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
+            Finding = true;
             labelFindResults.Text = "";
             labelInstanceOrder.Text = "";
             EnableResults(false);
@@ -116,6 +118,7 @@ namespace DocMgr
             {
                 labelFindResults.Visible = true;
                 labelFindResults.Text = "Not found.";
+                Finding = false; 
                 return;
             }
 
@@ -140,6 +143,7 @@ namespace DocMgr
                 buttonPrevious.Focus();
             }
 
+            Finding = false;
             Cursor.Current = Cursors.Default;
 
             //buttonNext_Click(null, null);
@@ -244,10 +248,18 @@ namespace DocMgr
                 return false;
             }
 
-            tempRTBox.LoadFile(pathToDoc);
-            string rtf = tempRTBox.Rtf;
+            //tempRTBox.LoadFile(pathToDoc);
+            if (pathToDoc.EndsWith(".rtf"))
+                richTextBox.LoadFile(pathToDoc);
+            else
+                if (pathToDoc.EndsWith(".txt"))
+                    richTextBox.Text = File.ReadAllText(pathToDoc);
+                else
+                    throw new Exception("Unsupported file type.");
 
-            FindMatchesInString(tempRTBox.Text, searchString, matchCase, matchWholeWord);
+            //string rtf = richTextBox.Rtf;
+
+            FindMatchesInString(richTextBox.Text, searchString, matchCase, matchWholeWord);
 
             if (Matches == null)
                 numMatches = 0;
@@ -902,6 +914,9 @@ namespace DocMgr
 
         private void ClickTracker_Tick(object sender, EventArgs e)
         {
+            if (Finding)
+                return;         // Ignore if find operation is in progress.
+
             // 2. Check if the Left Mouse Button is physically pressed down
             if (Control.MouseButtons == MouseButtons.Left)
             {
