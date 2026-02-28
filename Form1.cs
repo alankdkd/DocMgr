@@ -17,6 +17,7 @@ using SearchDialog = DocMgr.FindForm;
 
 namespace DocMgr
 {
+    public record DocumentReference(string ProjectPath, string DocName);
 
     public partial class DocMgr : Form
     {
@@ -46,7 +47,7 @@ namespace DocMgr
         
         static private PropertyGrid propertyGrid;
         static private MySettings settings;
-
+        static List<DocumentReference> prevDocs = new List<DocumentReference>();
 
         public class MySettings
         {
@@ -2489,16 +2490,17 @@ namespace DocMgr
             // Check for Ctrl + Tab combination
             if (keyData == (Keys.Control | Keys.Tab))
             {
-                MessageBox.Show("Ctrl-Tab Detected!");
+                
+                //MessageBox.Show("Ctrl-Tab Detected!");
                 return true;
             }
 
             // Check for Ctrl + Tab combination
-            if (keyData == (Keys.Shift | Keys.Tab))
-            {
-                MessageBox.Show("Shift-Tab Detected!");
-                return true;
-            }
+            //if (keyData == (Keys.Shift | Keys.Tab))
+            //{
+            //    MessageBox.Show("Shift-Tab Detected!");
+            //    return true;
+            //}
 
             // Call the base method for all other keys
             return base.ProcessCmdKey(ref msg, keyData);

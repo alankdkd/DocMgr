@@ -20,8 +20,8 @@ namespace DocMgr
         //List<int> listOffset;
         //List<int> listWidth;
         MatchCollection Matches;
-        List<(string docName, string projectPath)> DocList;
-        (string docName, string projectPath)? CurrentDoc = null;
+        List<DocumentReference> DocList;
+        DocumentReference? CurrentDoc = null;
         int CurrentDocNum = 0;
         string? CurrentProjectName;
         string? CurrentDocPath = null;
@@ -164,11 +164,11 @@ namespace DocMgr
         }
 
         // Get an int descriptor for doc with this name.
-        private int GetNumberOfDoc(string docName, List<(string docName, string projectPath)> docList)
+        private int GetNumberOfDoc(string docName, List<DocumentReference> docList)
         {
             int docNum = 0;
             foreach (var doc in docList)
-                if (doc.docName == docName)
+                if (doc.DocName == docName)
                     return docNum;
                 else
                     ++docNum;
@@ -176,14 +176,14 @@ namespace DocMgr
             return 0;           // Shouldn't happen.
         }
 
-        private void GetDocsInScope(object doclist)     // Get the doc/project pairs to process.
+        private void GetDocsInScope(List<DocumentReference> doclist)     // Get the doc/project pairs to process.
         {
             DocList = new();
 
             if (CurrentScope == SearchScope.CurrentDoc)
             {
                 if (DocName != "" && ProjName != "")
-                    DocList.Add(new(DocName, Root.DocPath));      // The only doc.
+                    DocList.Add(new(Root.DocPath, DocName));      // The only doc.
             }
             else
                 if (CurrentScope == SearchScope.CurrentProject)
@@ -196,9 +196,9 @@ namespace DocMgr
                 AddAllProjectsDocsToList(DocList);        // All projects.
         }
 
-        private List<(string docName, string projectPath)> GetDocsWithInstances(List<(string docName, string projectPath)> docList)
+        private List<DocumentReference> GetDocsWithInstances(List<DocumentReference> docList)
         {
-            List<(string docName, string projectPath)> docsWithList = new();    // With instances.
+            List<DocumentReference> docsWithList = new();    // With instances.
             HashSet<string> projectNames = new();                               // Proj-name set for summary.
             MatchCase = checkMatchCase.Checked;
             MatchWholeWord = checkMatchWholeWord.Checked;
@@ -221,26 +221,26 @@ namespace DocMgr
             return docsWithList;
         }
 
-        private bool DocContainsString((string docName, string projectPath) doc, string searchString,
+        private bool DocContainsString(DocumentReference doc, string searchString,
             bool matchCase, bool matchWholeWord, out int numMatches)
         {
             Doc? newDocRoot;
 
-            LoadProject(doc.projectPath, out newDocRoot);
+            LoadProject(doc.ProjectPath, out newDocRoot);
 
             if (newDocRoot == null)
             {
-                MessageBox.Show($"Warning: Project not found at {doc.projectPath} in DocContainsString().");
+                MessageBox.Show($"Warning: Project not found at {doc.ProjectPath} in DocContainsString().");
                 numMatches = 0;
                 return false;
             }
 
-            string pathToDoc = GetPathToDoc(doc.docName, newDocRoot);
+            string pathToDoc = GetPathToDoc(doc.DocName, newDocRoot);
 
             if (pathToDoc.Length == 0 || !File.Exists(pathToDoc))
             {
                 if (pathToDoc.Length == 0)
-                    MessageBox.Show($"Warning: Document {doc.docName} not found in project.");
+                    MessageBox.Show($"Warning: Document {doc.DocName} not found in project.");
                 else
                     MessageBox.Show($"Warning: Document not found at {pathToDoc}.");
 
@@ -264,14 +264,14 @@ namespace DocMgr
             return numMatches > 0;
         }
 
-        private void AddProjectToSet(HashSet<string> projectNames, (string docName, string projectPath) doc)
+        private void AddProjectToSet(HashSet<string> projectNames, DocumentReference doc)
         {
-            string projectName = Path.GetFileNameWithoutExtension(doc.projectPath);
+            string projectName = Path.GetFileNameWithoutExtension(doc.ProjectPath);
             projectNames.Add(projectName);
         }
 
         private string FormatFindResults(int totalMatches, HashSet<string> projectNames,
-            List<(string docName, string projectPath)> docsWithList)
+            List<DocumentReference> docsWithList)
         {
             StringBuilder sb = new();
 
@@ -305,7 +305,7 @@ namespace DocMgr
             return sb.ToString();
         }
 
-        private void AddProjectsDocsToList(List<(string docName, string projectPath)> docList, Doc project)
+        private void AddProjectsDocsToList(List<DocumentReference> docList, Doc project)
         {
             if (project.DocPath.Length == 0)
             {
@@ -314,10 +314,10 @@ namespace DocMgr
             }
 
             foreach (Doc doc in project.SubDocs)               // Add all of this project's docs to Doc List:
-                DocList.Add(new(doc.DocName, project.DocPath));
+                DocList.Add(new(project.DocPath, doc.DocName));
         }
 
-        private void AddAllProjectsDocsToList(List<(string docName, string projectPath)> docList)
+        private void AddAllProjectsDocsToList(List<DocumentReference> docList)
         {
             LoadProjectDlg LoadProj = new();                // Add all projects' docs to Doc List:
             projMap = LoadProjectDlg.GetProjMap();
@@ -492,7 +492,7 @@ namespace DocMgr
             }
         }
 
-        private void ShowDoc((string docName, string projectPath)? currentDoc)
+        private void ShowDoc(DocumentReference? currentDoc)
         {
             if (currentDoc == null)
             {
@@ -502,7 +502,7 @@ namespace DocMgr
 
             bool loadDoc = false;
 
-            if (Path.GetFileNameWithoutExtension(currentDoc.Value.projectPath) != CurrentProjectName)
+            if (Path.GetFileNameWithoutExtension(currentDoc.ProjectPath) != CurrentProjectName)
             {
                 loadDoc = true;                             // If loading project, need to load doc.
 
@@ -510,15 +510,15 @@ namespace DocMgr
                     return;
             }
 
-            if (currentDoc.Value.docName != DisplayedDoc)
+            if (currentDoc.DocName != DisplayedDoc)
             {
                 loadDoc = true;                             // If displayed doc different, load current.
-                mainForm.HighlightThisButton(currentDoc.Value.docName);
+                mainForm.HighlightThisButton(currentDoc.DocName);
             }
 
             if (loadDoc)
             {
-                CurrentDocPath = GetPathToDoc(currentDoc.Value.docName, CurrentProjectInfo);
+                CurrentDocPath = GetPathToDoc(currentDoc.DocName, CurrentProjectInfo);
 
                 if (CurrentDocPath.Length == 0)
                     return;
@@ -526,7 +526,7 @@ namespace DocMgr
                 if (!RtfRichTextBox.LoadFileIntoRtfBox(tempRTBox, CurrentDocPath))
                     return;
 
-                DisplayedDoc = currentDoc.Value.docName;
+                DisplayedDoc = currentDoc.DocName;
             }
 
             int searchStart = (DirectionForward) ? 0 : tempRTBox.Text.Length;
@@ -570,7 +570,7 @@ namespace DocMgr
 
             if (mainForm != null)
             {
-                mainForm.DocName.Text = currentDoc.Value.docName + ':';
+                mainForm.DocName.Text = currentDoc.DocName + ':';
                 mainForm.ProjectName.Text = Path.GetFileNameWithoutExtension(CurrentProjectInfo.DocPath);
             }
 
@@ -595,9 +595,9 @@ namespace DocMgr
             return "";                                          // Signal not found.
         }
 
-        private bool LoadCurrentProject((string docName, string projectPath)? currentDoc)
+        private bool LoadCurrentProject(DocumentReference? currentDoc)
         {
-            string projPath = currentDoc.Value.projectPath;
+            string projPath = currentDoc.ProjectPath;
             CurrentProjectName = Path.GetFileNameWithoutExtension(projPath);
 
             if (string.IsNullOrEmpty(projPath) || !File.Exists(projPath))
