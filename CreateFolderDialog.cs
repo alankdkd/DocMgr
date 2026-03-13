@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace DocMgr
 {
-    public partial class CreateFolderDialog : Form
+    public partial class CreateFolderDialog : AutoCloseBaseForm
     {
         internal string NewFolderPath { get; set; }
 

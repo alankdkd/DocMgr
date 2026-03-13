@@ -11,7 +11,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace DocMgr
 {
-    public partial class FormRenameDoc : Form
+    public partial class FormRenameDoc : AutoCloseBaseForm
     {
         string NewName, Extension;
         public string FolderForDoc;// { get => folderForDoc; set => folderForDoc = value; }

@@ -2,7 +2,7 @@
 
 namespace DocMgr
 {
-    public partial class LoadProjectDlg : Form
+    public partial class LoadProjectDlg : AutoCloseBaseForm
     {
         public static Dictionary<string, string> projMap;
         public string selectedPath = "";

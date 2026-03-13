@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace DocMgr
 {
-    public partial class PropertiesForm : Form
+    public partial class PropertiesForm : AutoCloseBaseForm
     {
         public PropertiesForm()
         {

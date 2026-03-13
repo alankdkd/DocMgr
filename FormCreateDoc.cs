@@ -13,7 +13,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DocMgr
 {
-    public partial class FormCreateDoc : Form
+    public partial class FormCreateDoc : AutoCloseBaseForm
     {
         string folderForDoc;
         string docName = "";

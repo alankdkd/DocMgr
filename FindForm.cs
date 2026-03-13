@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace DocMgr
 {
-    public partial class FindForm : Form
+    public partial class FindForm : AutoCloseBaseForm
     {
         RtfRichTextBox richTextBox, tempRTBox = new();
         string DocName, ProjName;
@@ -71,9 +71,9 @@ namespace DocMgr
             textString.Text = SearchText;
 
             // 1. Initialize the timer
-            _clickTracker = new System.Windows.Forms.Timer();
-            _clickTracker.Interval = 50; // Check every 50ms (fast enough to feel instant)
-            _clickTracker.Tick += ClickTracker_Tick;
+            //_clickTracker = new System.Windows.Forms.Timer();
+            //_clickTracker.Interval = 50; // Check every 50ms (fast enough to feel instant)
+            //_clickTracker.Tick += ClickTracker_Tick;
 
             KeyPreview = true;
             SetAttributes();
@@ -906,10 +906,10 @@ namespace DocMgr
         private void FindForm_Load(object sender, EventArgs e)
         {
             // 1. Start tracking as soon as the dialog is shown
-            _clickTracker.Start();
+            //_clickTracker.Start();
         }
 
-        private void ClickTracker_Tick(object sender, EventArgs e)
+        protected override void ClickTracker_Tick(object sender, EventArgs e)
         {
             if (Finding)
                 return;         // Ignore if find operation is in progress.
@@ -931,8 +931,8 @@ namespace DocMgr
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             // 6. Stop and clean up the timer
-            _clickTracker.Stop();
-            _clickTracker.Dispose();
+            //_clickTracker.Stop();
+            //_clickTracker.Dispose();
             base.OnFormClosed(e);
         }
     }
