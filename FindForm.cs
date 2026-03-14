@@ -15,7 +15,7 @@ namespace DocMgr
 {
     public partial class FindForm : AutoCloseBaseForm
     {
-        RtfRichTextBox richTextBox, tempRTBox = new();
+        RtfRichTextBox richTextBox, tempRTBox;
         string DocName, ProjName;
         //List<int> listOffset;
         //List<int> listWidth;
@@ -45,10 +45,22 @@ namespace DocMgr
         DocMgr mainForm;
         public string? DisplayedDoc = null;
 
+        // Add a minimal parameterless ctor so the WinForms designer can instantiate the form.
+        // Keep the ctor minimal — no runtime interactions.
+        public FindForm()
+        {
+            InitializeComponent();
+        }
 
+        // Runtime ctor: initialize normally but bail out early when in design mode.
         public FindForm(RtfRichTextBox box, Doc projectRoot, string docName, DocMgr callingForm)
         {
             InitializeComponent();
+
+            // If Visual Studio designer instantiates this form, avoid running runtime-only logic.
+            if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                return;
+
             this.KeyPreview = true;
             richTextBox = box;
             Root = projectRoot;
@@ -907,6 +919,7 @@ namespace DocMgr
         {
             // 1. Start tracking as soon as the dialog is shown
             //_clickTracker.Start();
+            tempRTBox = new();
         }
 
         protected override void ClickTracker_Tick(object sender, EventArgs e)
@@ -914,26 +927,12 @@ namespace DocMgr
             if (Finding)
                 return;         // Ignore if find operation is in progress.
 
-            // 2. Check if the Left Mouse Button is physically pressed down
-            if (Control.MouseButtons == MouseButtons.Left)
-            {
-                // 3. Get current mouse position relative to the screen
-                Point mousePos = Cursor.Position;
-
-                // 4. If the mouse is NOT inside the dialog's area, close it
-                if (!this.Bounds.Contains(mousePos))
-                {
-                    Close();
-                }
-            }
+            base.ClickTracker_Tick(sender, e);
         }
 
-        protected override void OnFormClosed(FormClosedEventArgs e)
-        {
-            // 6. Stop and clean up the timer
-            //_clickTracker.Stop();
-            //_clickTracker.Dispose();
-            base.OnFormClosed(e);
-        }
+        //protected override void OnFormClosed(FormClosedEventArgs e)
+        //{
+        //    base.OnFormClosed(e);
+        //}
     }
 }
