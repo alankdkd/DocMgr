@@ -43,7 +43,7 @@ public class RtfRichTextBox : RichTextBox
             return;
         }
 
-        IDataObject data = Clipboard.GetDataObject();
+        IDataObject data = GetClipboardObject();
         if (data == null) return;
 
         // Prefer raw RTF payload (may be available as string or MemoryStream)
@@ -117,7 +117,7 @@ public class RtfRichTextBox : RichTextBox
     }
     public static bool ContainsSingleHtmlImage()
     {
-        IDataObject dataObject = Clipboard.GetDataObject();
+        IDataObject dataObject = GetClipboardObject();
 
         if (dataObject == null)
         {
@@ -153,6 +153,26 @@ public class RtfRichTextBox : RichTextBox
 
         return false;
     }
+
+    /// <summary>
+    /// Get clipboard or null if exception.
+    /// </summary>
+    private static IDataObject GetClipboardObject()
+    {
+        IDataObject dataObject;
+        
+        try
+        {
+            dataObject = Clipboard.GetDataObject();
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+
+        return dataObject;
+    }
+
     private void ConvertHtmlToRtfAndPaste(string html)
     {
         // Wrap fragment in minimal HTML doc to ensure consistent rendering
@@ -299,7 +319,7 @@ public class RtfRichTextBox : RichTextBox
         else
             if (filePath.EndsWith(".txt"))
             {
-                richTextBox.Font = DocMgr.Properties.Settings.Default.DefaultFont; ;
+                richTextBox.Font = DocMgr.Properties.Settings.Default.DefaultFont;
                 richTextBox.Text = File.ReadAllText(filePath);
             }
             else

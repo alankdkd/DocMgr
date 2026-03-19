@@ -422,33 +422,6 @@ namespace DocMgr
                     return;
                 }
             }
-            //ORIG:
-            //if (moveMatchUp)
-            //    ++MatchOrderInDoc;
-            //else
-            //    --MatchOrderInDoc;
-
-            //if (MatchOrderInDoc == -1)
-            //{
-            //    --CurrentDocNum;
-
-            //    if (CurrentDocNum == -1)
-            //        CurrentDocNum = DocList.Count() - 1;
-
-            //    ShowDoc(DocList[CurrentDocNum]);
-            //    return;
-            //}
-            //else
-            //if (moveMatchUp  &&  MatchOrderInDoc == NumMatches)
-            //{
-            //    ++CurrentDocNum;
-
-            //    if (CurrentDocNum == DocList.Count)
-            //        CurrentDocNum = 0;
-
-            //    ShowDoc(DocList[CurrentDocNum]);
-            //    return;
-            //}
 
             Match match = Matches[MatchOrderInDoc];
             string value = match.Value;
