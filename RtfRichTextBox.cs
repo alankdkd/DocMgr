@@ -165,7 +165,7 @@ public class RtfRichTextBox : RichTextBox
         {
             dataObject = Clipboard.GetDataObject();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

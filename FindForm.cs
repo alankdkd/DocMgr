@@ -121,7 +121,7 @@ namespace DocMgr
             labelInstanceOrder.Text = "";
             EnableResults(false);
             SearchText = textString.Text;
-            GetDocsInScope(DocList);
+            GetDocsInScope();
             DocList = GetDocsWithInstances(DocList);
             buttonNext.Enabled = DocList.Count > 0;
             buttonPrevious.Enabled = DocList.Count > 0;
@@ -188,7 +188,7 @@ namespace DocMgr
             return 0;           // Shouldn't happen.
         }
 
-        private void GetDocsInScope(List<DocumentReference> doclist)     // Get the doc/project pairs to process.
+        private void GetDocsInScope()     // Get the doc/project pairs to process.
         {
             DocList = new();
 
@@ -868,16 +868,29 @@ namespace DocMgr
 
             if (e.Control && e.KeyCode == Keys.B)
             {
-                buttonPrevious_Click(null, null);
+                if (!buttonPrevious.Enabled)
+                    return;
+
+                    buttonPrevious_Click(null, null);
                 e.Handled = true;
             }
 
             if (e.KeyCode == Keys.F3)
             {
                 if (e.Shift)
+                {
+                    if (!buttonPrevious.Enabled)
+                        return;
+
                     buttonPrevious_Click(null, null);
+                }
                 else
+                {
+                    if (!buttonNext.Enabled)
+                        return;
+
                     buttonNext_Click(null, null);
+                }
 
                 e.Handled = true;
             }
