@@ -75,7 +75,7 @@ namespace DocMgr
             Cursor.Position = new Point(textString.Left + 10, textString.Top + 8);
 
             if (Location.X + Width > Screen.PrimaryScreen.WorkingArea.Width)    // Fix if off right edge:
-                Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - Width - 10, Location.Y);
+                Location = new Point(box.Left - Width - 10, Location.Y);
 
             if (richTextBox.SelectionLength > 0)
                 SearchText = richTextBox.SelectedText;
